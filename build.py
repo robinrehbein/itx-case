@@ -47,7 +47,7 @@ side_parts, (n_gpu_side, n_psu_side) = timed("Seitenwände", side_walls.build)
 front = timed("Front", panels.front)
 rear, (rear_d15, rear_gpu) = timed("Rückwand", panels.rear)
 mid_parts = timed("Mittelwand", midwall.build)
-plinth_parts, (pl_sides, pl_ends) = timed("Sockel", plinth.build)
+plinth_parts, a_pl = timed("Sockel", plinth.build)
 extra_parts, fit_parts = timed("Extras", extras.build)
 dummy_parts = timed("Dummies", dummies.build)
 
@@ -156,9 +156,9 @@ for p in all_printed:
 
 
 # --------------------------------------------------------------------------
-log("\n== Freie Querschnitte (Ø%.0f, Raster %.0f) ==" % (P.VENT_D, P.VENT_PITCH))
+log("\n== Freie Querschnitte (Ø%.1f, Raster %.1f; Sockel Ø%.1f) =="
+    % (P.VENT_D, P.VENT_PITCH, P.PLINTH_VENT_D))
 hex_ratio = math.pi * (P.VENT_D / 2) ** 2 / (P.VENT_PITCH ** 2 * math.sqrt(3) / 2)
-a_pl = hole_area(pl_sides) * 2 + hole_area(pl_ends) * 2
 a_fl = hole_area(floor.vent_points())
 a_gs = hole_area(side_walls.gpu_vent_points())
 # offener Anteil vor den GPU-Lüftern (Kartenfläche ohne Blechzone)
@@ -183,9 +183,9 @@ lines = [
     f"  Seitenwand GPU        {a_gs/100:7.0f} cm²  (vor der Karte {a_fan/gs_field*100:.1f} % offen)",
     f"  Seitenwand Netzteil   {a_ps/100:7.0f} cm²",
     "Abluft:",
-    f"  Rückwand D15          {a_rd/100:7.0f} cm²  (1x 140-mm-Lüfter frei: {fan140/100:.0f} cm²)",
+    f"  Rückwand Board-Kammer {a_rd/100:7.0f} cm²  (1x 140-mm-Lüfter frei: {fan140/100:.0f} cm²)",
     f"  Deckel GPU (top_vent) {a_top/100:7.0f} cm²",
-    f"  Rückwand GPU          {a_rg/100:7.0f} cm²  + Slotblech ~{a_open/100:.0f} cm²",
+    f"  Rückwand GPU-Kammer   {a_rg/100:7.0f} cm²  + Slotblech ~{a_open/100:.0f} cm²",
     f"Summen: Zuluft {(min(a_pl, a_fl) + a_gs + a_ps)/100:.0f} cm², "
     f"Abluft {(a_rd + a_top + a_rg + a_open)/100:.0f} cm²",
     f"Vergleich: 3x 95-mm-GPU-Lüfter ~{3*fan95/100:.0f} cm², 2x 140 mm D15 ~{2*fan140/100:.0f} cm²",

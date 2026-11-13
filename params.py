@@ -109,6 +109,10 @@ PLINTH_LIP_W = 6.0     # Bodenlippe innen (Gummifüße)
 PLINTH_LIP_T = 2.0
 PLINTH_R = CORNER_R - PLINTH_INSET
 PLINTH_TABS = [(100.0, "L"), (260.0, "L"), (100.0, "R"), (260.0, "R")]
+# Schraubpfosten und Fugenflansche stehen frei hinter dem Ring (Löcher bleiben durchgängig)
+PLINTH_POST_D = 11.0
+PLINTH_POST_OFF = 9.5      # Pfostenmitte ab Ring-Innenfläche -> 4 mm Luft dahinter
+PLINTH_FLANGE_GAP = 4.0    # Flansch ab Ring-Innenfläche
 
 # --------------------------------------------------------------------------
 # Lage der Komponenten
@@ -222,26 +226,35 @@ VGROOVE = 0.8         # Fase je Seite -> V-Nut 1.6 breit, 0.8 tief
 # --------------------------------------------------------------------------
 # Lüftung: runde Löcher im Wabenraster
 # --------------------------------------------------------------------------
-VENT_D = 4.0
-VENT_PITCH = 6.0
-VENT_EDGE = 1.0        # Mindeststeg zum Feldrand
-TOP_VENT = dict(x0=25.0, x1=335.0, y0=12.0, y1=80.0)   # Deckel über GPU
-PSU_VENT = dict(x0=PSU_X0 + 2, x1=PSU_X1 - 2, z0=PSU_Z0 + 2, z1=PSU_Z1 - 1)
-# GPU-Seitenwand: Raster 5.7 statt 6, damit vor der Karte >= 40 % offen bleiben (Ruling, README)
-GPU_SIDE_PITCH = 5.7
-GPU_SIDE_VENT = dict(x0=25.0, x1=333.0, z0=20.0, z1=188.0)
-REAR_D15_VENT = dict(y0=145.0, y1=248.0, z0=SOCKET_Z - COOLER_KEEP_Z, z1=196.0)
-REAR_GPU_VENT = dict(y0=22.0, y1=82.0, z0=GPU_RAIL_Z1 + 6.0, z1=196.0)
+# Optik wie Mac Studio: feine Löcher, dicht, große Felder mit runden Ecken, ohne Lücken.
+VENT_D = 3.2
+VENT_PITCH = 4.5       # Steg 1.3 mm, Feld theoretisch 45.9 % offen
+VENT_EDGE = 1.0        # Mindeststeg zum Feldrand / zu Ausschnitten
+# Felder, die über die Trennfuge laufen, liegen symmetrisch zu SPLIT_X (Spalte auf der Fuge)
+TOP_VENT = dict(x0=19.0, x1=331.0, y0=12.0, y1=80.0, r=14.0)   # Deckel über GPU
+GPU_SIDE_VENT = dict(x0=19.0, x1=331.0, z0=20.0, z1=184.0, r=14.0)
+PSU_VENT = dict(x0=PSU_X0 + 2, x1=PSU_X1 - 2, z0=PSU_Z0 + 2, z1=PSU_Z1 - 1, r=8.0)
+# Rückwand: ein Feld über die ganze ebene Fläche, Ausschnitte darin ausgespart
+REAR_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=TAB_Z_BOT[1] + 3.0,
+                 z1=TAB_Z_TOP[0] - 3.0, r=12.0)
+REAR_RAIL_CLEAR = 6.0  # über der GPU-Leiste frei (Lasche + Schraubenköpfe)
+# Sockelring: etwas größere Löcher (Engstelle der Bodenzuluft), drei Höhen, rundum
+PLINTH_VENT_D = 3.8
+PLINTH_VENT_PITCH = 5.0
+PLINTH_VENT_EDGE = 0.6
 
 # --------------------------------------------------------------------------
 # Front / Rückwand
 # --------------------------------------------------------------------------
 BUTTON_D = 16.2        # 16-mm-Vandalismus-Taster
 BUTTON_Y = FLAT_Y1 - 20.0
-BUTTON_Z = 25.0
-BUTTON_DEPTH = 28.0    # Bauraum hinter der Front
+# Taster sitzt frei über dem Netzteil (nicht davor): eigener Bauraum, Leitung zum
+# F_PANEL-Anschluss (PWR_SW) des Mainboards. Unten rechts wäre direkt am Netzteil.
+BUTTON_Z = INNER_H / 2
+BUTTON_DEPTH = 28.0    # Körper hinter der Front
+BUTTON_CABLE = 22.0    # dahinter frei für Anschlüsse und Kabelbogen
 USBC_W, USBC_H = 9.4, 3.8
-USBC_Z = 48.0
+USBC_Z = BUTTON_Z + 23.0
 
 C14_W, C14_H = 27.5, 19.8   # Schnapp-Einbau-Ausschnitt (Typ mit Schnapphaken, 1..2 mm Wand)
 C14_Y = 225.0

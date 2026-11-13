@@ -35,17 +35,23 @@ def io_window():
 
 
 def rear_vent_points():
+    """Ein Lochfeld über die ganze Rückwand (wie beim Mac Studio); I/O-Fenster,
+    Slotöffnung, GPU-Leiste und C14 sind mit gleichem Rand ausgespart.
+    Rückgabe getrennt nach Kammer: (Board-Kammer, GPU-Kammer)."""
     iy0, iy1, iz0, iz1 = io_window()
-    m = P.IO_KEEPOUT + 3.0
-    tabs = [(y - 8, y + 8, P.TAB_Z_TOP[0] - 4, 999) for y in P.REAR_TABS_Y_TOP]
+    m = P.IO_KEEPOUT + 0.5                    # ausgedünnte Zone um das I/O-Fenster
+    g = P.GPU_OPEN
+    cy0, cy1 = P.C14_Y - P.C14_W / 2, P.C14_Y + P.C14_W / 2
+    cz0, cz1 = P.C14_Z - P.C14_H / 2, P.C14_Z + P.C14_H / 2
     keep = [(iy0 - m, iy1 + m, iz0 - m, iz1 + m),
-            (P.C14_Y - P.C14_W / 2 - 6, P.C14_Y + P.C14_W / 2 + 6,
-             P.C14_Z - P.C14_H / 2 - 6, P.C14_Z + P.C14_H / 2 + 6)] + tabs
-    v = P.REAR_D15_VENT
-    d15 = hex_grid(v["y0"], v["y1"], v["z0"], v["z1"], keep)
-    g = P.REAR_GPU_VENT
-    gpu = hex_grid(g["y0"], g["y1"], g["z0"], g["z1"], keep)
-    return d15, gpu
+            (g["y0"], g["y1"], g["z0"], g["z1"]),
+            (g["y1"], iy0, g["z0"], g["z1"]),              # Steg zwischen den Ausschnitten
+            (-999, P.MID_Y0, P.GPU_RAIL_Z0, P.GPU_RAIL_Z1 + P.REAR_RAIL_CLEAR),
+            (cy0 - 4, cy1 + 4, cz0 - 4, cz1 + 4)]
+    v = P.REAR_VENT
+    pts = hex_grid(v["y0"], v["y1"], v["z0"], v["z1"], keep, corner_r=v["r"])
+    ym = (P.MID_Y0 + P.MID_Y1) / 2
+    return [q for q in pts if q[0] >= ym], [q for q in pts if q[0] < ym]
 
 
 def rear():

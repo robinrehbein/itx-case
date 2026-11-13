@@ -56,6 +56,8 @@ DIRS = {
     "right": (0, -1, 0),        # auf die rechte Seite (Board-Kammer)
     "top": (0, 0, -1),
     "front": (1, 0, 0),
+    "rear": (-1, 0, 0),
+    "iso_low": (1, 1, 0.9),     # von vorn links unten (Sockel und Boden)
 }
 
 
@@ -95,6 +97,10 @@ show(lambda o: o.Gruppe != "dummy")
 snap("01_gesamt_vorn")   # erster Aufruf wärmt die Ansicht an
 snap("01_gesamt_vorn")
 snap("02_gesamt_hinten", "iso_rear")
+snap("02b_seite_links", "left")
+snap("02c_rueckwand", "rear")
+snap("02d_front", "front")
+snap("02e_unten", "iso_low")
 
 # 2 Kammern offen (Deckel und Seitenwände ausgeblendet, Komponenten sichtbar)
 show(lambda o: not is_open_hidden(o))

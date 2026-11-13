@@ -3,7 +3,7 @@ Dome für Front-/Rück-/Mittelwand, Sockel für Netzteil-, Riser- und GPU-Halter
 import params as P
 from parts.common import (Spec, box, cyl_z, rrect_prism, hex_grid, holes_z, fuse_all,
                           cut_all, dome_floor, insert_down, insert_up, split_with_flanges,
-                          envelope_case)
+                          envelope_case, cut_holes_split)
 
 
 def dome_positions():
@@ -15,8 +15,8 @@ def dome_positions():
 
 
 def plinth_screw_positions():
-    yl = P.OUT_Y0 + P.PLINTH_INSET + P.PLINTH_T + 5.0
-    yr = P.OUT_Y1 - P.PLINTH_INSET - P.PLINTH_T - 5.0
+    yl = P.OUT_Y0 + P.PLINTH_INSET + P.PLINTH_T + P.PLINTH_POST_OFF
+    yr = P.OUT_Y1 - P.PLINTH_INSET - P.PLINTH_T - P.PLINTH_POST_OFF
     return [(x, yl if s == "L" else yr) for (x, s) in P.PLINTH_TABS]
 
 
@@ -29,18 +29,21 @@ def low_boss_positions():
 
 
 def vent_points():
+    """Lochfrei bleiben nur: der Streifen unter der Mittelwand, die Fugenflansche selbst
+    (2 x 4 mm), Dome und Schraubsockel."""
     i = P.PLINTH_INSET + P.PLINTH_T + 2.0
-    keep = [(-999, 999, P.MID_Y0 - 2, P.MID_Y1 + 2),
-            (P.SPLIT_X - 11, P.SPLIT_X + 11, -999, 999)]
+    keep = [(-999, 999, P.MID_Y0 - 1, P.MID_Y1 + 1),
+            (P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, -999, 999)]
+    rb = P.DOME_D / 2
     for (x, y) in dome_positions() + plinth_screw_positions() + low_boss_positions():
-        keep.append((x - 6.5, x + 6.5, y - 6.5, y + 6.5))
-    return hex_grid(P.OUT_X0 + i, P.OUT_X1 - i, P.OUT_Y0 + i, P.OUT_Y1 - i, keep)
+        keep.append((x - rb, x + rb, y - rb, y + rb))
+    return hex_grid(P.OUT_X0 + i, P.OUT_X1 - i, P.OUT_Y0 + i, P.OUT_Y1 - i, keep,
+                    corner_r=max(P.PLINTH_R - P.PLINTH_T - 2.0, 0.0), col_at=P.SPLIT_X)
 
 
 def build():
     plate = rrect_prism(P.OUT_X0, P.OUT_X1, P.OUT_Y0, P.OUT_Y1, P.CORNER_R, -P.T_FLOOR, 0)
     pts = vent_points()
-    plate = cut_all(plate, holes_z(pts, -P.T_FLOOR - 1, 1))
 
     rim = rrect_prism(0, P.INNER_L, 0, P.INNER_W, P.CORNER_RI, 0, P.RIM_H).cut(
         rrect_prism(P.RIM_W, P.INNER_L - P.RIM_W, P.RIM_W, P.INNER_W - P.RIM_W,
@@ -54,7 +57,7 @@ def build():
         adds.append(cyl_z(x, y, 0, P.LOW_BOSS_H, P.DOME_D / 2))
         cuts.append(insert_down(x, y, P.LOW_BOSS_H))
     for (x, y) in plinth_screw_positions():
-        adds.append(cyl_z(x, y, 0, 4.0, P.DOME_D / 2))
+        adds.append(cyl_z(x, y, 0, P.LOW_BOSS_H, P.DOME_D / 2))   # bleibt unter dem Netzteil-Halter
         cuts.append(insert_up(x, y, -P.T_FLOOR))
     shape = cut_all(fuse_all([plate] + adds), cuts)
 
@@ -62,6 +65,8 @@ def build():
             (P.MID_Y1 + 1.0, P.INNER_W - 11.0, 0.0, P.FLANGE_D)]
     bolts = [(30.0, 5.0), (70.0, 5.0), (120.0, 5.0), (200.0, 5.0), (245.0, 5.0)]
     a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_case())
+    a, b = cut_holes_split(a, b, P.SPLIT_X, [q[0] for q in pts],
+                           holes_z(pts, -P.T_FLOOR - 1, 0.5))
     col = (0.78, 0.78, 0.80)
     return [Spec("boden_vorn", a, col, explode=(-25, 0, -70), minutes=None),
             Spec("boden_hinten", b, col, explode=(25, 0, -70))], len(pts)

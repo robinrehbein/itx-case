@@ -131,35 +131,67 @@ def solid(shape):
 # --------------------------------------------------------------------------
 # Lochfelder
 # --------------------------------------------------------------------------
-def hex_grid(u0, u1, v0, v1, keep=(), d=None, pitch=None, edge=None):
+def _in_rrect(u, v, u0, u1, v0, v1, r):
+    if not (u0 - 1e-6 <= u <= u1 + 1e-6 and v0 - 1e-6 <= v <= v1 + 1e-6):
+        return False
+    r = min(r, (u1 - u0) / 2, (v1 - v0) / 2)
+    if r <= 0:
+        return True
+    cu = min(max(u, u0 + r), u1 - r)
+    cv = min(max(v, v0 + r), v1 - r)
+    return (u - cu) ** 2 + (v - cv) ** 2 <= r * r + 1e-6
+
+
+def _hex_core(a0, a1, b0, b1, p, anchor=None, odd=False):
+    """Wabenraster: Linien im Abstand p*sqrt(3)/2 entlang a, darauf Löcher im Abstand p
+    entlang b, jede zweite Linie um p/2 versetzt. anchor: eine Linie liegt genau auf a."""
+    da = p * math.sqrt(3) / 2
+    if anchor is None:
+        n = int((a1 - a0) / da + 1e-6) + 1
+        k0, base = 0, a0 + ((a1 - a0) - (n - 1) * da) / 2
+    else:
+        k0, base = -int(math.floor((anchor - a0) / da + 1e-6)), anchor
+    nb = int((b1 - b0) / p + 1e-6) + 1
+    bstart = b0 + ((b1 - b0) - (nb - 1) * p) / 2
+    out = []
+    k = k0
+    while base + k * da <= a1 + 1e-6:
+        b = bstart + (p / 2 if (k + (1 if odd else 0)) % 2 else 0.0)
+        while b <= b1 + 1e-6:
+            out.append((base + k * da, b))
+            b += p
+        k += 1
+    return out
+
+
+def hex_grid(u0, u1, v0, v1, keep=(), d=None, pitch=None, edge=None, corner_r=0.0,
+             col_at=None, col_odd=False):
     """Mittelpunkte eines Wabenrasters, symmetrisch im Feld (sauberer Rand).
-    keep: Rechtecke (u0,u1,v0,v1), die frei bleiben."""
+    keep: Rechtecke (u0,u1,v0,v1), die frei bleiben. corner_r: Eckradius des Feldes.
+    col_at=None: Lochreihen entlang u, in v versetzt.
+    col_at=u:    Lochspalten entlang v, eine Spalte genau auf u. So schneidet eine Trennfuge
+                 bei u nur Lochmitten – das Feld läuft ohne Lücke über die Fuge."""
     d = d or P.VENT_D
     pitch = pitch or P.VENT_PITCH
     edge = P.VENT_EDGE if edge is None else edge
     r = d / 2
-    ua, ub = u0 + r + edge, u1 - r - edge
-    va, vb = v0 + r + edge, v1 - r - edge
+    m = r + edge
+    ua, ub = u0 + m, u1 - m
+    va, vb = v0 + m, v1 - m
     if ub < ua or vb < va:
         return []
-    dv = pitch * math.sqrt(3) / 2
-    nrows = int((vb - va) // dv) + 1
-    vstart = va + ((vb - va) - (nrows - 1) * dv) / 2
-    n0 = int((ub - ua) // pitch) + 1
-    ustart = ua + ((ub - ua) - (n0 - 1) * pitch) / 2
+    if col_at is None:
+        raw = [(u, v) for (v, u) in _hex_core(va, vb, ua, ub, pitch)]
+    else:
+        raw = _hex_core(ua, ub, va, vb, pitch, anchor=col_at, odd=col_odd)
+    rc = max(corner_r - m, 0.0)
     pts = []
-    for i in range(nrows):
-        v = vstart + i * dv
-        u = ustart + (pitch / 2 if i % 2 else 0)
-        while u <= ub + 1e-6:
-            ok = True
-            for (a0, a1, b0, b1) in keep:
-                if a0 - r - edge < u < a1 + r + edge and b0 - r - edge < v < b1 + r + edge:
-                    ok = False
-                    break
-            if ok:
-                pts.append((u, v))
-            u += pitch
+    for (u, v) in raw:
+        if not _in_rrect(u, v, ua, ub, va, vb, rc):
+            continue
+        if any(a0 - m < u < a1 + m and b0 - m < v < b1 + m for (a0, a1, b0, b1) in keep):
+            continue
+        pts.append((u, v))
     return pts
 
 
@@ -288,3 +320,12 @@ def split_with_flanges(shape, xs, ribs, bolts, envelope=None, side_b_nut=True):
     a = solid(cut_all(a, cut_a))
     b = solid(cut_all(b, cut_b))
     return a, b
+
+
+def cut_holes_split(a, b, xs, pts_x, tools, r=None):
+    """Löcher erst nach dem Teilen schneiden (V-Nut bleibt eine saubere Fase).
+    Löcher auf der Fuge werden zu Halblöchern in beiden Hälften."""
+    r = (P.VENT_D / 2) if r is None else r
+    ta = [t for x, t in zip(pts_x, tools) if x - r < xs]
+    tb = [t for x, t in zip(pts_x, tools) if x + r > xs]
+    return solid(cut_all(a, ta)), solid(cut_all(b, tb))

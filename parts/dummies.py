@@ -53,7 +53,9 @@ def riser():
 
 
 def keepouts():
-    btn = cyl_x(P.BUTTON_Y, P.BUTTON_Z, 0, P.BUTTON_DEPTH, 11.0)
+    # Körper + Mutter, dahinter Raum für Anschlüsse und Leitung zum Mainboard (F_PANEL)
+    btn = cyl_x(P.BUTTON_Y, P.BUTTON_Z, 0, P.BUTTON_DEPTH, 11.0).fuse(
+        cyl_x(P.BUTTON_Y, P.BUTTON_Z, P.BUTTON_DEPTH, P.BUTTON_DEPTH + P.BUTTON_CABLE, 7.0))
     c14 = box(P.INNER_L - P.C14_DEPTH, P.INNER_L, P.C14_Y - 15, P.C14_Y + 15,
               P.C14_Z - 12, P.C14_Z + 12)
     return [Spec("dummy_taster", btn, (0.6, 0.6, 0.6), group="dummy", printable=False),

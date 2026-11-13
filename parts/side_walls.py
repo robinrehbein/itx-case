@@ -3,7 +3,7 @@ Unten im Randfalz des Bodens, oben mit Magneten 10x3 im Deckel gehalten.
 Links: Lochfeld vor den GPU-Lüftern. Rechts: Lochfeld vor dem Netzteil."""
 import params as P
 from parts.common import (Spec, box, rrect_prism, wedge_x, hex_grid, holes_y, cyl_z, fuse_all,
-                          cut_all, split_with_flanges, envelope_case, BIG)
+                          cut_all, split_with_flanges, envelope_case, cut_holes_split, BIG)
 
 H = P.INNER_H
 
@@ -14,7 +14,8 @@ def ring():
     return outer.cut(inner)
 
 
-SIDE_RIB_Z = [(P.RIM_H + 0.5, 24.0), (186.0, H - 0.5)]   # kurze Flanschpaare oben/unten
+# kurze Flanschpaare unter und über dem Lochfeld (das Feld läuft über die Fuge durch)
+SIDE_RIB_Z = [(P.RIM_H + 0.5, 18.0), (195.0, H - 0.5)]
 
 
 def side_ribs(side):
@@ -40,20 +41,22 @@ def side_ribs(side):
 
 
 def seam_keep():
-    k = [(P.SPLIT_X - 1.5, P.SPLIT_X + 1.5, -999, 999)]
-    k += [(P.SPLIT_X - P.FLANGE_T - 1, P.SPLIT_X + P.FLANGE_T + 1, z0 - 1, z1 + 1)
-          for (z0, z1) in SIDE_RIB_Z]
-    return k
+    """Nur die Flansche selbst (inkl. Stützkeil) bleiben lochfrei."""
+    d = P.FLANGE_D
+    (lz0, lz1), (uz0, uz1) = SIDE_RIB_Z
+    return [(P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, 0.0, lz1),
+            (P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, uz0 - d - 1, uz1)]
 
 
 def gpu_vent_points():
     v = P.GPU_SIDE_VENT
-    return hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], seam_keep(), pitch=P.GPU_SIDE_PITCH)
+    return hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], seam_keep(), corner_r=v["r"],
+                    col_at=P.SPLIT_X)
 
 
 def psu_vent_points():
     v = P.PSU_VENT
-    return hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], seam_keep())
+    return hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], seam_keep(), corner_r=v["r"])
 
 
 def magnet_boss(x, side):
@@ -79,9 +82,9 @@ def build():
     right = r.common(box(-BIG, BIG, P.FLAT_Y1, BIG, -BIG, BIG))
 
     gpts = gpu_vent_points()
-    left = cut_all(left, holes_y(gpts, P.OUT_Y0 - 1, 1))
     ppts = psu_vent_points()
-    right = cut_all(right, holes_y(ppts, P.INNER_W - 1, P.OUT_Y1 + 1))
+    vents = {"L": (gpts, holes_y(gpts, P.OUT_Y0 - 1, 0.5)),
+             "R": (ppts, holes_y(ppts, P.INNER_W - 0.5, P.OUT_Y1 + 1))}
 
     out = []
     col = (0.70, 0.71, 0.74)
@@ -96,6 +99,8 @@ def build():
         ribs = side_ribs(side)
         bolts = [(yb, (z0 + z1) / 2) for (z0, z1) in SIDE_RIB_Z]
         a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_case())
+        pts, tools = vents[side]
+        a, b = cut_holes_split(a, b, P.SPLIT_X, [q[0] for q in pts], tools)
         name = "seite_links" if side == "L" else "seite_rechts"
         ey = -130 if side == "L" else 130
         out.append(Spec(name + "_vorn", a, col, explode=(-25, ey, 0)))
