@@ -19,7 +19,7 @@ import MeshPart  # noqa: E402
 
 import params as P  # noqa: E402
 from parts import floor, lid, side_walls, panels, midwall, plinth, extras, dummies  # noqa: E402
-from parts.common import hole_area  # noqa: E402
+from parts.common import hole_area, VGROOVE_LOG  # noqa: E402
 
 OUT = os.path.join(ROOT, "out")
 QUICK = os.environ.get("QUICK") == "1"     # QUICK=1: ohne STL/STEP-Export
@@ -56,6 +56,13 @@ assembly_printed = case_parts + [p for p in extra_parts if p.group == "extra"]
 all_printed = case_parts + extra_parts + fit_parts
 
 errors, warnings = [], []
+
+log("\n== V-Nut an den Trennstellen ==")
+split_names = [p.name for p in floor_parts + lid_parts + side_parts + plinth_parts]
+for name, (side, n, how) in zip(split_names, VGROOVE_LOG):
+    log(f"  {name:<22} {n:2d} Kanten  {how}")
+    if how != "V-Fase":
+        warnings.append(f"{name}: {how}")
 
 # --------------------------------------------------------------------------
 log("\n== Gültigkeit ==")

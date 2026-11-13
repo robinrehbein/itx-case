@@ -1,13 +1,25 @@
 == Bauteile ==
-  Boden                          13.4 s
-  Deckel                          2.3 s
-  Seitenwände                    11.6 s
+  Boden                          14.1 s
+  Deckel                          2.5 s
+  Seitenwände                    11.8 s
   Front                           0.0 s
   Rückwand                        1.4 s
   Mittelwand                      0.1 s
   Sockel                          1.4 s
-  Extras                          0.5 s
+  Extras                          0.6 s
   Dummies                         0.0 s
+
+== V-Nut an den Trennstellen ==
+  boden_vorn              3 Kanten  V-Fase
+  boden_hinten            3 Kanten  V-Fase
+  deckel_vorn             3 Kanten  V-Fase
+  deckel_hinten           3 Kanten  V-Fase
+  seite_links_vorn        1 Kanten  V-Fase
+  seite_links_hinten      1 Kanten  V-Fase
+  seite_rechts_vorn       1 Kanten  V-Fase
+  seite_rechts_hinten     1 Kanten  V-Fase
+  sockel_vorn             6 Kanten  V-Fase
+  sockel_hinten           6 Kanten  V-Fase
 
 == Gültigkeit ==
   ok
@@ -72,4 +84,4 @@
   /Users/robinrehbein/Code/itx-case/out/assembly.FCStd
 
 == Ergebnis ==
-  OK – 98 s
+  OK – 100 s

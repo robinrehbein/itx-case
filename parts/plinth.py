@@ -53,10 +53,10 @@ def build():
     adds = [a.common(clip) for a in adds]
     shape = cut_all(fuse_all([shape] + adds), hcuts)
 
-    zr0, zr1 = Z0 + P.PLINTH_LIP_T, Z1
+    zr0, zr1 = Z0, Z1   # Flansche stehen auf dem Bett
     ribs = [(y0 + t - 1, y0 + t + P.FLANGE_D, zr0, zr1),
             (y1 - t - P.FLANGE_D, y1 - t + 1, zr0, zr1)]
-    zc = (zr0 + zr1) / 2
+    zc = (Z0 + P.PLINTH_LIP_T + Z1) / 2
     bolts = [(y0 + t + P.FLANGE_D / 2, zc), (y1 - t - P.FLANGE_D / 2, zc)]
     a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_plinth())
     col = (0.30, 0.30, 0.32)

@@ -8,6 +8,7 @@ import params as P
 
 V = App.Vector
 BIG = 5000.0
+VGROOVE_LOG = []   # (Teil-x, Kanten, Methode) für den Bericht
 
 
 class Spec:
@@ -242,22 +243,27 @@ def vgroove(piece, xs, envelope, size=None):
         p = e.valueAt(0.5 * (e.FirstParameter + e.LastParameter))
         if _on_envelope(p, env_faces):
             edges.append(e)
+    side = "A" if piece.BoundBox.XMin < xs - 1e-3 else "B"
     if not edges:
+        VGROOVE_LOG.append((side, 0, "keine Außenkante"))
         return piece
     try:
         res = piece.makeChamfer(size, edges)
         if res.isValid() and res.Volume > 0:
+            VGROOVE_LOG.append((side, len(edges), "V-Fase"))
             return res
     except Exception:
         pass
     # Rückfall: rechteckige Schattenfuge
     inner = envelope.makeOffsetShape(-size, 0.01)
     notch = envelope.cut(inner).common(box(xs - size, xs + size, -BIG, BIG, -BIG, BIG))
+    VGROOVE_LOG.append((side, len(edges), "Rechteckfuge (Rückfall)"))
     return solid(piece.cut(notch))
 
 
 def split_with_flanges(shape, xs, ribs, bolts, envelope=None, side_b_nut=True):
-    """Teilt bei x = xs. ribs: Querschnitte (y0,y1,z0,z1) der Flansche, bolts: (y,z).
+    """Teilt bei x = xs. ribs: Querschnitte (y0,y1,z0,z1) der Flansche oder Funktionen
+    f(x0, x1) -> Körper, bolts: (y,z).
     Gibt (A, B) zurück, A = vorn (x < xs)."""
     a = solid(shape.common(box(-BIG, xs, -BIG, BIG, -BIG, BIG)))
     b = solid(shape.common(box(xs, BIG, -BIG, BIG, -BIG, BIG)))
@@ -265,8 +271,12 @@ def split_with_flanges(shape, xs, ribs, bolts, envelope=None, side_b_nut=True):
         a = vgroove(a, xs, envelope)
         b = vgroove(b, xs, envelope)
     t = P.FLANGE_T
-    rib_a = [box(xs - t, xs, y0, y1, z0, z1) for (y0, y1, z0, z1) in ribs]
-    rib_b = [box(xs, xs + t, y0, y1, z0, z1) for (y0, y1, z0, z1) in ribs]
+
+    def rib(r, x0, x1):
+        return r(x0, x1) if callable(r) else box(x0, x1, *r)
+
+    rib_a = [rib(r, xs - t, xs) for r in ribs]
+    rib_b = [rib(r, xs, xs + t) for r in ribs]
     a = solid(fuse_all([a] + rib_a))
     b = solid(fuse_all([b] + rib_b))
     cut_a, cut_b = [], []

@@ -31,6 +31,7 @@ T_LID = 5.0
 T_MID = 5.0         # Mittelwand
 CORNER_R = 22.0     # Grundriss-Eckradius außen
 LID_EDGE_R = 2.5    # Rundung Deckel-Oberkante
+LID_EDGE_BED_CHAMFER = 1.0  # davon die äußersten 1 mm als 45°-Fase (liegt auf dem Druckbett)
 
 # --------------------------------------------------------------------------
 # Komponenten

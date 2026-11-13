@@ -31,7 +31,9 @@ def build():
     plate = rrect_prism(P.OUT_X0, P.OUT_X1, P.OUT_Y0, P.OUT_Y1, P.CORNER_R, P.INNER_H, TOP)
     top_edges = [e for e in plate.Edges
                  if abs(e.BoundBox.ZMin - TOP) < 1e-6 and abs(e.BoundBox.ZMax - TOP) < 1e-6]
-    plate = plate.makeFillet(P.LID_EDGE_R, top_edges)
+    # Rundung oben; die ersten 1 mm auf dem Bett als 45°-Fase, damit die Kante druckbar bleibt
+    plate = plate.makeFillet(P.LID_EDGE_R, top_edges).common(
+        plate.makeChamfer(P.LID_EDGE_BED_CHAMFER, top_edges))
     pts = vent_points()
     plate = cut_all(plate, holes_z(pts, P.INNER_H - 1, TOP + 1))
 

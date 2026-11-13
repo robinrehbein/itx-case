@@ -17,6 +17,28 @@ def ring():
 SIDE_RIB_Z = [(P.RIM_H + 0.5, 24.0), (186.0, H - 0.5)]   # kurze Flanschpaare oben/unten
 
 
+def side_ribs(side):
+    """Flansche stützenfrei für den stehenden Druck: unten bis aufs Bett (neben dem
+    Randfalz), oben mit 45°-Keil darunter."""
+    d = P.FLANGE_D
+    (lz0, lz1), (uz0, uz1) = SIDE_RIB_Z
+    if side == "L":
+        yw, yi, yr = -1.0, d, P.RIM_W + 0.5          # Wand, innen, neben dem Falz
+    else:
+        yw, yi, yr = P.INNER_W + 1.0, P.INNER_W - d, P.INNER_W - P.RIM_W - 0.5
+    ya, yb = sorted((yw, yi))
+    yra, yrb = sorted((yr, yi))
+
+    def lower(x0, x1):
+        return box(x0, x1, ya, yb, lz0, lz1).fuse(box(x0, x1, yra, yrb, 0.0, lz1))
+
+    def upper(x0, x1):
+        w = wedge_x(x0, x1, [(yw, uz0 - d - 1), (yw, uz0), (yi, uz0)])
+        return box(x0, x1, ya, yb, uz0, uz1).fuse(w)
+
+    return [lower, upper]
+
+
 def seam_keep():
     k = [(P.SPLIT_X - 1.5, P.SPLIT_X + 1.5, -999, 999)]
     k += [(P.SPLIT_X - P.FLANGE_T - 1, P.SPLIT_X + P.FLANGE_T + 1, z0 - 1, z1 + 1)
@@ -70,11 +92,8 @@ def build():
             adds.append(b)
             cuts.append(p)
         shape = cut_all(fuse_all([shape] + adds), cuts)
-        if side == "L":
-            ry0, ry1, yb = -1.0, P.FLANGE_D, P.FLANGE_D / 2
-        else:
-            ry0, ry1, yb = P.INNER_W - P.FLANGE_D, P.INNER_W + 1.0, P.INNER_W - P.FLANGE_D / 2
-        ribs = [(ry0, ry1, z0, z1) for (z0, z1) in SIDE_RIB_Z]
+        yb = P.FLANGE_D / 2 if side == "L" else P.INNER_W - P.FLANGE_D / 2
+        ribs = side_ribs(side)
         bolts = [(yb, (z0 + z1) / 2) for (z0, z1) in SIDE_RIB_Z]
         a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_case())
         name = "seite_links" if side == "L" else "seite_rechts"

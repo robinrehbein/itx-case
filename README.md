@@ -111,35 +111,42 @@ Einschmelzmuttern mit einer Lötspitze bei ca. 245 °C setzen.
 
 ## Montage-Reihenfolge
 
+Die Reihenfolge folgt der Zugänglichkeit der Schrauben. Die Deckelschrauben der Board-Kammer
+sitzen hinter dem Board bzw. über dem I/O-Block und gehen nur bei leerer Kammer. Die
+GPU-Lasche wird von oben verschraubt, also vor dem Deckel.
+
 1. **Passtest:** `passtest_board` mit dem Board verschrauben (Muttern hinten), `passtest_rueckwand`
    über die Zapfen stecken. Prüfen: I/O-Blende rastet im Fenster ein. Riser einstecken, Karte mit
    Slotblech an die Leiste setzen: Die Lasche muss auf der Leiste aufliegen, und die Karte darf
    nicht an der Leiste anstoßen. Abweichungen in `params.py` korrigieren (`ITX_HOLE_C`,
    `IO_FROM_BOTTOM`, `BRACKET_TAB_ABOVE_FINGERS`, `GPU_RAIL_H`).
-2. **Einschmelzmuttern** in alle Dome und Bossen setzen (Boden von oben, Plinth-Bossen von unten,
-   Deckel von unten, Mittelwand-Abstandshalter, Netzteil-Halterpfosten).
+2. **Einschmelzmuttern** in alle Dome und Bossen setzen: Boden von oben, Sockelbossen von unten,
+   Deckel von unten, Abstandshalter der Mittelwand, Pfosten des Netzteil-Halters.
 3. **Magnete** in Deckel und Seitenwände kleben (Sekundenkleber oder Epoxid). Vorher die Polung
    festlegen: Deckel-Magnete alle mit Nordpol nach unten, Seitenwand-Magnete mit Südpol nach oben.
 4. **Hälften verschrauben:** Boden, Deckel, Sockel, Mittelwand und beide Seitenwände jeweils an den
-   Flanschen mit M3 × 12 und Mutter. V-Nut außen sauber ausrichten, erst dann anziehen.
+   Flanschen mit M3 × 12 und Mutter. Die V-Nut außen sauber ausrichten, erst dann anziehen.
 5. **Sockel unter den Boden** schrauben (4 × M3 × 12 von unten), Gummifüße auf die Lippe kleben.
-6. **Riser-Halter, GPU-Stütze und Netzteil-Halter** auf den Boden schrauben (die Langlöcher
-   zunächst nur leicht anziehen).
-7. **Front** (Taster vorher einbauen) und **Rückwand** (C14 vorher einschnappen) in den Randfalz
-   setzen und unten über die Laschen in die Bodendome schrauben.
-8. **Mittelwand** einsetzen und unten verschrauben. Das Board mit montiertem NH-D15 (Lüfter
-   blasen nach hinten) auf die Abstandshalter schrauben, Riser vorher in den Slot stecken und das
-   Kabel unten durch die Mittelwand führen.
-9. **Netzteil** flach auf den Halter legen (Lüfter nach unten, Rückseite zur rechten Seitenwand),
-   C14-Verlängerung einstecken, Bügel überlegen und seitlich verschrauben.
-10. **GPU:** Riserbuchse auf den Träger schrauben, Höhe und Länge über die Langlöcher einstellen,
-    Karte einstecken, Lasche auf die Leiste schrauben (Mutter im Kanal vorher an die Slotposition
-    schieben), GPU-Stütze unter die Kartenvorderkante schieben.
-11. **Kabel** oben vorn durch die Mittelwand ziehen, mit dem Kabelkamm ordnen.
-12. **Deckel** aufsetzen und von innen über die Laschen von Front, Rückwand und Mittelwand
-    verschrauben.
+6. **Halter auf den Boden:** Riser-Halter und GPU-Stütze (Langlöcher nur leicht anziehen),
+   Netzteil-Halter. Netzteil flach auflegen (Lüfter nach unten, Rückseite zur rechten Seitenwand),
+   Bügel überlegen und seitlich verschrauben. Die vordere Bügelschraube geht nur, solange die
+   Front noch nicht montiert ist.
+7. **Front** (Taster vorher einbauen) und **Rückwand** (C14 vorher einschnappen) an den Randfalz
+   stellen und unten über die Laschen in die Bodendome schrauben. C14-Verlängerung ins Netzteil.
+8. **Mittelwand** einsetzen und unten verschrauben.
+9. **GPU-Kammer:** Riserkabel durch die untere Durchführung der Mittelwand fädeln (der Stecker
+   bleibt in der Board-Kammer). Riserbuchse auf den Träger schrauben, Höhe und Länge über die
+   Langlöcher einstellen. Karte einstecken, M3-Mutter im Kanal der Leiste an die Slotposition
+   schieben, Lasche von oben verschrauben. GPU-Stütze unter die Kartenvorderkante schieben und
+   festziehen. Stromkabel oben vorn durch die Mittelwand führen, mit dem Kabelkamm ordnen.
+10. **Deckel** aufsetzen und von innen über die Laschen verschrauben: 3 × Front, 2 × Rückwand,
+    3 × Mittelwand. Die Board-Kammer ist dabei noch leer.
+11. **Board** (ohne Kühler) auf die Abstandshalter schrauben, Riserstecker in den Slot.
+12. **NH-D15** am Board montieren (Lüfter blasen nach hinten), Kabel anschließen.
 13. **Seitenwände** unten in den Randfalz stellen und oben andrücken: Die Magnete halten sie.
     Zum Öffnen oben nach außen kippen und abheben.
+
+Zum Abnehmen des Deckels müssen Kühler und Board wieder heraus (Schritte 12 → 10 rückwärts).
 
 ## Luftstrom und freie Querschnitte
 
@@ -154,6 +161,9 @@ Löcher Ø4 im Wabenraster mit 6 mm Abstand (theoretisch 40,3 % offen).
 | **Abluft** Rückwand hinter dem D15 | 56 cm² | ein 140-mm-Lüfter hat ca. 139 cm² freie Fläche |
 | Deckel über der GPU (`TOP_VENT`) | 69 cm² | |
 | Rückwand GPU | 12 cm² + ca. 29 cm² | Lochfeld plus Slotblech |
+
+Die zwei Lochreihen im 12 mm hohen Sockel lassen oben und unten nur 0,4 mm Steg. Das ist
+druckbar, wirkt aber knapp. Mit `PLINTH_H = 16` werden die Stege breiter und es gibt mehr Zuluft.
 
 Engstellen: Die Bodenzuluft hängt am Sockelring, und hinter dem D15 bleibt wegen des
 I/O-Fensters nur ein Teil der Rückwand für Löcher. Wer mehr Luft braucht, stellt
@@ -175,6 +185,13 @@ I/O-Fensters nur ein Teil der Rückwand für Löcher. Wer mehr Luft braucht, ste
   von der Leiste und der Mittelwand-Nachbarschaft.
 - **Netzteil 25 mm vor der Seitenwand**, damit ein gewinkelter C13-Stecker in die Netzteilbuchse
   passt.
+- **Deckelkante: Rundung r 2,5 mit 1 mm 45°-Fase am Rand.** Der Deckel liegt mit der Sichtseite
+  auf dem Bett. Eine reine Rundung würde dort in den ersten Schichten ausfransen. Die Fase ist
+  nur von unten sichtbar (`LID_EDGE_BED_CHAMFER = 0` gibt die reine Rundung zurück).
+- **Trennflansche stützenfrei:** An den Seitenwänden reicht das untere Flanschpaar bis aufs Bett
+  (neben dem Randfalz), das obere hat einen 45°-Keil. Die Sockelflansche stehen auf dem Bett.
+- **V-Nut** an allen Außenkanten der Trennstellen als 0,8-mm-Fase je Hälfte (`out/report.txt`
+  listet die Kanten pro Teil).
 - **Gemeinsame Trennstelle x = 175 mm** für Boden, Deckel, Sockel, Mittelwand und Seitenwände.
   Alle Fugen liegen außen in einer Linie.
 
