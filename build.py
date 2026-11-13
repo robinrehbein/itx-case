@@ -2,6 +2,10 @@
 
 Erzeugt out/step/*.step (Montagelage), out/stl/*.stl (Druckorientierung),
 out/assembly.FCStd (mit Dummies) und out/report.txt. Exit-Code != 0 bei Fehlern.
+
+Die Teile entstehen in Modellkoordinaten (y links -> rechts, Linkssystem) und werden
+hier an der Ebene y = INNER_W / 2 gespiegelt, damit sie im rechtshändigen FreeCAD-Raum
+und in STEP/STL die richtige Händigkeit haben (siehe params.py).
 """
 import math
 import os
@@ -54,6 +58,20 @@ dummy_parts = timed("Dummies", dummies.build)
 case_parts = floor_parts + lid_parts + side_parts + [front, rear] + mid_parts + plinth_parts
 assembly_printed = case_parts + [p for p in extra_parts if p.group == "extra"]
 all_printed = case_parts + extra_parts + fit_parts
+
+
+def to_freecad(p):
+    """Modell -> FreeCAD-Raum. Drehungen der Druckorientierung werden mitgespiegelt
+    (Achse gespiegelt, Winkel umgekehrt), damit dieselbe Fläche auf dem Bett liegt."""
+    vol = p.shape.Volume
+    p.shape = p.shape.mirror(App.Vector(0, P.INNER_W / 2, 0), App.Vector(0, 1, 0))
+    if abs(p.shape.Volume - vol) > 1e-3 * max(vol, 1.0):
+        raise RuntimeError(f"{p.name}: Spiegelung verändert das Volumen")
+    p.print_rot = [((a[0], -a[1], a[2]), -ang) for a, ang in p.print_rot]
+    p.explode = (p.explode[0], -p.explode[1], p.explode[2])
+
+
+timed("Spiegeln (Händigkeit)", lambda: [to_freecad(p) for p in all_printed + dummy_parts])
 
 errors, warnings = [], []
 
@@ -175,9 +193,12 @@ g = P.GPU_OPEN
 a_open = (g["y1"] - g["y0"]) * (g["z1"] - g["z0"]) * 0.5   # Slotblech ~50 % offen
 fan140 = math.pi * (70 ** 2 - 22 ** 2)
 fan95 = math.pi * (47.5 ** 2 - 14 ** 2)
+front_board, front_gpu, _ = panels.front_vent_points()
+a_fb, a_fg = hole_area(front_board), hole_area(front_gpu)
 lines = [
     f"Wabenfeld offen (theoretisch): {hex_ratio*100:.1f} %",
     "Zuluft:",
+    f"  Front Board-Kammer    {a_fb/100:7.0f} cm²  (gerade vor dem CPU-Kühler)",
     f"  Sockelring            {a_pl/100:7.0f} cm²  (Engstelle der Bodenzuluft)",
     f"  Boden (über Sockel)   {a_fl/100:7.0f} cm²",
     f"  Seitenwand GPU        {a_gs/100:7.0f} cm²  (vor der Karte {a_fan/gs_field*100:.1f} % offen)",
@@ -186,8 +207,9 @@ lines = [
     f"  Rückwand Board-Kammer {a_rd/100:7.0f} cm²  (1x 140-mm-Lüfter frei: {fan140/100:.0f} cm²)",
     f"  Deckel GPU (top_vent) {a_top/100:7.0f} cm²",
     f"  Rückwand GPU-Kammer   {a_rg/100:7.0f} cm²  + Slotblech ~{a_open/100:.0f} cm²",
-    f"Summen: Zuluft {(min(a_pl, a_fl) + a_gs + a_ps)/100:.0f} cm², "
-    f"Abluft {(a_rd + a_top + a_rg + a_open)/100:.0f} cm²",
+    f"  Front GPU-Kammer      {a_fg/100:7.0f} cm²",
+    f"Summen: Zuluft {(min(a_pl, a_fl) + a_gs + a_ps + a_fb)/100:.0f} cm², "
+    f"Abluft {(a_rd + a_top + a_rg + a_open + a_fg)/100:.0f} cm²",
     f"Vergleich: 3x 95-mm-GPU-Lüfter ~{3*fan95/100:.0f} cm², 2x 140 mm D15 ~{2*fan140/100:.0f} cm²",
 ]
 for line in lines:
@@ -199,6 +221,10 @@ if a_fan / gs_field < 0.40:
 log("\n== Maße ==")
 for k, val in P.summary().items():
     log(f"  {k}: {val}")
+r_sq, r_bend = dummies.riser_length()
+log(f"  Riser-Flachband Stecker -> Sockel: {r_sq:.0f} mm eckig, ~{r_bend:.0f} mm mit Biegeradien")
+if r_bend > 250:
+    warnings.append(f"Riser-Bahn {r_bend:.0f} mm: 250-mm-Riser reicht nicht")
 if P.COOLER_AIR < 3:
     errors.append(f"Luft über dem Kühler nur {P.COOLER_AIR:.1f} mm")
 if P.GPU_SLOTS == 4 and P.BRACKET_SLOT_Y0 < P.FLAT_Y0:

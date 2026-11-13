@@ -8,7 +8,11 @@ def board():
     pcb = box(P.BOARD_X0, P.BOARD_X1, P.BOARD_Y0, P.BOARD_Y1, P.BOARD_Z0, P.BOARD_Z1)
     iy0, iy1, iz0, iz1 = io_window()
     io = box(P.BOARD_X1 - 24, P.INNER_L, P.BOARD_Y1, iy1 - 1.5, iz0 + 1.5, iz1 - 1.5)
-    return Spec("dummy_board", pcb.fuse(io), (0.10, 0.45, 0.20), group="dummy", printable=False)
+    b = P.CPU_BACKPLATE
+    back = box(P.SOCKET_X - b["w"] / 2, P.SOCKET_X + b["w"] / 2, P.BOARD_Y0 - b["t"], P.BOARD_Y0,
+               P.SOCKET_Z - b["w"] / 2, P.SOCKET_Z + b["w"] / 2)
+    return Spec("dummy_board", fuse_all([pcb, io, back]), (0.10, 0.45, 0.20), group="dummy",
+                printable=False)
 
 
 def cooler():
@@ -39,17 +43,43 @@ def psu():
     return Spec("dummy_netzteil", s, (0.15, 0.15, 0.15), group="dummy", printable=False)
 
 
+RISER_PLUG = 16.0      # Stecker-Platine ragt so weit aus dem Slot
+RISER_OVER = 3.0       # Flachband über der Board-Oberkante
+
+
+def riser_band():
+    """Lage des Flachbands: (y0, y1) hinter dem Board, z-Oberkante des Bogens."""
+    y0 = P.MID_Y1 - P.RISER_POCKET["depth"] + 1.0
+    return y0, y0 + P.RISER_BAND_T, P.BOARD_Z1 + RISER_OVER + P.RISER_BAND_T
+
+
+def riser_length():
+    """Länge des Flachbands zwischen Stecker- und Sockelplatine: (eckig, mit Biegeradien)."""
+    y0, y1, ztop = riser_band()
+    yb, zb, zlow = (y0 + y1) / 2, ztop - P.RISER_BAND_T / 2, 4.75
+    legs = [zb - P.PCIE_SLOT_Z,                       # vom Stecker hoch
+            P.BOARD_Y1 + RISER_PLUG - yb,             # über die Board-Oberkante
+            zb - zlow,                                # hinter dem Board nach unten
+            yb - P.GPU_PCB_Y]                         # unter der Mittelwand zum Sockel
+    square = sum(legs)
+    return square, square - 4 * (2 - 3.14159 / 2) * 8.0   # vier Bögen mit r = 8
+
+
 def riser():
     x0, x1 = P.BOARD_X1 - P.PCIE_SLOT_FROM_IO - P.PCIE_SLOT_LEN, P.BOARD_X1 - P.PCIE_SLOT_FROM_IO
-    zs = P.BOARD_Z0 + P.PCIE_SLOT_FROM_BOTTOM
-    plug = box(x0, x1, P.BOARD_Y1, P.BOARD_Y1 + 14, zs - 6, zs + 6)
-    drop = box(x0, x1, P.MID_Y1 + 1.5, P.BOARD_Y1 + 14, 1.0, zs - 6)
-    through = box(x0, x1, 72.0, P.MID_Y1 + 1.5, 1.0, 8.5)
+    zs = P.PCIE_SLOT_Z
+    y0, y1, ztop = riser_band()
+    yp = P.BOARD_Y1 + RISER_PLUG
+    plug = box(x0, x1, P.BOARD_Y1, yp, zs - 6, zs + 6)
+    up = box(x0, x1, yp - P.RISER_BAND_T, yp, zs + 6, ztop)
+    over = box(x0, x1, y0, yp, ztop - P.RISER_BAND_T, ztop)
+    down = box(x0, x1, y0, y1, 1.0, ztop)
+    through = box(x0, x1, 72.0, y1, 1.0, 8.5)
     fx0, fx1 = P.GPU_FINGER_X0 - 4, P.GPU_FINGER_X1 + 4
     pcb = box(fx0 - 6, fx1 + 6, 68.0, 84.0, 12.0, 13.6)
     sock = box(fx0, fx1, P.GPU_PCB_Y - 5.5, P.GPU_PCB_Y + 5.5, 13.6, P.GPU_Z0 + 8)
-    return Spec("dummy_riser", fuse_all([plug, drop, through, pcb, sock]), (0.85, 0.75, 0.10),
-                group="dummy", printable=False)
+    return Spec("dummy_riser", fuse_all([plug, up, over, down, through, pcb, sock]),
+                (0.85, 0.75, 0.10), group="dummy", printable=False)
 
 
 def keepouts():

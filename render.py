@@ -47,17 +47,18 @@ def explode(scale=1.0):
                                     base[o.Name].Rotation)
 
 
-# Blickrichtungen in Gehäusekoordinaten (x vorn->hinten, y links->rechts, z oben)
+# Blickrichtungen im FreeCAD-Raum (rechtshändig: x vorn->hinten, z oben, +y ist von
+# vorn gesehen LINKS; build.py hat die Teile dafür gespiegelt)
 DIRS = {
-    "iso": (1, 1, -0.8),        # von vorn links oben
-    "iso_rear": (-1, 1, -0.8),  # von hinten links oben
-    "iso_right": (1, -1, -0.8), # von vorn rechts oben
-    "left": (0, 1, 0),          # auf die linke Seite (GPU-Kammer)
-    "right": (0, -1, 0),        # auf die rechte Seite (Board-Kammer)
+    "iso": (1, -1, -0.8),        # von vorn links oben
+    "iso_rear": (-1, -1, -0.8),  # von hinten, linke Seite (GPU-Kammer), oben
+    "iso_right": (1, 1, -0.8),   # von vorn rechts oben
+    "left": (0, -1, 0),          # auf die linke Seite (GPU-Kammer)
+    "right": (0, 1, 0),          # auf die rechte Seite (Board-Kammer)
     "top": (0, 0, -1),
     "front": (1, 0, 0),
     "rear": (-1, 0, 0),
-    "iso_low": (1, 1, 0.9),     # von vorn links unten (Sockel und Boden)
+    "iso_low": (1, -1, 0.9),     # von vorn links unten (Sockel und Boden)
 }
 
 

@@ -1,9 +1,20 @@
 """Alle Maße in mm. Einzige Quelle für Maße – Bauteile lesen nur von hier.
 
-Koordinaten (Innenraum):
+Modellkoordinaten (Innenraum):
   x: vorn -> hinten   (0 = Innenseite Frontwand)
   y: links -> rechts  (0 = Innenseite linke Seitenwand, von vorn gesehen)
   z: unten -> oben    (0 = Oberseite Boden)
+
+Achtung Händigkeit: x nach hinten, y nach rechts, z nach oben ist ein Linkssystem.
+FreeCAD rechnet rechtshändig, dort zeigt +y von vorn gesehen nach links. build.py
+spiegelt deshalb jedes Teil beim Export an der Ebene y = INNER_W / 2. Alle Maße hier
+und in parts/ bleiben in Modellkoordinaten; im FreeCAD-Raum gilt y_fc = INNER_W - y.
+
+Folge für das Layout (echte Bauteile sind nicht spiegelbar): Die Karte steht links mit
+den Kontakten unten, Lüfter zur linken Seitenwand, Blech hinten. Das Board steht rechts
+mit der Bestückung nach rechts und der I/O-Blende hinten – dadurch liegt seine
+Slot-Kante OBEN (Board „kopfüber", wie in einem Inverted-Tower oder im Dan A4).
+Der Riser läuft vom Slot über die Board-Oberkante hinter dem Board nach unten.
 """
 
 # --------------------------------------------------------------------------
@@ -38,7 +49,7 @@ LID_EDGE_BED_CHAMFER = 1.0  # davon die äußersten 1 mm als 45°-Fase (liegt au
 # --------------------------------------------------------------------------
 BOARD = 170.0
 PCB_T = 1.6
-STANDOFF = 6.0
+STANDOFF = 8.0         # 6.35 wäre Standard; 8 lässt hinter dem Board Platz für den Riser
 
 COOLERS = {
     # Höhe ab Platinenoberseite; Breite in z, Tiefe in x (Lüfter blasen +x)
@@ -124,19 +135,20 @@ BOARD_Y1 = BOARD_Y0 + PCB_T             # Bestückungsseite
 BOARD_REAR_GAP = 4.0                    # Platinenhinterkante -> Rückwand innen
 BOARD_X1 = INNER_L - BOARD_REAR_GAP     # I/O-Kante
 BOARD_X0 = BOARD_X1 - BOARD
-BOARD_Z0 = 22.0                         # Unterkante Platine (Riser-Bogen)
+BOARD_Z0 = 22.0                         # Unterkante Platine (Kühler bleibt über den Laschen)
 BOARD_Z1 = BOARD_Z0 + BOARD
 
 # Sockelmitte (Parameter: anpassen fürs neue Board)
 SOCKET_FROM_IO = 90.0
-SOCKET_FROM_BOTTOM = 105.0
+SOCKET_FROM_SLOT_EDGE = 105.0
 SOCKET_X = BOARD_X1 - SOCKET_FROM_IO
-SOCKET_Z = BOARD_Z0 + SOCKET_FROM_BOTTOM
+SOCKET_Z = BOARD_Z1 - SOCKET_FROM_SLOT_EDGE   # Slot-Kante liegt oben
+CPU_BACKPLATE = dict(w=90.0, t=6.0)      # Rückplatte des Kühlers hinter dem Board (Annahme)
 COOLER_KEEP_X = COOLER["d"] / 2          # ±80.5
 COOLER_KEEP_Z = COOLER["w"] / 2          # ±75
 COOLER_AIR = BOARD_CHAMBER - STANDOFF - PCB_T - COOLER["h"]
 
-# Mini-ITX-Lochbild. d = Abstand zur I/O-Kante, l = Abstand zur Slot-Kante (unten).
+# Mini-ITX-Lochbild. d = Abstand zur I/O-Kante, l = Abstand zur Slot-Kante (im Gehäuse oben).
 # Quelle: ATX 2.2 / microATX (Löcher C, F, H, J); C–F 6.1" (154.94) Richtung vorn,
 # C–H/J 6.2" (157.48) quer, H 0.9" (22.86) weiter von der I/O-Kante als C.
 # Kante-Abstände (10.16 / 6.35) aus Mini-ITX-Zeichnungen – mit Passtest-Platte prüfen.
@@ -150,14 +162,15 @@ ITX_HOLES = {
 # PCIe-x16-Slot auf dem Board (für Riser-Stecker)
 PCIE_SLOT_FROM_IO = 45.0
 PCIE_SLOT_LEN = 89.0
-PCIE_SLOT_FROM_BOTTOM = 10.0
+PCIE_SLOT_FROM_EDGE = 10.0
+PCIE_SLOT_Z = BOARD_Z1 - PCIE_SLOT_FROM_EDGE
 
 # I/O-Blende (ATX 2.2, 3.3.5): 158.75 x 44.45, Unterkante 3.81 unter Platinenoberseite,
 # Rückwand für Clip 0.94..1.32 dick, Ecken r<=0.99, Sperrzone 2.5 rundum.
 IO_W = 158.75
 IO_H = 44.45
 IO_BELOW_PCB_TOP = 3.81
-IO_FROM_BOTTOM = 5.6         # Lage entlang der Kante – UNSICHER, Passtest
+IO_FROM_SLOT_EDGE = 5.6      # Lage entlang der Kante (ab Slot-Kante) – UNSICHER, Passtest
 IO_PANEL_T = 1.2
 IO_KEEPOUT = 2.5
 
@@ -205,7 +218,7 @@ FRONT_TABS_Y = [40.0, 135.0, 230.0]
 REAR_TABS_Y_BOT = [40.0, 135.0, 230.0]
 REAR_TABS_Y_TOP = [135.0, 230.0]           # GPU-Kammer oben: Kabelbogen
 MID_TABS_X_BOT = [30.0, 140.0, 195.0, 335.0]
-MID_TABS_X_TOP = [30.0, 140.0, 351.0]      # außerhalb des Kühlers
+MID_TABS_X_TOP = [30.0, 140.0, 351.0]      # außerhalb des Riser-Bogens (x 212..315)
 
 # Seitenwände: unten Randfalz im Boden, oben Magnete 10x3
 RIM_H = 3.0
@@ -238,6 +251,11 @@ PSU_VENT = dict(x0=PSU_X0 + 2, x1=PSU_X1 - 2, z0=PSU_Z0 + 2, z1=PSU_Z1 - 1, r=8.
 REAR_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=TAB_Z_BOT[1] + 3.0,
                  z1=TAB_Z_TOP[0] - 3.0, r=12.0)
 REAR_RAIL_CLEAR = 6.0  # über der GPU-Leiste frei (Lasche + Schraubenköpfe)
+# Front: gleiches Feld wie an der Rückwand. Der CPU-Kühler bläst von vorn nach hinten und
+# saugt hier geradeaus an (über dem Netzteil). None = Front geschlossen.
+# Nur vor der Board-Kammer: y0 = MID_Y1 + 4.
+FRONT_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=TAB_Z_BOT[1] + 3.0,
+                  z1=TAB_Z_TOP[0] - 3.0, r=12.0)
 # Sockelring: etwas größere Löcher (Engstelle der Bodenzuluft), drei Höhen, rundum
 PLINTH_VENT_D = 3.8
 PLINTH_VENT_PITCH = 5.0
@@ -247,7 +265,8 @@ PLINTH_VENT_EDGE = 0.6
 # Front / Rückwand
 # --------------------------------------------------------------------------
 BUTTON_D = 16.2        # 16-mm-Vandalismus-Taster
-BUTTON_Y = FLAT_Y1 - 20.0
+BUTTON_Y = FLAT_Y1 - 30.0
+BUTTON_KEEP_R = 13.0   # lochfreier Kreis um den Taster (Auflage für Kragen und Mutter)
 # Taster sitzt frei über dem Netzteil (nicht davor): eigener Bauraum, Leitung zum
 # F_PANEL-Anschluss (PWR_SW) des Mainboards. Unten rechts wäre direkt am Netzteil.
 BUTTON_Z = INNER_H / 2
@@ -258,7 +277,7 @@ USBC_Z = BUTTON_Z + 23.0
 
 C14_W, C14_H = 27.5, 19.8   # Schnapp-Einbau-Ausschnitt (Typ mit Schnapphaken, 1..2 mm Wand)
 C14_Y = 225.0
-C14_Z = 27.0
+C14_Z = 183.0               # über dem Kühler (der sitzt beim kopfüber stehenden Board unten)
 C14_PANEL_T = 2.0
 C14_DEPTH = 22.0
 
@@ -266,6 +285,10 @@ GPU_OPEN = dict(y0=BRACKET_SLOT_Y0 + 1.5, y1=GPU_Y1 - 1.5, z0=GPU_Z0 + 3.0, z1=G
 
 # Mittelwand-Durchführungen
 RISER_PASS = dict(x0=212.0, x1=315.0, z0=0.0, z1=21.0)
+# Tasche auf der Board-Seite: dort läuft das Riser-Flachband hinter dem Board nach unten.
+# Hinter dem Board bleiben STANDOFF + Tiefe, davon belegt die Kühler-Rückplatte bis 6 mm.
+RISER_POCKET = dict(x0=212.0, x1=315.0, z0=RISER_PASS["z1"], z1=203.0, depth=3.0)
+RISER_BAND_T = 4.0     # Bauraum für das Flachband (ein- oder zweilagig)
 CABLE_PASS = dict(x0=25.0, x1=85.0, z0=160.0, z1=195.0)
 
 # --------------------------------------------------------------------------
@@ -289,6 +312,7 @@ def summary():
         "GPU-Kammer": GPU_CHAMBER,
         "Board-Kammer": BOARD_CHAMBER,
         "Luft über Kühler": round(COOLER_AIR, 2),
+        "Platz hinter dem Board (Riser + Rückplatte)": STANDOFF + RISER_POCKET["depth"],
         "Sockel-Mitte (x, z)": (SOCKET_X, SOCKET_Z),
         "GPU-Profil": GPU_PROFILE,
         "GPU Luft Lüfter->Seitenwand": GPU_Y0,

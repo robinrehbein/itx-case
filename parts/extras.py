@@ -119,7 +119,7 @@ def cable_comb():
 
 # --------------------------------------------------------------------------
 def fit_test():
-    """Passtest: Board-Platte (2 mm, ITX-Löcher auf 6-mm-Säulen) + Rückwand-Platte
+    """Passtest: Board-Platte (2 mm, ITX-Löcher auf Säulen in Abstandshalter-Höhe) + Rückwand-Platte
     (2 mm, I/O-Fenster, GPU-Slotöffnung, Leiste mit Mutternkanal). Gesteckt über Zapfen."""
     X1 = P.INNER_L
     yb0, yb1 = P.MID_Y1 - 2, P.MID_Y1

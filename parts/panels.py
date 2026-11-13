@@ -11,6 +11,26 @@ def tab(x0, x1, y, z0, z1, hole_x):
     return t, cyl_z(hole_x, y, z0 - 1, z1 + 1, P.M3_CLEAR / 2)
 
 
+def front_vent_points():
+    """Lochfeld der Front, gleiches Bild wie die Rückwand; um den Taster bleibt ein Kreis frei.
+    Rückgabe: (Board-Kammer, GPU-Kammer, blind vor der Mittelwand). Die blinden Löcher
+    halten das Feld optisch geschlossen, zählen aber nicht zum Querschnitt."""
+    v = P.FRONT_VENT
+    if not v:
+        return [], [], []
+    keep = []
+    if P.USB_C:
+        keep.append((P.BUTTON_Y - P.USBC_W / 2 - 2, P.BUTTON_Y + P.USBC_W / 2 + 2,
+                     P.USBC_Z - P.USBC_H / 2 - 2, P.USBC_Z + P.USBC_H / 2 + 2))
+    rk = P.BUTTON_KEEP_R + P.VENT_D / 2
+    pts = [q for q in hex_grid(v["y0"], v["y1"], v["z0"], v["z1"], keep, corner_r=v["r"])
+           if (q[0] - P.BUTTON_Y) ** 2 + (q[1] - P.BUTTON_Z) ** 2 >= rk * rk]
+    r = P.VENT_D / 2
+    blind = [q for q in pts if P.MID_Y0 - r < q[0] < P.MID_Y1 + r]
+    return ([q for q in pts if q[0] >= P.MID_Y1 + r], [q for q in pts if q[0] <= P.MID_Y0 - r],
+            blind)
+
+
 def front():
     shape = box(P.OUT_X0, 0, P.FLAT_Y0, P.FLAT_Y1, 0, H)
     adds, cuts = [], []
@@ -23,6 +43,8 @@ def front():
     if P.USB_C:
         cuts.append(rrect_x(P.OUT_X0 - 1, 1, P.BUTTON_Y - P.USBC_W / 2, P.BUTTON_Y + P.USBC_W / 2,
                             P.USBC_Z - P.USBC_H / 2, P.USBC_Z + P.USBC_H / 2, P.USBC_H / 2 - 0.01))
+    board, gpu, blind = front_vent_points()
+    cuts += holes_x(board + gpu + blind, P.OUT_X0 - 1, 1)
     shape = cut_all(fuse_all([shape] + adds), cuts)
     return Spec("front", shape, (0.86, 0.86, 0.88), print_rot=[((0, 1, 0), -90)],
                 explode=(-140, 0, 0))
@@ -30,8 +52,8 @@ def front():
 
 def io_window():
     y0 = P.BOARD_Y1 - P.IO_BELOW_PCB_TOP
-    z0 = P.BOARD_Z0 + P.IO_FROM_BOTTOM
-    return y0, y0 + P.IO_H, z0, z0 + P.IO_W
+    z1 = P.BOARD_Z1 - P.IO_FROM_SLOT_EDGE      # Slot-Kante des Boards liegt oben
+    return y0, y0 + P.IO_H, z1 - P.IO_W, z1
 
 
 def rear_vent_points():

@@ -1,5 +1,6 @@
-"""Mittelwand (5 mm): trägt das Board auf Abstandshaltern, Riser-Durchführung unten,
-Kabeldurchführung oben vorn. Laschen nur auf der Board-Seite (GPU-Seite hat 3 mm Luft)."""
+"""Mittelwand (5 mm): trägt das Board auf Abstandshaltern (Slot-Kante oben), Tasche für das
+Riser-Flachband hinter dem Board, Riser-Durchführung unten, Kabeldurchführung oben vorn.
+Laschen nur auf der Board-Seite (GPU-Seite hat 3 mm Luft)."""
 import params as P
 from parts.common import (Spec, box, cyl_y, cyl_z, rrect_y, fuse_all, cut_all, split_with_flanges)
 
@@ -9,7 +10,7 @@ X0, X1 = P.RIM_W + 0.2, P.INNER_L - P.RIM_W - 0.2   # über dem Randfalz frei
 
 def standoff_positions():
     """ITX-Löcher in Gehäusekoordinaten (x, z)."""
-    return {k: (P.BOARD_X1 - d, P.BOARD_Z0 + l) for k, (d, l) in P.ITX_HOLES.items()}
+    return {k: (P.BOARD_X1 - d, P.BOARD_Z1 - l) for k, (d, l) in P.ITX_HOLES.items()}
 
 
 def build():
@@ -28,6 +29,8 @@ def build():
         cuts.append(cyl_y(x, z, P.BOARD_Y0 - P.INSERT_DEPTH, P.BOARD_Y0 + 0.01, P.INSERT_D / 2))
     r = P.RISER_PASS
     cuts.append(rrect_y(r["x0"], r["x1"], r["z0"] - 5, r["z1"], y0 - 1, y1 + 1, 3.0))
+    k = P.RISER_POCKET
+    cuts.append(box(k["x0"], k["x1"], y1 - k["depth"], y1 + 1, k["z0"] - 4, k["z1"]))
     c = P.CABLE_PASS
     cuts.append(rrect_y(c["x0"], c["x1"], c["z0"], c["z1"], y0 - 1, y1 + 1, 6.0))
     shape = cut_all(fuse_all([shape] + adds), cuts)

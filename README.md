@@ -1,9 +1,10 @@
 # ITX-Case – 3D-druckbares Mini-ITX-Gehäuse
 
-Ein flacher, breiter Block im Stil des Mac Studio mit zwei Kammern. Links steht die GPU aufrecht
-parallel zur Mittelwand. Rechts sitzen Board, Noctua NH-D15 und SFX-Netzteil. Ein Riser-Kabel
-verbindet beide Kammern unten durch die Mittelwand. Die Zuluft kommt unsichtbar durch den
-gelochten Sockel und den Boden.
+Ein flacher, breiter Block im Stil des Mac Studio mit zwei Kammern. Von vorn gesehen steht links
+die GPU aufrecht parallel zur Mittelwand, mit den Lüftern zur linken Seitenwand. Rechts sitzen
+Board, Noctua NH-D15 und SFX-Netzteil. Ein flexibles Riser-Kabel verbindet beide Kammern. Die
+Lüftung läuft nur über Felder aus kleinen runden Löchern: Front, Rückwand, linke Seitenwand,
+Deckel über der GPU, Boden und der rundum gelochte Sockel.
 
 | | |
 |---|---|
@@ -11,10 +12,36 @@ gelochten Sockel und den Boden.
 | Höhe mit Sockel | 232 mm |
 | Innen | 358 × 271 × 210 mm |
 | GPU-Kammer / Board-Kammer | 85 / 181 mm (5 mm Mittelwand) |
-| Luft über dem Kühler | 8,4 mm |
+| Luft über dem Kühler | 6,4 mm |
 | Drucker | Voron 2.4 300, Teile ≤ 290 × 290 × 270 mm |
 
 ![Gesamtansicht](out/png/01_gesamt_vorn.png)
+
+## Layout: Das Board steht kopfüber
+
+Eine Grafikkarte und ein Mainboard lassen sich nicht spiegeln. Steht die Karte mit den Kontakten
+unten, dem Slotblech hinten und den Lüftern nach außen, dann steht sie von vorn gesehen links.
+Das Board dahinter zeigt mit der Bestückung nach rechts und mit der I/O-Blende nach hinten.
+In dieser Lage liegt seine Slot-Kante oben. Das Board steht also kopfüber, wie im Dan A4-SFX.
+
+Das hat vier Folgen:
+
+- Der Riser läuft vom Slot über die Oberkante des Boards, hinter dem Board in einer 3 mm tiefen
+  Tasche der Mittelwand nach unten und unten durch die Mittelwand zur Karte. Die Bahn ist im
+  Modell 231 mm lang (245 mm eckig gemessen). Ein 250-mm-Riser passt.
+- Die Abstandshalter sind 8 mm hoch statt 6,35 mm. Hinter dem Board bleiben damit 11 mm für das
+  Flachband (4 mm) und die Rückplatte des Kühlers (bis 6 mm).
+- Der NH-D15 sitzt unten in der Kammer (z = 12 bis 162 mm), das Netzteil steht davor.
+- Die Kaltgerätebuchse sitzt hinten oben rechts, weil unten der Kühler bis an die Rückwand reicht.
+
+`params.py` und `parts/` rechnen mit y von links nach rechts. Das ist ein Linkssystem, FreeCAD
+rechnet rechtshändig. `build.py` spiegelt deshalb jedes Teil vor dem Export an der Ebene
+y = `INNER_W` / 2. STEP, STL und `assembly.FCStd` haben die richtige Händigkeit.
+
+**Stände vor diesem Umbau nicht drucken.** Dort war das Gehäuse spiegelverkehrt modelliert.
+Eine echte Karte hätte mit den Lüftern zur Mittelwand gezeigt.
+
+![Board-Kammer offen](out/png/05b_offen_board_iso.png)
 
 ## Bauen
 
@@ -35,14 +62,14 @@ kein Export).
 | `out/step/` | STEP pro Teil in Montagelage, `_baugruppe.step` komplett |
 | `out/stl/` | STL pro Teil in Druckorientierung |
 | `out/assembly.FCStd` | Montage mit Dummy-Komponenten (Gruppen Gehäuse/Halter/Komponenten) |
-| `out/png/` | Gesamtansicht, beide Kammern offen, Explosionsansicht |
+| `out/png/` | Ansichten von allen Seiten, beide Kammern offen, Explosionsansichten |
 
 ## Prüfungen (Stand des letzten Builds)
 
-1. **Kollisionen:** Gehäuse und Halter gegen alle Dummies (Board mit I/O-Block, NH-D15,
-   GPU mit 35-mm-Kabelbogen und Slotblech, Netzteil, Riser mit Stecker, Kabel und Sockel,
-   Taster, C14): Schnittvolumen 0. Druckteile untereinander: keine Überschneidung. Das gilt
-   für die Profile `reaper`, `max` und `SFX-L`.
+1. **Kollisionen:** Gehäuse und Halter gegen alle Dummies (Board mit I/O-Block und
+   Kühler-Rückplatte, NH-D15, GPU mit 35-mm-Kabelbogen und Slotblech, Netzteil, Riser mit Stecker,
+   Flachband und Sockel, Taster mit Bauraum für die Leitung, C14): Schnittvolumen 0. Druckteile
+   untereinander: keine Überschneidung. Das gilt für die Profile `reaper`, `max` und `SFX-L`.
 2. **Druckbett:** Alle Teile passen nach dem Drehen in die Druckorientierung auf das Bett.
 3. **Manifold:** Alle 22 STLs sind geschlossene Körper ohne Non-Manifold-Kanten.
 
@@ -53,40 +80,40 @@ Der Slicer ist maßgeblich.
 
 | Teil | Druckmaß (mm) | Orientierung | Zeit | ASA |
 |---|---|---|---|---|
-| boden_vorn / boden_hinten | 179 / 187 × 279 × 15 | Unterseite aufs Bett | 7 h + 7 h | 246 g |
-| deckel_vorn / deckel_hinten | 181 / 189 × 283 × 15 | Oberseite aufs Bett | 7 h + 7 h | 290 g |
-| seite_links_vorn / _hinten | 179 / 187 × 22 × 210 | stehend | 4,5 h + 4,5 h | 146 g |
-| seite_rechts_vorn / _hinten | 179 / 187 × 22 × 210 | stehend | 4,5 h + 5 h | 189 g |
-| front | 210 × 235 × 14 | Sichtseite aufs Bett | 6 h | 117 g |
-| rueckwand | 210 × 235 × 17 | Sichtseite aufs Bett | 4 h | 69 g |
-| mittelwand_vorn / _hinten | 173 / 182 × 210 × 15 | GPU-Seite aufs Bett | 5 h + 5 h | 217 g |
-| sockel_vorn / _hinten | 163 / 171 × 247 × 12 | stehend, Lippe unten | 1 h + 1 h | 28 g |
-| netzteil_halter | 137 × 112 × 31 | wie eingebaut | 1 h | 17 g |
+| boden_vorn / boden_hinten | 179 / 187 × 279 × 15 | Unterseite aufs Bett | 7,2 h + 7,4 h | 231 g |
+| deckel_vorn / deckel_hinten | 181 / 189 × 283 × 15 | Oberseite aufs Bett | 6,9 h + 7,2 h | 282 g |
+| seite_links_vorn / _hinten | 179 / 187 × 22 × 210 | stehend | 4,6 h + 4,8 h | 142 g |
+| seite_rechts_vorn / _hinten | 179 / 187 × 22 × 210 | stehend | 4,7 h + 4,9 h | 187 g |
+| front | 210 × 235 × 14 | Sichtseite aufs Bett | 5,6 h | 75 g |
+| rueckwand | 210 × 235 × 17 | Sichtseite aufs Bett | 4,3 h | 62 g |
+| mittelwand_vorn / _hinten | 173 / 182 × 210 × 15 | GPU-Seite aufs Bett | 5,0 h + 4,2 h | 184 g |
+| sockel_vorn / _hinten | 163 / 171 × 247 × 12 | stehend, Lippe unten | 1,1 h + 1,1 h | 28 g |
+| netzteil_halter | 137 × 112 × 31 | wie eingebaut | 0,9 h | 17 g |
 | netzteil_buegel | 143 × 56 × 20 | Steg aufs Bett | 0,6 h | 9 g |
-| riser_halter | 161 × 14 × 21 | wie eingebaut | 0,4 h | 5 g |
+| riser_halter | 161 × 14 × 21 | wie eingebaut | 0,4 h | 4 g |
 | riser_traeger | 129 × 20 × 10 | wie eingebaut | 0,4 h | 5 g |
 | gpu_stuetze | 47 × 16 × 21 | wie eingebaut | 0,3 h | 3 g |
 | kabelkamm | 38 × 10 × 8 | wie eingebaut | 0,2 h | 1 g |
-| passtest_board | 182 × 184 × 8 | flach | 1,6 h | 23 g |
-| passtest_rueckwand | 185 × 131 × 15 | flach | 1,1 h | 16 g |
-| **Summe Gehäuse + Halter** | | | **ca. 80 h** | **ca. 1,4 kg** |
+| passtest_board | 182 × 184 × 10 | flach | 1,6 h | 23 g |
+| passtest_rueckwand | 185 × 131 × 15 | flach | 1,1 h | 15 g |
+| **Summe Gehäuse + Halter** | | | **ca. 72 h** | **ca. 1,25 kg** |
 
 **Zuerst die zwei Passtest-Teile drucken.** Sie prüfen die Maße, die nicht sicher sind (siehe
-unten), mit echtem Board und echter Karte, bevor 80 Stunden Druckzeit anfallen.
+unten), mit echtem Board und echter Karte, bevor 72 Stunden Druckzeit anfallen.
 
 ## Einkaufsliste
 
 | Teil | Menge | Hinweis |
 |---|---|---|
 | M3-Einschmelzmuttern, 5–5,7 mm lang, Außen-Ø ca. 4,6 | 50 | 35 verbaut (Bohrung Ø4,1, Tiefe 5,5) |
-| Zylinderkopfschrauben M3 × 8 | 40 | Wandlaschen, Netzteil, Riser, GPU-Stütze, Leiste |
-| Zylinderkopfschrauben M3 × 12 | 30 | Trennflansche (2 × 4 mm), Sockel an Boden |
+| Zylinderkopfschrauben M3 × 8 | 45 | Wandlaschen, Netzteil, Riser, GPU-Stütze, Leiste, Sockel an Boden (4 Stück, Köpfe im Pfosten versenkt) |
+| Zylinderkopfschrauben M3 × 12 | 30 | Trennflansche (2 × 4 mm) |
 | Zylinderkopfschrauben M3 × 6 | 10 | Board auf Einschmelzmuttern, GPU-Slotblech |
 | M3-Muttern (DIN 934) | 30 | Flansche, Mutternkanal der GPU-Leiste |
 | Neodym-Scheibenmagnete 10 × 3 mm | 16 | 8 im Deckel, 8 in den Seitenwänden, **Polung beachten** |
-| PCIe-4.0-x16-Riserkabel, 150–200 mm | 1 | gerade Buchse, Stecker gerade; Kabel läuft unter dem Board durch die Mittelwand |
-| C14-Einbaubuchse, Schnappbefestigung, Ausschnitt 27,5 × 19,8 mm, Wandstärke 1–2 mm | 1 | mit internem Kabel C14 → C13 gewinkelt, ca. 30 cm |
-| Vandalismus-Taster 16 mm, Taster (nicht rastend), max. 28 mm Einbautiefe | 1 | mit Kabel für den Power-Switch-Header |
+| PCIe-4.0-x16-Riser mit flexiblem Flachband, 250 mm | 1 | Bauart wie für Sandwich-Gehäuse. Der Stecker ist gewinkelt, das Band verlässt ihn Richtung Slot-Kante des Boards. Die Buchse steht am anderen Ende gerade nach oben. Vor dem Kauf ein Foto des Risers mit `out/png/05b_offen_board_iso.png` vergleichen. |
+| C14-Einbaubuchse, Schnappbefestigung, Ausschnitt 27,5 × 19,8 mm, Wandstärke 1–2 mm | 1 | mit internem Kabel C14 auf C13 gewinkelt, ca. 50 cm (Buchse hinten oben, Netzteil vorn unten) |
+| Vandalismus-Taster 16 mm, Taster (nicht rastend), max. 28 mm Einbautiefe | 1 | mit zweipoliger Leitung und Dupont-Buchse 2,54 mm für den F_PANEL-Anschluss des Boards (PWR_SW), 30–40 cm |
 | Gummifüße selbstklebend, Ø8 × 2–3 mm | 8 | auf die Sockellippe |
 | optional: USB-C-Einbaubuchse mit Verlängerung | 1 | `USB_C = True` |
 | SFX-Netzteil ≥ 750 W | 1 | PowerColor empfiehlt für die Reaper mindestens 750 W |
@@ -107,80 +134,119 @@ unten), mit echtem Board und echter Karte, bevor 80 Stunden Druckzeit anfallen.
 | Nahtposition | hinten bzw. an der Innenseite (`Rear` / gemalt) |
 | Bügeln | Deckel- und Bodenunterseite optional (Sichtflächen liegen auf dem Bett, Textur-PEI ergibt eine gleichmäßige Oberfläche) |
 
+Die Stege zwischen den Löchern sind 1,3 mm breit. In der Slicer-Vorschau prüfen, dass sie ohne
+Lücke gefüllt sind. Falls nicht, hilft der Arachne-Wandgenerator. In den Seitenwänden und im
+Sockel liegen die Löcher beim Druck waagerecht. Bei Ø3,2 und Ø3,8 geht das ohne Stützen.
+
 Einschmelzmuttern mit einer Lötspitze bei ca. 245 °C setzen.
 
 ## Montage-Reihenfolge
 
 Die Reihenfolge folgt der Zugänglichkeit der Schrauben. Die Deckelschrauben der Board-Kammer
 sitzen hinter dem Board bzw. über dem I/O-Block und gehen nur bei leerer Kammer. Die
-GPU-Lasche wird von oben verschraubt, also vor dem Deckel.
+GPU-Lasche wird von oben verschraubt, also vor dem Deckel. Das Flachband des Risers liegt hinter
+dem Board und muss vor dem Board hinein.
 
 1. **Passtest:** `passtest_board` mit dem Board verschrauben (Muttern hinten), `passtest_rueckwand`
    über die Zapfen stecken. Prüfen: I/O-Blende rastet im Fenster ein. Riser einstecken, Karte mit
    Slotblech an die Leiste setzen: Die Lasche muss auf der Leiste aufliegen, und die Karte darf
    nicht an der Leiste anstoßen. Abweichungen in `params.py` korrigieren (`ITX_HOLE_C`,
-   `IO_FROM_BOTTOM`, `BRACKET_TAB_ABOVE_FINGERS`, `GPU_RAIL_H`).
+   `IO_FROM_SLOT_EDGE`, `BRACKET_TAB_ABOVE_FINGERS`, `GPU_RAIL_H`).
 2. **Einschmelzmuttern** in alle Dome und Bossen setzen: Boden von oben, Sockelbossen von unten,
    Deckel von unten, Abstandshalter der Mittelwand, Pfosten des Netzteil-Halters.
 3. **Magnete** in Deckel und Seitenwände kleben (Sekundenkleber oder Epoxid). Vorher die Polung
    festlegen: Deckel-Magnete alle mit Nordpol nach unten, Seitenwand-Magnete mit Südpol nach oben.
 4. **Hälften verschrauben:** Boden, Deckel, Sockel, Mittelwand und beide Seitenwände jeweils an den
    Flanschen mit M3 × 12 und Mutter. Die V-Nut außen sauber ausrichten, erst dann anziehen.
-5. **Sockel unter den Boden** schrauben (4 × M3 × 12 von unten), Gummifüße auf die Lippe kleben.
+5. **Sockel unter den Boden** schrauben (4 × M3 × 8 von unten durch die Pfosten), Gummifüße auf
+   die Lippe kleben.
 6. **Halter auf den Boden:** Riser-Halter und GPU-Stütze (Langlöcher nur leicht anziehen),
    Netzteil-Halter. Netzteil flach auflegen (Lüfter nach unten, Rückseite zur rechten Seitenwand),
    Bügel überlegen und seitlich verschrauben. Die vordere Bügelschraube geht nur, solange die
    Front noch nicht montiert ist.
-7. **Front** (Taster vorher einbauen) und **Rückwand** (C14 vorher einschnappen) an den Randfalz
-   stellen und unten über die Laschen in die Bodendome schrauben. C14-Verlängerung ins Netzteil.
+7. **Front** und **Rückwand:** Vorher den Taster in die Front schrauben und die C14-Buchse in die
+   Rückwand schnappen. Beide Wände an den Randfalz stellen und unten über die Laschen in die
+   Bodendome schrauben. Die C14-Verlängerung oben an der rechten Seite nach vorn zum Netzteil
+   führen. Die Taster-Leitung bleibt lose. Sie geht später an den F_PANEL-Anschluss des Boards
+   (PWR_SW, Polung egal). Der Taster hat keine Verbindung zum Netzteil.
 8. **Mittelwand** einsetzen und unten verschrauben.
-9. **GPU-Kammer:** Riserkabel durch die untere Durchführung der Mittelwand fädeln (der Stecker
-   bleibt in der Board-Kammer). Riserbuchse auf den Träger schrauben, Höhe und Länge über die
-   Langlöcher einstellen. Karte einstecken, M3-Mutter im Kanal der Leiste an die Slotposition
-   schieben, Lasche von oben verschrauben. GPU-Stütze unter die Kartenvorderkante schieben und
-   festziehen. Stromkabel oben vorn durch die Mittelwand führen, mit dem Kabelkamm ordnen.
-10. **Deckel** aufsetzen und von innen über die Laschen verschrauben: 3 × Front, 2 × Rückwand,
+9. **Riser:** Das Flachband auf der Board-Seite in die Tasche der Mittelwand legen. Das Ende mit
+   der Buchse unten durch die Durchführung in die GPU-Kammer führen, das Ende mit dem Stecker
+   oben aus der Tasche hängen lassen. Die Buchse auf den Träger schrauben, Höhe und Länge über
+   die Langlöcher einstellen.
+10. **GPU-Kammer:** Karte einstecken, M3-Mutter im Kanal der Leiste an die Slotposition schieben,
+    Lasche von oben verschrauben. GPU-Stütze unter die Kartenvorderkante schieben und festziehen.
+    Stromkabel oben vorn durch die Mittelwand führen, mit dem Kabelkamm ordnen.
+11. **Deckel** aufsetzen und von innen über die Laschen verschrauben: 3 × Front, 2 × Rückwand,
     3 × Mittelwand. Die Board-Kammer ist dabei noch leer.
-11. **Board** (ohne Kühler) auf die Abstandshalter schrauben, Riserstecker in den Slot.
-12. **NH-D15** am Board montieren (Lüfter blasen nach hinten), Kabel anschließen.
-13. **Seitenwände** unten in den Randfalz stellen und oben andrücken: Die Magnete halten sie.
+12. **Board** ohne Kühler, aber mit montierter Kühler-Rückplatte kopfüber auf die Abstandshalter
+    schrauben: I/O hinten, Slot oben. Das Flachband liegt dabei hinter dem Board. Den Riserstecker
+    über die Oberkante des Boards in den Slot stecken.
+13. **NH-D15** am Board montieren (Lüfter blasen nach hinten), Kabel anschließen, Taster-Leitung
+    auf PWR_SW stecken.
+14. **Seitenwände** unten in den Randfalz stellen und oben andrücken: Die Magnete halten sie.
     Zum Öffnen oben nach außen kippen und abheben.
 
-Zum Abnehmen des Deckels müssen Kühler und Board wieder heraus (Schritte 12 → 10 rückwärts).
+Zum Abnehmen des Deckels müssen Kühler und Board wieder heraus (Schritte 13 bis 11 rückwärts).
 
 ## Luftstrom und freie Querschnitte
 
-Löcher Ø4 im Wabenraster mit 6 mm Abstand (theoretisch 40,3 % offen).
+Die Löcher haben Ø3,2 im Wabenraster mit 4,5 mm Abstand (theoretisch 45,9 % offen), im Sockel
+Ø3,8 mit 5 mm Abstand. In Deckel, Seitenwand und Sockel laufen die Felder ohne Lücke über die
+Trennfuge, eine Lochspalte liegt genau auf der Fuge.
 
 | | Fläche | Bemerkung |
 |---|---|---|
-| **Zuluft** Sockelring | 38 cm² | Engstelle der Bodenzuluft, zusätzlich ca. 35 cm² Spalt unter der Lippe bei 3-mm-Füßen |
-| Boden über dem Sockel | 244 cm² | |
-| Seitenwand vor der GPU | 211 cm² | 40,9 % offen vor der Karte |
-| Seitenwand Netzteil | 27 cm² | Netzteil-Abluft |
-| **Abluft** Rückwand hinter dem D15 | 56 cm² | ein 140-mm-Lüfter hat ca. 139 cm² freie Fläche |
-| Deckel über der GPU (`TOP_VENT`) | 69 cm² | |
-| Rückwand GPU | 12 cm² + ca. 29 cm² | Lochfeld plus Slotblech |
+| **Zuluft** Front vor der Board-Kammer | 124 cm² | gerade vor dem CPU-Kühler |
+| Sockelring | 44 cm² | Engstelle der Bodenzuluft, zusätzlich ca. 35 cm² Spalt unter der Lippe bei 3-mm-Füßen |
+| Boden über dem Sockel | 294 cm² | |
+| Seitenwand vor der GPU | 225 cm² | 43,9 % offen vor der Karte |
+| Seitenwand Netzteil | 30 cm² | Netzteil-Abluft |
+| **Abluft** Rückwand Board-Kammer | 82 cm² | ein 140-mm-Lüfter hat ca. 139 cm² freie Fläche |
+| Deckel über der GPU (`TOP_VENT`) | 85 cm² | |
+| Rückwand GPU-Kammer | 18 cm² + ca. 29 cm² | Lochfeld plus Slotblech |
+| Front vor der GPU-Kammer | 48 cm² | |
+| **Summe** | Zuluft 423 cm², Abluft 261 cm² | zum Vergleich: 3 × 95-mm-GPU-Lüfter ca. 194 cm², 2 × 140 mm am D15 ca. 277 cm² |
 
-Die zwei Lochreihen im 12 mm hohen Sockel lassen oben und unten nur 0,4 mm Steg. Das ist
-druckbar, wirkt aber knapp. Mit `PLINTH_H = 16` werden die Stege breiter und es gibt mehr Zuluft.
+Der D15 bläst von vorn nach hinten. Er saugt durch die Front an und bläst durch die Rückwand aus.
+Das Netzteil steht vorn unten und verdeckt nur die unteren 75 mm der Front, darüber ist der Weg
+zum Kühler frei. Hinter dem D15 bleibt wegen des I/O-Fensters nur ein Teil der Rückwand für
+Löcher. Das ist die Engstelle der Board-Kammer. Der Boden hat zwei lochfreie Streifen, einen unter
+der Mittelwand und einen 8 mm breiten am Flansch der Trennfuge.
 
-Engstellen: Die Bodenzuluft hängt am Sockelring, und hinter dem D15 bleibt wegen des
-I/O-Fensters nur ein Teil der Rückwand für Löcher. Wer mehr Luft braucht, stellt
-`PLINTH_H` auf 16 (drei Lochreihen statt zwei) oder vergrößert das Feld `REAR_D15_VENT`.
+Stellschrauben in `params.py`:
+
+- `FRONT_VENT = None` schließt die Front. Mit `y0 = MID_Y1 + 4` bleibt nur das Feld vor der
+  Board-Kammer.
+- `REAR_VENT`, `TOP_VENT`, `GPU_SIDE_VENT` und `PSU_VENT` legen die übrigen Felder fest.
+- `VENT_D` und `VENT_PITCH` gelten für alle Felder außer dem Sockel.
 
 ## Entscheidungen
 
+- **GPU links, Board rechts und kopfüber.** Der Grund steht oben im Abschnitt Layout. Die
+  Alternative wäre ein normal stehendes Board links und eine hängende Karte rechts mit den
+  Kontakten nach oben.
+- **Front mit Lochfeld über die ganze Fläche.** Der CPU-Kühler bekommt so Luft auf geradem Weg.
+  Das Feld hat dasselbe Bild wie die Rückwand. Die Löcher vor der Stirnkante der Mittelwand
+  enden an der Mittelwand, damit das Feld außen keine Lücke hat.
+- **Taster rechts auf halber Höhe, mit eigener Leitung zum Board.** Er sitzt frei über dem
+  Netzteil und hat 50 mm Bauraum nach hinten. Um ihn bleibt ein lochfreier Kreis mit 13 mm Radius
+  als Auflage für Kragen und Mutter. `BUTTON_Y` und `BUTTON_Z` verschieben ihn.
+- **Abstandshalter 8 mm** statt 6,35 mm, damit Flachband und Kühler-Rückplatte hinter das Board
+  passen. Über dem D15 bleiben dadurch 6,4 mm statt 8,4 mm.
+- **Tasche für das Flachband in der Mittelwand**, 3 mm tief. Dort bleiben 2 mm Wand stehen.
 - **Wandstärke 4 mm überall** statt 3 mm an den Seiten. Seitenwand-Eckbögen und Front/Rückwand
   stoßen dadurch bündig aneinander. Folge: außen 279 statt ca. 277 mm breit.
-- **Raster 5,7 mm in der GPU-Seitenwand** statt 6 mm. Mit 6 mm wäre das Feld wegen der Fuge
-  nur ca. 36 % offen gewesen; die Vorgabe von mindestens 40 % hat Vorrang. Die Lochgröße bleibt Ø4.
-- **Seitenwand-Flansche nur oben und unten** (je ein Paar 20 mm lang), damit die Fuge vor den
-  GPU-Lüftern Löcher behalten kann.
+- **Ein Lochbild für alle Felder** (Ø3,2 im 4,5-mm-Raster). Vor der Karte sind 43,9 % offen, die
+  Vorgabe war mindestens 40 %.
+- **Seitenwand-Flansche nur oben und unten** (je ein kurzes Paar), damit das Lochfeld vor den
+  GPU-Lüftern über die Fuge durchläuft.
+- **Sockel rundum gelocht**, auch in den Eckbögen. Schraubpfosten und Fugenflansche stehen frei
+  hinter dem Ring, damit sie kein Loch verdecken.
 - **GPU-Kammer bleibt 85 mm** für Karten bis 340 × 140 × 65 mm (Profil `max`), obwohl die Reaper
   nur 42 mm dick ist. Sie hat dadurch 40 mm Luft vor den Lüftern.
-- **Laschen der Mittelwand nur auf der Board-Seite.** Oben sitzen sie nur außerhalb des Kühlers
-  (x = 30, 140, 351), weil über dem D15 nur 8 mm Luft bleiben.
+- **Laschen der Mittelwand nur auf der Board-Seite.** Oben sitzen sie außerhalb des Riser-Bogens
+  (x = 30, 140, 351).
 - **Rückwand oben in der GPU-Kammer ohne Lasche**, wegen des Kabelbogens. Gehalten wird sie dort
   von der Leiste und der Mittelwand-Nachbarschaft.
 - **Netzteil 25 mm vor der Seitenwand**, damit ein gewinkelter C13-Stecker in die Netzteilbuchse
@@ -199,12 +265,14 @@ I/O-Fensters nur ein Teil der Rückwand für Löcher. Wer mehr Luft braucht, ste
 
 | Maß | Wert in `params.py` | Stand |
 |---|---|---|
-| ITX-Lochbild | C(0,0), F(154,94; 0), H(22,86; 157,48), J(154,94; 157,48) mit erster Koordinate **Richtung vorn**, zweiter **quer** | Abstände sind die 0,1"-Rasterwerte aus ATX/microATX (6,1" / 6,2" / 0,9"). Deine Liste stimmt, wenn die erste Koordinate Richtung vorn zählt; quer gelesen läge die vordere Lochreihe nur 2,4 mm vor der Platinenkante. Loch C: 10,16 mm von der I/O-Kante, 6,17 mm von der Slot-Kante – aus Zeichnungen, nicht aus der Spezifikation. |
-| I/O-Fenster | 158,75 × 44,45, Unterkante 3,81 unter Platinenoberseite, Wand 1,2 mm, Ecken r 0,99, Sperrzone 2,5 | Aus ATX 2.2, Abschnitt 3.3.5 (Text). Die Lage entlang der Kante (`IO_FROM_BOTTOM` = 5,6) ist geschätzt; die Zeichnung (Fig. 3/4) war nur als Bild verfügbar. |
+| ITX-Lochbild | C(0,0), F(154,94; 0), H(22,86; 157,48), J(154,94; 157,48) mit erster Koordinate **Richtung vorn**, zweiter **quer** | Abstände sind die 0,1"-Rasterwerte aus ATX/microATX (6,1" / 6,2" / 0,9"). Deine Liste stimmt, wenn die erste Koordinate Richtung vorn zählt; quer gelesen läge die vordere Lochreihe nur 2,4 mm vor der Platinenkante. Loch C: 10,16 mm von der I/O-Kante, 6,17 mm von der Slot-Kante – aus Zeichnungen, nicht aus der Spezifikation. Im Gehäuse liegt die Slot-Kante oben. |
+| I/O-Fenster | 158,75 × 44,45, Unterkante 3,81 unter Platinenoberseite, Wand 1,2 mm, Ecken r 0,99, Sperrzone 2,5 | Aus ATX 2.2, Abschnitt 3.3.5 (Text). Die Lage entlang der Kante (`IO_FROM_SLOT_EDGE` = 5,6) ist geschätzt; die Zeichnung (Fig. 3/4) war nur als Bild verfügbar. |
 | PCIe-Slotblech | Länge 120,02, Slotabstand 20,32, Lasche 112 über der Fingerunterkante, Leiste 6 mm hoch | Slotabstand sicher (0,8"). Laschenhöhe und Freiraum unter der Lasche geschätzt. |
-| NH-D15-Höhe | 165 mm ab Platine | Die Noctua-Seite nennt für den NH-D15 G2 168 mm (`COOLER_PROFILE = "NH-D15 G2"` lässt dann 5,4 mm Luft). |
+| Riser | Bahn 231 mm, Flachband 4 mm dick, Stecker ragt 16 mm aus dem Slot | Gewinkelter Stecker angenommen, kein konkretes Modell. Länge und Steckerform am gekauften Riser prüfen, bevor die Mittelwand gedruckt wird. |
+| Platz hinter dem Board | 11 mm, davon 8 mm Abstandshalter und 3 mm Tasche | Kühler-Rückplatte mit 6 mm angenommen (`CPU_BACKPLATE`). Eine M.2-SSD auf der Rückseite des Boards hat 6 mm bis zum Flachband und bekommt wenig Luft. |
+| NH-D15-Höhe | 165 mm ab Platine | Die Noctua-Seite nennt für den NH-D15 G2 168 mm (`COOLER_PROFILE = "NH-D15 G2"` lässt dann 3,4 mm Luft). |
 | Reaper-Maße | 304 × 127 × 42 mm (mit Blech), 2 × 8-Pin | Händlerangaben; Karte ohne Blech 289 × 111 × 41. |
-| Sockel-/Slotlage | Sockel 90 mm von I/O, 105 mm von unten; Slot 10 mm von unten, 45–134 mm von I/O | Parameter, für das kommende Board anpassen. Für das Z590I Vision D nicht verifiziert. |
+| Sockel-/Slotlage | Sockel 90 mm von I/O, 105 mm von der Slot-Kante; Slot 10 mm von der Kante, 45–134 mm von I/O | Parameter, für das kommende Board anpassen. Für das Z590I Vision D nicht verifiziert. |
 | Netzteil und C14 | SFX 125 × 63,5 × 100; C14-Schnappbuchse 27,5 × 19,8 | Typ festgelegt, konkretes Modell offen. |
 
 **Option 4 Slots:** Bei `GPU_SLOTS = 4` reicht die Slotöffnung (81 mm) in den Eckbogen der
