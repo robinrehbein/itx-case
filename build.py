@@ -185,8 +185,10 @@ fz0, fz1 = P.GPU_Z0, min(P.GPU_Z0 + P.GPU["H"], P.GPU_SIDE_VENT["z1"])
 fan_pts = [q for q in side_walls.gpu_vent_points() if fx0 <= q[0] <= fx1 and fz0 <= q[1] <= fz1]
 gs_field = (fx1 - fx0) * (fz1 - fz0)
 a_fan = hole_area(fan_pts)
-a_ps = hole_area(side_walls.psu_vent_points())
-a_top = hole_area(lid.vent_points())
+side_psu, side_board = side_walls.board_vent_points()
+a_ps, a_bs = hole_area(side_psu), hole_area(side_board)
+top_board, top_gpu = lid.vent_points()
+a_tb, a_tg = hole_area(top_board), hole_area(top_gpu)
 a_rd = hole_area(rear_d15)
 a_rg = hole_area(rear_gpu)
 g = P.GPU_OPEN
@@ -202,14 +204,17 @@ lines = [
     f"  Sockelring            {a_pl/100:7.0f} cm²  (Engstelle der Bodenzuluft)",
     f"  Boden (über Sockel)   {a_fl/100:7.0f} cm²",
     f"  Seitenwand GPU        {a_gs/100:7.0f} cm²  (vor der Karte {a_fan/gs_field*100:.1f} % offen)",
-    f"  Seitenwand Netzteil   {a_ps/100:7.0f} cm²",
     "Abluft:",
     f"  Rückwand Board-Kammer {a_rd/100:7.0f} cm²  (1x 140-mm-Lüfter frei: {fan140/100:.0f} cm²)",
-    f"  Deckel GPU (top_vent) {a_top/100:7.0f} cm²",
+    f"  Deckel Board-Kammer   {a_tb/100:7.0f} cm²",
+    f"  Seitenwand Netzteil   {a_ps/100:7.0f} cm²  (hinter dem Netzteil)",
+    f"  Deckel GPU-Kammer     {a_tg/100:7.0f} cm²",
     f"  Rückwand GPU-Kammer   {a_rg/100:7.0f} cm²  + Slotblech ~{a_open/100:.0f} cm²",
     f"  Front GPU-Kammer      {a_fg/100:7.0f} cm²",
-    f"Summen: Zuluft {(min(a_pl, a_fl) + a_gs + a_ps + a_fb)/100:.0f} cm², "
-    f"Abluft {(a_rd + a_top + a_rg + a_open + a_fg)/100:.0f} cm²",
+    "Ohne feste Richtung (nicht in den Summen):",
+    f"  Seitenwand Board-Kammer {a_bs/100:5.0f} cm²  (neben Kühler und Board)",
+    f"Summen: Zuluft {(min(a_pl, a_fl) + a_gs + a_fb)/100:.0f} cm², "
+    f"Abluft {(a_rd + a_tb + a_ps + a_tg + a_rg + a_open + a_fg)/100:.0f} cm²",
     f"Vergleich: 3x 95-mm-GPU-Lüfter ~{3*fan95/100:.0f} cm², 2x 140 mm D15 ~{2*fan140/100:.0f} cm²",
 ]
 for line in lines:

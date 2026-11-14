@@ -212,6 +212,20 @@ def holes_x(pts, x0, x1, d=None):
     return [cyl_x(u, v, x0, x1, r) for (u, v) in pts]
 
 
+def split_blind(pts, rects=(), discs=(), d=None):
+    """Teilt Lochmitten in (durchgehend, blind). Blind ist jedes Loch, das eine Zone berührt:
+    rects = (u0, u1, v0, v1), discs = (u, v, Radius). Hinter diesen Löchern sitzt ein Flansch
+    oder Dom; sie werden als Sackloch geschnitten, damit das Feld außen geschlossen aussieht."""
+    r = (d or P.VENT_D) / 2
+
+    def hit(u, v):
+        if any(a0 - r < u < a1 + r and b0 - r < v < b1 + r for (a0, a1, b0, b1) in rects):
+            return True
+        return any((u - cu) ** 2 + (v - cv) ** 2 < (rd + r) ** 2 for (cu, cv, rd) in discs)
+
+    return [q for q in pts if not hit(*q)], [q for q in pts if hit(*q)]
+
+
 def hole_area(pts, d=None):
     d = d or P.VENT_D
     return len(pts) * math.pi * d * d / 4

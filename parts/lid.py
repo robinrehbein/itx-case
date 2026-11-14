@@ -1,7 +1,7 @@
-"""Deckel: voller Grundriss mit gerundeter Oberkante, Lochfeld über der GPU (TOP_VENT),
-Magnettaschen über den Seitenwänden, Dome für die Wandlaschen."""
+"""Deckel: voller Grundriss mit gerundeter Oberkante, ein Lochfeld über die ganze Fläche
+(TOP_VENT), Magnettaschen über den Seitenwänden, Dome für die Wandlaschen."""
 import params as P
-from parts.common import (Spec, rrect_prism, hex_grid, holes_z, cyl_z, fuse_all, cut_all,
+from parts.common import (Spec, rrect_prism, hex_grid, holes_z, split_blind, cyl_z, fuse_all, cut_all,
                           dome_lid, split_with_flanges, envelope_case, cut_holes_split)
 
 TOP = P.INNER_H + P.T_LID
@@ -21,10 +21,27 @@ def magnet_positions():
     return [(x, yl) for x in P.MAGNET_X] + [(x, yr) for x in P.MAGNET_X]
 
 
-def vent_points():
-    """Feld läuft ohne Lücke über die Trennfuge (Lochspalte auf der Fuge)."""
+# Fugenflansch nur über der Board-Kammer (y0, y1, z0, z1)
+SEAM_RIB = (P.MID_Y1 + 1.0, P.INNER_W - 11.0, P.INNER_H - P.FLANGE_D, P.INNER_H)
+
+
+def vent_sets():
+    """Feld läuft ohne Lücke über die Trennfuge (Lochspalte auf der Fuge).
+    Rückgabe: (durchgehend, blind). Blind sind die Löcher über Fugenflansch und Domen."""
     v = P.TOP_VENT
-    return hex_grid(v["x0"], v["x1"], v["y0"], v["y1"], corner_r=v["r"], col_at=P.SPLIT_X)
+    pts = hex_grid(v["x0"], v["x1"], v["y0"], v["y1"], corner_r=v["r"], col_at=P.SPLIT_X)
+    rects = [(P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, SEAM_RIB[0], SEAM_RIB[1])]
+    discs = [(x, y, P.DOME_D / 2) for (x, y) in dome_positions()]
+    return split_blind(pts, rects, discs)
+
+
+def vent_points():
+    """Offene Löcher nach Kammer: (Board-Kammer, GPU-Kammer). Löcher über der Mittelwand
+    gehen durch den Deckel, zählen aber nicht zum Querschnitt."""
+    through, _ = vent_sets()
+    r = P.VENT_D / 2
+    return ([q for q in through if q[1] >= P.MID_Y1 + r],
+            [q for q in through if q[1] <= P.MID_Y0 - r])
 
 
 def build():
@@ -34,7 +51,7 @@ def build():
     # Rundung oben; die ersten 1 mm auf dem Bett als 45°-Fase, damit die Kante druckbar bleibt
     plate = plate.makeFillet(P.LID_EDGE_R, top_edges).common(
         plate.makeChamfer(P.LID_EDGE_BED_CHAMFER, top_edges))
-    pts = vent_points()
+    through, blind = vent_sets()
 
     adds, cuts = [], []
     for (x, y) in dome_positions():
@@ -45,15 +62,15 @@ def build():
         cuts.append(cyl_z(x, y, P.INNER_H - 0.01, P.INNER_H + P.MAGNET_H, P.MAGNET_D / 2))
     shape = cut_all(fuse_all([plate] + adds), cuts)
 
-    # Flansch nur über der Board-Kammer: über der GPU bleibt das Lochfeld frei
-    z0 = P.INNER_H - P.FLANGE_D
-    ribs = [(P.MID_Y1 + 1.0, P.INNER_W - 11.0, z0, P.INNER_H)]
+    # Flansch nur über der Board-Kammer: über der GPU bleibt das Lochfeld offen
+    ribs = [SEAM_RIB]
     zb = P.INNER_H - 5.0
     bolts = [(105.0, zb), (150.0, zb), (200.0, zb), (245.0, zb)]
     a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_case())
-    a, b = cut_holes_split(a, b, P.SPLIT_X, [q[0] for q in pts],
-                           holes_z(pts, P.INNER_H - 1, TOP + 1))
+    tools = (holes_z(through, P.INNER_H - 1, TOP + 1)
+             + holes_z(blind, P.INNER_H + P.VENT_BLIND_SKIN, TOP + 1))
+    a, b = cut_holes_split(a, b, P.SPLIT_X, [q[0] for q in through + blind], tools)
     col = (0.80, 0.80, 0.82)
     rot = [((1, 0, 0), 180)]   # Sichtfläche aufs Bett
     return [Spec("deckel_vorn", a, col, print_rot=rot, explode=(-25, 0, 120)),
-            Spec("deckel_hinten", b, col, print_rot=rot, explode=(25, 0, 120))], len(pts)
+            Spec("deckel_hinten", b, col, print_rot=rot, explode=(25, 0, 120))], len(through)

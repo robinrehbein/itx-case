@@ -1,8 +1,10 @@
 """Seitenwände: laufen mit Viertelkreis um die Ecken bis zur Front/Rückwand.
 Unten im Randfalz des Bodens, oben mit Magneten 10x3 im Deckel gehalten.
-Links: Lochfeld vor den GPU-Lüftern. Rechts: Lochfeld vor dem Netzteil."""
+Beide Wände tragen das gleiche Lochfeld, auf gleicher Höhe wie Front und Rückwand.
+Links sitzt es vor den GPU-Lüftern, rechts neben Kühler und Netzteil."""
 import params as P
-from parts.common import (Spec, box, rrect_prism, wedge_x, hex_grid, holes_y, cyl_z, fuse_all,
+from parts.common import (Spec, box, rrect_prism, wedge_x, hex_grid, holes_y, split_blind, cyl_z,
+                          fuse_all,
                           cut_all, split_with_flanges, envelope_case, cut_holes_split, BIG)
 
 H = P.INNER_H
@@ -40,23 +42,47 @@ def side_ribs(side):
     return [lower, upper]
 
 
-def seam_keep():
-    """Nur die Flansche selbst (inkl. Stützkeil) bleiben lochfrei."""
+def blind_zones():
+    """Zonen (x0, x1, z0, z1), hinter denen innen Material an der Wand sitzt: Fugenflansche
+    mit Stützkeil und die Magnetnasen. Löcher dort werden Sacklöcher."""
     d = P.FLANGE_D
     (lz0, lz1), (uz0, uz1) = SIDE_RIB_Z
-    return [(P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, 0.0, lz1),
-            (P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, uz0 - d - 1, uz1)]
+    zones = [(P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, 0.0, lz1),
+             (P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, uz0 - d - 1, uz1)]
+    zb = H - P.MAGNET_BOSS_H - P.MAGNET_BOSS_DEPTH + 1.0   # hier tritt der Keil aus der Wand
+    zones += [(x - 8.0, x + 8.0, zb, H) for x in P.MAGNET_X]
+    return zones
+
+
+def _field(v):
+    pts = hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], corner_r=v["r"], col_at=P.SPLIT_X)
+    return split_blind(pts, blind_zones())
+
+
+def gpu_vent_sets():
+    """(durchgehend, blind) der linken Wand."""
+    return _field(P.GPU_SIDE_VENT)
 
 
 def gpu_vent_points():
-    v = P.GPU_SIDE_VENT
-    return hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], seam_keep(), corner_r=v["r"],
-                    col_at=P.SPLIT_X)
+    return gpu_vent_sets()[0]
 
 
-def psu_vent_points():
+def board_vent_sets():
+    """(durchgehend, blind) der rechten Wand. Ohne BOARD_SIDE_VENT nur das Feld am Netzteil."""
+    if P.BOARD_SIDE_VENT:
+        return _field(P.BOARD_SIDE_VENT)
     v = P.PSU_VENT
-    return hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], seam_keep(), corner_r=v["r"])
+    return split_blind(hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], corner_r=v["r"]),
+                       blind_zones())
+
+
+def board_vent_points():
+    """Offene Löcher der rechten Wand: (hinter dem Netzteil, übriges Feld)."""
+    v = P.PSU_VENT
+    through, _ = board_vent_sets()
+    psu = [q for q in through if v["x0"] <= q[0] <= v["x1"] and v["z0"] <= q[1] <= v["z1"]]
+    return psu, [q for q in through if q not in psu]
 
 
 def magnet_boss(x, side):
@@ -81,10 +107,12 @@ def build():
     left = r.common(box(-BIG, BIG, -BIG, P.FLAT_Y0, -BIG, BIG))
     right = r.common(box(-BIG, BIG, P.FLAT_Y1, BIG, -BIG, BIG))
 
-    gpts = gpu_vent_points()
-    ppts = psu_vent_points()
-    vents = {"L": (gpts, holes_y(gpts, P.OUT_Y0 - 1, 0.5)),
-             "R": (ppts, holes_y(ppts, P.INNER_W - 0.5, P.OUT_Y1 + 1))}
+    sk = P.VENT_BLIND_SKIN
+    gt, gb = gpu_vent_sets()
+    bt, bb = board_vent_sets()
+    vents = {"L": (gt + gb, holes_y(gt, P.OUT_Y0 - 1, 0.5) + holes_y(gb, P.OUT_Y0 - 1, -sk)),
+             "R": (bt + bb, holes_y(bt, P.INNER_W - 0.5, P.OUT_Y1 + 1)
+                   + holes_y(bb, P.INNER_W + sk, P.OUT_Y1 + 1))}
 
     out = []
     col = (0.70, 0.71, 0.74)
@@ -105,4 +133,4 @@ def build():
         ey = -130 if side == "L" else 130
         out.append(Spec(name + "_vorn", a, col, explode=(-25, ey, 0)))
         out.append(Spec(name + "_hinten", b, col, explode=(25, ey, 0)))
-    return out, (len(gpts), len(ppts))
+    return out, (len(gt), len(bt))

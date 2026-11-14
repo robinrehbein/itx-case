@@ -243,19 +243,27 @@ VGROOVE = 0.8         # Fase je Seite -> V-Nut 1.6 breit, 0.8 tief
 VENT_D = 3.2
 VENT_PITCH = 4.5       # Steg 1.3 mm, Feld theoretisch 45.9 % offen
 VENT_EDGE = 1.0        # Mindeststeg zum Feldrand / zu Ausschnitten
-# Felder, die über die Trennfuge laufen, liegen symmetrisch zu SPLIT_X (Spalte auf der Fuge)
-TOP_VENT = dict(x0=19.0, x1=331.0, y0=12.0, y1=80.0, r=14.0)   # Deckel über GPU
-GPU_SIDE_VENT = dict(x0=19.0, x1=331.0, z0=20.0, z1=184.0, r=14.0)
+# Alle Wandfelder beginnen und enden auf derselben Höhe (zwischen den Wandlaschen).
+VENT_Z0 = TAB_Z_BOT[1] + 3.0     # 14
+VENT_Z1 = TAB_Z_TOP[0] - 3.0     # 196
+VENT_BLIND_SKIN = 0.6  # Löcher über Flanschen und Domen enden als Sackloch vor dieser Haut
+# Felder über die Trennfuge haben eine Lochspalte genau auf SPLIT_X.
+# Deckel: ein Feld über die ganze Fläche, 16 mm vom Rand (Magnete und Dome der Front/Rückwand
+# liegen im Rand). Nur über der GPU-Kammer: y1 = MID_Y0 - 5.
+TOP_VENT = dict(x0=OUT_X0 + 16.0, x1=OUT_X1 - 16.0, y0=OUT_Y0 + 16.0, y1=OUT_Y1 - 16.0, r=14.0)
+# Seitenwände: gleiche Höhe und gleicher Abstand zu den Eckbögen wie Front und Rückwand
+GPU_SIDE_VENT = dict(x0=FLAT_X0 + 4.0, x1=FLAT_X1 - 4.0, z0=VENT_Z0, z1=VENT_Z1, r=12.0)
+# Rechte Seitenwand (Board-Kammer): gleiches Feld wie links. None = nur das Feld PSU_VENT.
+BOARD_SIDE_VENT = dict(x0=FLAT_X0 + 4.0, x1=FLAT_X1 - 4.0, z0=VENT_Z0, z1=VENT_Z1, r=12.0)
+# Fenster hinter dem Netzteil (Abluft); zählt den Querschnitt und ist das Feld ohne BOARD_SIDE_VENT
 PSU_VENT = dict(x0=PSU_X0 + 2, x1=PSU_X1 - 2, z0=PSU_Z0 + 2, z1=PSU_Z1 - 1, r=8.0)
 # Rückwand: ein Feld über die ganze ebene Fläche, Ausschnitte darin ausgespart
-REAR_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=TAB_Z_BOT[1] + 3.0,
-                 z1=TAB_Z_TOP[0] - 3.0, r=12.0)
+REAR_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=VENT_Z0, z1=VENT_Z1, r=12.0)
 REAR_RAIL_CLEAR = 6.0  # über der GPU-Leiste frei (Lasche + Schraubenköpfe)
 # Front: gleiches Feld wie an der Rückwand. Der CPU-Kühler bläst von vorn nach hinten und
 # saugt hier geradeaus an (über dem Netzteil). None = Front geschlossen.
 # Nur vor der Board-Kammer: y0 = MID_Y1 + 4.
-FRONT_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=TAB_Z_BOT[1] + 3.0,
-                  z1=TAB_Z_TOP[0] - 3.0, r=12.0)
+FRONT_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=VENT_Z0, z1=VENT_Z1, r=12.0)
 # Sockelring: etwas größere Löcher (Engstelle der Bodenzuluft), drei Höhen, rundum
 PLINTH_VENT_D = 3.8
 PLINTH_VENT_PITCH = 5.0

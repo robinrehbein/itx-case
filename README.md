@@ -3,8 +3,9 @@
 Ein flacher, breiter Block im Stil des Mac Studio mit zwei Kammern. Von vorn gesehen steht links
 die GPU aufrecht parallel zur Mittelwand, mit den Lüftern zur linken Seitenwand. Rechts sitzen
 Board, Noctua NH-D15 und SFX-Netzteil. Ein flexibles Riser-Kabel verbindet beide Kammern. Die
-Lüftung läuft nur über Felder aus kleinen runden Löchern: Front, Rückwand, linke Seitenwand,
-Deckel über der GPU, Boden und der rundum gelochte Sockel.
+Lüftung läuft nur über Felder aus kleinen runden Löchern: Front, Rückwand, beide Seitenwände,
+der ganze Deckel, Boden und der rundum gelochte Sockel. Die Felder von Front, Rückwand und
+Seitenwänden beginnen und enden auf derselben Höhe (14 und 196 mm über dem Boden).
 
 | | |
 |---|---|
@@ -76,14 +77,14 @@ kein Export).
 ## Teileliste
 
 Die Zeiten sind grobe Schätzungen aus Volumen und Oberfläche (0,4-mm-Düse, 0,2-mm-Schicht).
-Der Slicer ist maßgeblich.
+Der Slicer ist maßgeblich. Die vielen Löcher kosten im Slicer mehr Zeit, als die Schätzung zeigt.
 
 | Teil | Druckmaß (mm) | Orientierung | Zeit | ASA |
 |---|---|---|---|---|
 | boden_vorn / boden_hinten | 179 / 187 × 279 × 15 | Unterseite aufs Bett | 7,2 h + 7,4 h | 231 g |
-| deckel_vorn / deckel_hinten | 181 / 189 × 283 × 15 | Oberseite aufs Bett | 6,9 h + 7,2 h | 282 g |
-| seite_links_vorn / _hinten | 179 / 187 × 22 × 210 | stehend | 4,6 h + 4,8 h | 142 g |
-| seite_rechts_vorn / _hinten | 179 / 187 × 22 × 210 | stehend | 4,7 h + 4,9 h | 187 g |
+| deckel_vorn / deckel_hinten | 181 / 189 × 283 × 15 | Oberseite aufs Bett | 6,8 h + 7,1 h | 200 g |
+| seite_links_vorn / _hinten | 179 / 187 × 22 × 210 | stehend | 4,6 h + 4,8 h | 136 g |
+| seite_rechts_vorn / _hinten | 179 / 187 × 22 × 210 | stehend | 4,6 h + 4,8 h | 136 g |
 | front | 210 × 235 × 14 | Sichtseite aufs Bett | 5,6 h | 75 g |
 | rueckwand | 210 × 235 × 17 | Sichtseite aufs Bett | 4,3 h | 62 g |
 | mittelwand_vorn / _hinten | 173 / 182 × 210 × 15 | GPU-Seite aufs Bett | 5,0 h + 4,2 h | 184 g |
@@ -96,7 +97,7 @@ Der Slicer ist maßgeblich.
 | kabelkamm | 38 × 10 × 8 | wie eingebaut | 0,2 h | 1 g |
 | passtest_board | 182 × 184 × 10 | flach | 1,6 h | 23 g |
 | passtest_rueckwand | 185 × 131 × 15 | flach | 1,1 h | 15 g |
-| **Summe Gehäuse + Halter** | | | **ca. 72 h** | **ca. 1,25 kg** |
+| **Summe Gehäuse + Halter** | | | **ca. 71 h** | **ca. 1,1 kg** |
 
 **Zuerst die zwei Passtest-Teile drucken.** Sie prüfen die Maße, die nicht sicher sind (siehe
 unten), mit echtem Board und echter Karte, bevor 72 Stunden Druckzeit anfallen.
@@ -192,33 +193,45 @@ Zum Abnehmen des Deckels müssen Kühler und Board wieder heraus (Schritte 13 bi
 ## Luftstrom und freie Querschnitte
 
 Die Löcher haben Ø3,2 im Wabenraster mit 4,5 mm Abstand (theoretisch 45,9 % offen), im Sockel
-Ø3,8 mit 5 mm Abstand. In Deckel, Seitenwand und Sockel laufen die Felder ohne Lücke über die
-Trennfuge, eine Lochspalte liegt genau auf der Fuge.
+Ø3,8 mit 5 mm Abstand. In Deckel, Seitenwänden und Sockel laufen die Felder ohne Lücke über die
+Trennfuge, eine Lochspalte liegt genau auf der Fuge. Wo innen ein Fugenflansch, ein Schraubdom
+oder eine Magnetnase hinter dem Feld sitzt, sind die Löcher Sacklöcher mit 0,6 mm Haut
+(`VENT_BLIND_SKIN`). Von außen sieht das Feld dadurch überall gleich aus. Sacklöcher und die
+Löcher über der Mittelwand zählen nicht zum Querschnitt.
 
 | | Fläche | Bemerkung |
 |---|---|---|
 | **Zuluft** Front vor der Board-Kammer | 124 cm² | gerade vor dem CPU-Kühler |
 | Sockelring | 44 cm² | Engstelle der Bodenzuluft, zusätzlich ca. 35 cm² Spalt unter der Lippe bei 3-mm-Füßen |
 | Boden über dem Sockel | 294 cm² | |
-| Seitenwand vor der GPU | 225 cm² | 43,9 % offen vor der Karte |
-| Seitenwand Netzteil | 30 cm² | Netzteil-Abluft |
+| Linke Seitenwand vor der GPU | 250 cm² | 43,7 % offen vor der Karte |
 | **Abluft** Rückwand Board-Kammer | 82 cm² | ein 140-mm-Lüfter hat ca. 139 cm² freie Fläche |
-| Deckel über der GPU (`TOP_VENT`) | 85 cm² | |
+| Deckel über der Board-Kammer | 239 cm² | |
+| Rechte Seitenwand hinter dem Netzteil | 32 cm² | Netzteil-Abluft |
+| Deckel über der GPU-Kammer | 102 cm² | |
 | Rückwand GPU-Kammer | 18 cm² + ca. 29 cm² | Lochfeld plus Slotblech |
 | Front vor der GPU-Kammer | 48 cm² | |
-| **Summe** | Zuluft 423 cm², Abluft 261 cm² | zum Vergleich: 3 × 95-mm-GPU-Lüfter ca. 194 cm², 2 × 140 mm am D15 ca. 277 cm² |
+| **Ohne feste Richtung** rechte Seitenwand neben Kühler und Board | 217 cm² | nicht in den Summen |
+| **Summe** | Zuluft 418 cm², Abluft 550 cm² | zum Vergleich: 3 × 95-mm-GPU-Lüfter ca. 194 cm², 2 × 140 mm am D15 ca. 277 cm² |
 
 Der D15 bläst von vorn nach hinten. Er saugt durch die Front an und bläst durch die Rückwand aus.
 Das Netzteil steht vorn unten und verdeckt nur die unteren 75 mm der Front, darüber ist der Weg
 zum Kühler frei. Hinter dem D15 bleibt wegen des I/O-Fensters nur ein Teil der Rückwand für
-Löcher. Das ist die Engstelle der Board-Kammer. Der Boden hat zwei lochfreie Streifen, einen unter
-der Mittelwand und einen 8 mm breiten am Flansch der Trennfuge.
+Löcher. Was dort nicht hinauspasst, zieht nach oben durch den Deckel ab. Der Boden hat zwei lochfreie
+Streifen, einen unter der Mittelwand und einen 8 mm breiten am Flansch der Trennfuge.
+
+Der offene Deckel hat einen Preis: Staub und verschüttete Flüssigkeit fallen direkt auf Board
+und Karte, und der Deckel dämpft die Lüfter weniger. Auf dem Deckel sollte nichts liegen.
 
 Stellschrauben in `params.py`:
 
 - `FRONT_VENT = None` schließt die Front. Mit `y0 = MID_Y1 + 4` bleibt nur das Feld vor der
   Board-Kammer.
-- `REAR_VENT`, `TOP_VENT`, `GPU_SIDE_VENT` und `PSU_VENT` legen die übrigen Felder fest.
+- `VENT_Z0` und `VENT_Z1` legen Unter- und Oberkante aller Wandfelder gemeinsam fest.
+- `TOP_VENT` ist das Feld im Deckel. Mit `y1 = MID_Y0 - 5` liegt es nur über der GPU-Kammer.
+- `BOARD_SIDE_VENT = None` schließt die rechte Seitenwand bis auf das Feld hinter dem Netzteil
+  (`PSU_VENT`).
+- `REAR_VENT` und `GPU_SIDE_VENT` legen die übrigen Felder fest.
 - `VENT_D` und `VENT_PITCH` gelten für alle Felder außer dem Sockel.
 
 ## Entscheidungen
@@ -237,10 +250,15 @@ Stellschrauben in `params.py`:
 - **Tasche für das Flachband in der Mittelwand**, 3 mm tief. Dort bleiben 2 mm Wand stehen.
 - **Wandstärke 4 mm überall** statt 3 mm an den Seiten. Seitenwand-Eckbögen und Front/Rückwand
   stoßen dadurch bündig aneinander. Folge: außen 279 statt ca. 277 mm breit.
-- **Ein Lochbild für alle Felder** (Ø3,2 im 4,5-mm-Raster). Vor der Karte sind 43,9 % offen, die
+- **Ein Lochbild für alle Felder** (Ø3,2 im 4,5-mm-Raster). Vor der Karte sind 43,7 % offen, die
   Vorgabe war mindestens 40 %.
-- **Seitenwand-Flansche nur oben und unten** (je ein kurzes Paar), damit das Lochfeld vor den
-  GPU-Lüftern über die Fuge durchläuft.
+- **Deckel mit Lochfeld über die ganze Fläche**, 16 mm vom Rand. Im Rand sitzen die Magnete und
+  die Dome für Front und Rückwand.
+- **Beide Seitenwände mit dem gleichen Feld**, auf gleicher Höhe wie Front und Rückwand und mit
+  gleichem Abstand zu den Eckbögen. Die rechte Wand hatte vorher nur ein kleines Feld hinter dem
+  Netzteil.
+- **Seitenwand-Flansche nur oben und unten** (je ein kurzes Paar). Das Lochfeld läuft über die
+  Fuge durch, vor den Flanschen als Sacklöcher.
 - **Sockel rundum gelocht**, auch in den Eckbögen. Schraubpfosten und Fugenflansche stehen frei
   hinter dem Ring, damit sie kein Loch verdecken.
 - **GPU-Kammer bleibt 85 mm** für Karten bis 340 × 140 × 65 mm (Profil `max`), obwohl die Reaper
