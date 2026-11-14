@@ -119,6 +119,20 @@ def cut_all(shape, tools):
     return shape.cut(tools)
 
 
+def place(shape):
+    """Blockkörper (x=u, y=v, z=w) -> Gehäusekoordinaten (siehe params.to_case)."""
+    if P.LAYOUT == "A" or shape is None:
+        return shape
+    s = shape.copy()
+    s.rotate(V(0, 0, 0), V(1, 0, 0), 90)     # (u, v, w) -> (u, -w, v)
+    s.translate(V(0, P.Y_BASE, 0))
+    return s
+
+
+# Druckorientierung eines Blockteils im Gehäuse: erst zurück in den Block drehen
+PLACE_UNDO = [] if P.LAYOUT == "A" else [((1, 0, 0), -90)]
+
+
 def solid(shape):
     if shape.ShapeType == "Solid":
         return shape

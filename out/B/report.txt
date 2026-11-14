@@ -1,0 +1,87 @@
+== Variante B stehend, GPU reaper, SFX ==
+== Bauteile ==
+  Boden                           7.2 s
+  Deckel                          7.5 s
+  Seitenwände                    21.5 s
+  Front                           5.3 s
+  Rückwand                        3.0 s
+  Board-Träger                    0.3 s
+  Sockel                          2.6 s
+  Extras                          0.5 s
+  Dummies                         0.0 s
+  Spiegeln (Händigkeit)           4.0 s
+
+== V-Nut an den Trennstellen ==
+  boden_vorn              3 Kanten  V-Fase
+  boden_hinten            3 Kanten  V-Fase
+  deckel_vorn             3 Kanten  V-Fase
+  deckel_hinten           3 Kanten  V-Fase
+  seite_links_vorn        1 Kanten  V-Fase
+  seite_links_hinten      1 Kanten  V-Fase
+  seite_rechts_vorn       1 Kanten  V-Fase
+  seite_rechts_hinten     1 Kanten  V-Fase
+  sockel_vorn             6 Kanten  V-Fase
+  sockel_hinten           6 Kanten  V-Fase
+
+== Gültigkeit ==
+  ok
+
+== Kollision Gehäuse/Halter <-> Komponenten ==
+  keine Kollision
+
+== Überschneidung Druckteile untereinander ==
+  keine
+
+== Druckbett / Manifold / Export ==
+  boden_vorn              134.0 x  211.0 x   15.0  passt  manifold=ja  ~ 4.2 h  ~  67 g
+  boden_hinten            188.0 x  211.0 x   15.0  passt  manifold=ja  ~ 5.7 h  ~  89 g
+  deckel_vorn             135.0 x  213.0 x   15.0  passt  manifold=ja  ~ 4.0 h  ~  60 g
+  deckel_hinten           189.0 x  213.0 x   15.0  passt  manifold=ja  ~ 5.5 h  ~  81 g
+  seite_links_vorn        134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 3.8 h  ~  54 g
+  seite_links_hinten      188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 5.2 h  ~  72 g
+  seite_rechts_vorn       134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 3.8 h  ~  54 g
+  seite_rechts_hinten     188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 5.2 h  ~  72 g
+  front                   237.0 x  187.0 x   14.0  passt  manifold=ja  ~ 5.0 h  ~  67 g
+  rueckwand               237.0 x  187.0 x   17.0  passt  manifold=ja  ~ 3.9 h  ~  55 g
+  traeger_vorn            127.8 x  237.0 x   15.0  passt  manifold=ja  ~ 3.9 h  ~  82 g
+  traeger_hinten          181.8 x  237.0 x   15.0  passt  manifold=ja  ~ 4.9 h  ~ 104 g
+  sockel_vorn             118.0 x  179.0 x   20.0  passt  manifold=ja  ~ 1.2 h  ~  15 g
+  sockel_hinten           172.0 x  179.0 x   20.0  passt  manifold=ja  ~ 1.4 h  ~  18 g
+  netzteil_halter          70.5 x  128.0 x   28.0  passt  manifold=ja  ~ 1.2 h  ~  20 g
+  netzteil_klammer        103.5 x   30.5 x   14.0  passt  manifold=ja  ~ 0.3 h  ~   4 g
+  gpu_stuetze              47.0 x   16.0 x   13.0  passt  manifold=ja  ~ 0.2 h  ~   3 g
+  kabelkamm                37.6 x   10.0 x    8.0  passt  manifold=ja  ~ 0.2 h  ~   1 g
+  passtest_board          182.0 x  182.0 x   10.0  passt  manifold=ja  ~ 1.6 h  ~  22 g
+  passtest_rueckwand      132.6 x  211.4 x   15.0  passt  manifold=ja  ~ 1.6 h  ~  22 g
+
+== Freie Querschnitte (Ø3.2, Raster 4.5; Sockel Ø3.8) ==
+  Wabenfeld offen (theoretisch): 45.9 %
+    Front                     160 cm²  (vor Netzteil und CPU-Kühler)
+    Rückwand                   94 cm²  + Slotblech ~19 cm²
+    Seitenwand je Seite       266 cm²
+    Deckel                    212 cm²
+    Boden (über Sockel)       193 cm²
+    Sockelring                 57 cm²  (Engstelle der Bodenzuluft)
+  GPU saugt durch: Boden, vor der Karte 41.7 % offen
+  Vergleich: 3x 95-mm-GPU-Lüfter ~194 cm², 2x 140 mm D15 ~277 cm²
+
+== Maße ==
+  Variante: B stehend
+  Außen L x B x H (ohne Sockel): (322.0, 211.0, 247.0)
+  Außen H mit Sockel: 267.0
+  Innen L x B x H: (314.0, 203.0, 237.0)
+  Luft Kühler -> Wand oben/seitlich: 12.4
+  Sockel-Mitte (x, v): (220.0, 150.0)
+  GPU-Profil: reaper
+  GPU Luft Lüfter -> Wand: 17.0
+  Luft Netzteil -> Kühler: 64.0
+  Netzteil: SFX
+  Volumen außen: 17.8 l (Gehäuse 16.8 l, Sockel 1.0 l)
+  Volumen innen: 15.1 l (Quader ohne Eckbögen)
+
+== Montage-Dokument ==
+  /Users/robinrehbein/Code/itx-case/out/B/assembly.FCStd
+
+== Ergebnis ==
+  WARNUNG Sockelring 57 cm² kleiner als die GPU-Lüfterfläche 194 cm²: die Karte holt den Rest über Seitenwände und Front
+  OK – 529 s

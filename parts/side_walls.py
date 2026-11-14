@@ -1,7 +1,7 @@
 """Seitenwände: laufen mit Viertelkreis um die Ecken bis zur Front/Rückwand.
 Unten im Randfalz des Bodens, oben mit Magneten 10x3 im Deckel gehalten.
 Beide Wände tragen das gleiche Lochfeld, auf gleicher Höhe wie Front und Rückwand.
-Links sitzt es vor den GPU-Lüftern, rechts neben Kühler und Netzteil."""
+Bei A sitzt das linke Feld vor den GPU-Lüftern."""
 import params as P
 from parts.common import (Spec, box, rrect_prism, wedge_x, hex_grid, holes_y, split_blind, cyl_z,
                           fuse_all,
@@ -17,7 +17,7 @@ def ring():
 
 
 # kurze Flanschpaare unter und über dem Lochfeld (das Feld läuft über die Fuge durch)
-SIDE_RIB_Z = [(P.RIM_H + 0.5, 18.0), (195.0, H - 0.5)]
+SIDE_RIB_Z = [(P.RIM_H + 0.5, 18.0), (H - 15.0, H - 0.5)]
 
 
 def side_ribs(side):
@@ -59,30 +59,13 @@ def _field(v):
     return split_blind(pts, blind_zones())
 
 
-def gpu_vent_sets():
-    """(durchgehend, blind) der linken Wand."""
-    return _field(P.GPU_SIDE_VENT)
+def vent_sets():
+    """(durchgehend, blind); beide Wände haben dasselbe Feld."""
+    return _field(P.SIDE_VENT)
 
 
-def gpu_vent_points():
-    return gpu_vent_sets()[0]
-
-
-def board_vent_sets():
-    """(durchgehend, blind) der rechten Wand. Ohne BOARD_SIDE_VENT nur das Feld am Netzteil."""
-    if P.BOARD_SIDE_VENT:
-        return _field(P.BOARD_SIDE_VENT)
-    v = P.PSU_VENT
-    return split_blind(hex_grid(v["x0"], v["x1"], v["z0"], v["z1"], corner_r=v["r"]),
-                       blind_zones())
-
-
-def board_vent_points():
-    """Offene Löcher der rechten Wand: (hinter dem Netzteil, übriges Feld)."""
-    v = P.PSU_VENT
-    through, _ = board_vent_sets()
-    psu = [q for q in through if v["x0"] <= q[0] <= v["x1"] and v["z0"] <= q[1] <= v["z1"]]
-    return psu, [q for q in through if q not in psu]
+def vent_points():
+    return vent_sets()[0]
 
 
 def magnet_boss(x, side):
@@ -108,11 +91,10 @@ def build():
     right = r.common(box(-BIG, BIG, P.FLAT_Y1, BIG, -BIG, BIG))
 
     sk = P.VENT_BLIND_SKIN
-    gt, gb = gpu_vent_sets()
-    bt, bb = board_vent_sets()
-    vents = {"L": (gt + gb, holes_y(gt, P.OUT_Y0 - 1, 0.5) + holes_y(gb, P.OUT_Y0 - 1, -sk)),
-             "R": (bt + bb, holes_y(bt, P.INNER_W - 0.5, P.OUT_Y1 + 1)
-                   + holes_y(bb, P.INNER_W + sk, P.OUT_Y1 + 1))}
+    t, bl = vent_sets()
+    vents = {"L": (t + bl, holes_y(t, P.OUT_Y0 - 1, 0.5) + holes_y(bl, P.OUT_Y0 - 1, -sk)),
+             "R": (t + bl, holes_y(t, P.INNER_W - 0.5, P.OUT_Y1 + 1)
+                   + holes_y(bl, P.INNER_W + sk, P.OUT_Y1 + 1))}
 
     out = []
     col = (0.70, 0.71, 0.74)
@@ -133,4 +115,4 @@ def build():
         ey = -130 if side == "L" else 130
         out.append(Spec(name + "_vorn", a, col, explode=(-25, ey, 0)))
         out.append(Spec(name + "_hinten", b, col, explode=(25, ey, 0)))
-    return out, (len(gt), len(bt))
+    return out, len(t)

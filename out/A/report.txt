@@ -1,0 +1,83 @@
+== Variante A liegend, GPU reaper, SFX ==
+== Bauteile ==
+  Boden                           9.7 s
+  Deckel                         10.4 s
+  Seitenwände                    14.7 s
+  Front                           5.3 s
+  Rückwand                        3.4 s
+  Sockel                          1.7 s
+  Extras                          0.5 s
+  Dummies                         0.0 s
+  Spiegeln (Händigkeit)           4.3 s
+
+== V-Nut an den Trennstellen ==
+  boden_vorn              3 Kanten  V-Fase
+  boden_hinten            3 Kanten  V-Fase
+  deckel_vorn             3 Kanten  V-Fase
+  deckel_hinten           3 Kanten  V-Fase
+  seite_links_vorn        1 Kanten  V-Fase
+  seite_links_hinten      1 Kanten  V-Fase
+  seite_rechts_vorn       1 Kanten  V-Fase
+  seite_rechts_hinten     1 Kanten  V-Fase
+  sockel_vorn             6 Kanten  V-Fase
+  sockel_hinten           6 Kanten  V-Fase
+
+== Gültigkeit ==
+  ok
+
+== Kollision Gehäuse/Halter <-> Komponenten ==
+  keine Kollision
+
+== Überschneidung Druckteile untereinander ==
+  keine
+
+== Druckbett / Manifold / Export ==
+  boden_vorn              134.0 x  245.0 x   15.0  passt  manifold=ja  ~ 4.8 h  ~  78 g
+  boden_hinten            188.0 x  245.0 x   15.0  passt  manifold=ja  ~ 6.6 h  ~ 103 g
+  deckel_vorn             135.0 x  247.0 x   15.0  passt  manifold=ja  ~ 4.6 h  ~  67 g
+  deckel_hinten           189.0 x  247.0 x   15.0  passt  manifold=ja  ~ 6.3 h  ~  91 g
+  seite_links_vorn        134.0 x   14.0 x  180.0  passt  manifold=ja  ~ 3.0 h  ~  43 g
+  seite_links_hinten      188.0 x   14.0 x  180.0  passt  manifold=ja  ~ 4.0 h  ~  57 g
+  seite_rechts_vorn       134.0 x   14.0 x  180.0  passt  manifold=ja  ~ 3.0 h  ~  43 g
+  seite_rechts_hinten     188.0 x   14.0 x  180.0  passt  manifold=ja  ~ 4.0 h  ~  57 g
+  front                   180.0 x  221.0 x   14.0  passt  manifold=ja  ~ 4.5 h  ~  61 g
+  rueckwand               180.0 x  221.0 x   17.0  passt  manifold=ja  ~ 3.4 h  ~  47 g
+  sockel_vorn             118.0 x  213.0 x   12.0  passt  manifold=ja  ~ 0.9 h  ~  11 g
+  sockel_hinten           172.0 x  213.0 x   12.0  passt  manifold=ja  ~ 1.1 h  ~  13 g
+  netzteil_halter          70.5 x  128.0 x   28.0  passt  manifold=ja  ~ 1.2 h  ~  20 g
+  netzteil_klammer        103.5 x   30.5 x   14.0  passt  manifold=ja  ~ 0.3 h  ~   4 g
+  gpu_stuetze              47.0 x   16.0 x    8.6  passt  manifold=ja  ~ 0.2 h  ~   2 g
+  kabelkamm                37.6 x   10.0 x    8.0  passt  manifold=ja  ~ 0.2 h  ~   1 g
+  passtest_board          182.0 x  182.0 x   10.0  passt  manifold=ja  ~ 1.6 h  ~  22 g
+  passtest_rueckwand      132.6 x  211.4 x   15.0  passt  manifold=ja  ~ 1.6 h  ~  22 g
+
+== Freie Querschnitte (Ø3.2, Raster 4.5; Sockel Ø3.8) ==
+  Wabenfeld offen (theoretisch): 45.9 %
+    Front                     139 cm²  (vor Netzteil und CPU-Kühler)
+    Rückwand                   84 cm²  + Slotblech ~19 cm²
+    Seitenwand je Seite       190 cm²
+    Deckel                    264 cm²
+    Boden (über Sockel)       228 cm²
+    Sockelring                 37 cm²  (Engstelle der Bodenzuluft)
+  GPU saugt durch: linke Seitenwand, vor der Karte 44.0 % offen
+  Vergleich: 3x 95-mm-GPU-Lüfter ~194 cm², 2x 140 mm D15 ~277 cm²
+
+== Maße ==
+  Variante: A liegend
+  Außen L x B x H (ohne Sockel): (322.0, 245.0, 190.0)
+  Außen H mit Sockel: 202.0
+  Innen L x B x H: (314.0, 237.0, 180.0)
+  Luft Kühler -> Wand oben/seitlich: 5.4
+  Sockel-Mitte (x, v): (220.0, 150.0)
+  GPU-Profil: reaper
+  GPU Luft Lüfter -> Wand: 17.0
+  Luft Netzteil -> Kühler: 64.0
+  Netzteil: SFX
+  Volumen außen: 15.7 l (Gehäuse 15.0 l, Sockel 0.7 l)
+  Volumen innen: 13.4 l (Quader ohne Eckbögen)
+
+== Montage-Dokument ==
+  /Users/robinrehbein/Code/itx-case/out/A/assembly.FCStd
+
+== Ergebnis ==
+  OK – 437 s

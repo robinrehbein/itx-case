@@ -1,7 +1,9 @@
 """Headless-Build:  /Applications/FreeCAD.app/Contents/Resources/bin/freecadcmd build.py
 
-Erzeugt out/step/*.step (Montagelage), out/stl/*.stl (Druckorientierung),
-out/assembly.FCStd (mit Dummies) und out/report.txt. Exit-Code != 0 bei Fehlern.
+LAYOUT=A (liegend, Standard) oder LAYOUT=B (stehend) wählt die Variante.
+Erzeugt out/<LAYOUT>/step/*.step (Montagelage), out/<LAYOUT>/stl/*.stl (Druckorientierung),
+out/<LAYOUT>/assembly.FCStd (mit Dummies) und out/<LAYOUT>/report.txt.
+Exit-Code != 0 bei Fehlern.
 
 Die Teile entstehen in Modellkoordinaten (y links -> rechts, Linkssystem) und werden
 hier an der Ebene y = INNER_W / 2 gespiegelt, damit sie im rechtshändigen FreeCAD-Raum
@@ -22,10 +24,12 @@ import Part  # noqa: E402
 import MeshPart  # noqa: E402
 
 import params as P  # noqa: E402
-from parts import floor, lid, side_walls, panels, midwall, plinth, extras, dummies  # noqa: E402
-from parts.common import hole_area, VGROOVE_LOG  # noqa: E402
+from parts import floor, lid, side_walls, panels, tray, plinth, extras, dummies  # noqa: E402
+from parts.common import hole_area, VGROOVE_LOG, envelope_case, envelope_plinth  # noqa: E402
 
-OUT = os.path.join(ROOT, "out")
+VARIANT = P.LAYOUT if (P.GPU_PROFILE, P.PSU_TYPE) == ("reaper", "SFX") else \
+    f"{P.LAYOUT}-{P.GPU_PROFILE}-{P.PSU_TYPE}"
+OUT = os.path.join(ROOT, "out", VARIANT)   # Profil-Varianten landen daneben (nicht im Repo)
 QUICK = os.environ.get("QUICK") == "1"     # QUICK=1: ohne STL/STEP-Export
 LOG = []
 
@@ -43,14 +47,15 @@ def timed(label, fn):
 
 
 # --------------------------------------------------------------------------
+log(f"== Variante {P.summary()['Variante']}, GPU {P.GPU_PROFILE}, {P.PSU_TYPE} ==")
 log("== Bauteile ==")
 t0 = time.time()
 floor_parts, n_floor = timed("Boden", floor.build)
 lid_parts, n_lid = timed("Deckel", lid.build)
-side_parts, (n_gpu_side, n_psu_side) = timed("Seitenwände", side_walls.build)
+side_parts, n_side = timed("Seitenwände", side_walls.build)
 front = timed("Front", panels.front)
-rear, (rear_d15, rear_gpu) = timed("Rückwand", panels.rear)
-mid_parts = timed("Mittelwand", midwall.build)
+rear, rear_pts = timed("Rückwand", panels.rear)
+mid_parts = timed("Board-Träger", tray.build) if P.LAYOUT == "B" else []
 plinth_parts, a_pl = timed("Sockel", plinth.build)
 extra_parts, fit_parts = timed("Extras", extras.build)
 dummy_parts = timed("Dummies", dummies.build)
@@ -177,65 +182,68 @@ for p in all_printed:
 log("\n== Freie Querschnitte (Ø%.1f, Raster %.1f; Sockel Ø%.1f) =="
     % (P.VENT_D, P.VENT_PITCH, P.PLINTH_VENT_D))
 hex_ratio = math.pi * (P.VENT_D / 2) ** 2 / (P.VENT_PITCH ** 2 * math.sqrt(3) / 2)
+side_pts = side_walls.vent_points()
 a_fl = hole_area(floor.vent_points())
-a_gs = hole_area(side_walls.gpu_vent_points())
-# offener Anteil vor den GPU-Lüftern (Kartenfläche ohne Blechzone)
-fx0, fx1 = max(P.GPU_X0, P.GPU_SIDE_VENT["x0"]), P.INNER_L - P.GPU_RAIL_DEPTH
-fz0, fz1 = P.GPU_Z0, min(P.GPU_Z0 + P.GPU["H"], P.GPU_SIDE_VENT["z1"])
-fan_pts = [q for q in side_walls.gpu_vent_points() if fx0 <= q[0] <= fx1 and fz0 <= q[1] <= fz1]
-gs_field = (fx1 - fx0) * (fz1 - fz0)
-a_fan = hole_area(fan_pts)
-side_psu, side_board = side_walls.board_vent_points()
-a_ps, a_bs = hole_area(side_psu), hole_area(side_board)
-top_board, top_gpu = lid.vent_points()
-a_tb, a_tg = hole_area(top_board), hole_area(top_gpu)
-a_rd = hole_area(rear_d15)
-a_rg = hole_area(rear_gpu)
-g = P.GPU_OPEN
-a_open = (g["y1"] - g["y0"]) * (g["z1"] - g["z0"]) * 0.5   # Slotblech ~50 % offen
-fan140 = math.pi * (70 ** 2 - 22 ** 2)
+a_side = hole_area(side_pts)
+a_top = hole_area(lid.vent_points())
+a_front = hole_area(panels.front_vent_points())
+a_rear = hole_area(rear_pts)
+y0, y1, z0, z1 = panels.gpu_open()
+a_open = (y1 - y0) * (z1 - z0) * 0.5   # Slotblech ~50 % offen
 fan95 = math.pi * (47.5 ** 2 - 14 ** 2)
-front_board, front_gpu, _ = panels.front_vent_points()
-a_fb, a_fg = hole_area(front_board), hole_area(front_gpu)
+fan140 = math.pi * (70 ** 2 - 22 ** 2)
+# Fläche vor den GPU-Lüftern (Kartenfläche ohne Blechzone)
+fx0, fx1 = P.GPU_X0, P.INNER_L - P.GPU_RAIL_DEPTH
+if P.LAYOUT == "A":
+    fan_face = "linke Seitenwand"
+    fz0, fz1 = max(P.GPU_W0, P.SIDE_VENT["z0"]), min(P.GPU_W1, P.SIDE_VENT["z1"])
+    fan_pts = [q for q in side_pts if fx0 <= q[0] <= fx1 and fz0 <= q[1] <= fz1]
+    fan_field = (fx1 - fx0) * (fz1 - fz0)
+else:
+    fan_face = "Boden"
+    fy0, fy1 = P.Y_BASE - P.GPU_W1, P.Y_BASE - P.GPU_W0
+    fan_pts = [q for q in floor.vent_points() if fx0 <= q[0] <= fx1 and fy0 <= q[1] <= fy1]
+    fan_field = (fx1 - fx0) * (fy1 - fy0)
+a_fan = hole_area(fan_pts)
+gpu_in = (a_side + min(a_pl, a_fl) / 2) if P.LAYOUT == "A" else (min(a_pl, a_fl) + a_side / 2)
 lines = [
     f"Wabenfeld offen (theoretisch): {hex_ratio*100:.1f} %",
-    "Zuluft:",
-    f"  Front Board-Kammer    {a_fb/100:7.0f} cm²  (gerade vor dem CPU-Kühler)",
-    f"  Sockelring            {a_pl/100:7.0f} cm²  (Engstelle der Bodenzuluft)",
+    f"  Front                 {a_front/100:7.0f} cm²  (vor Netzteil und CPU-Kühler)",
+    f"  Rückwand              {a_rear/100:7.0f} cm²  + Slotblech ~{a_open/100:.0f} cm²",
+    f"  Seitenwand je Seite   {a_side/100:7.0f} cm²",
+    f"  Deckel                {a_top/100:7.0f} cm²",
     f"  Boden (über Sockel)   {a_fl/100:7.0f} cm²",
-    f"  Seitenwand GPU        {a_gs/100:7.0f} cm²  (vor der Karte {a_fan/gs_field*100:.1f} % offen)",
-    "Abluft:",
-    f"  Rückwand Board-Kammer {a_rd/100:7.0f} cm²  (1x 140-mm-Lüfter frei: {fan140/100:.0f} cm²)",
-    f"  Deckel Board-Kammer   {a_tb/100:7.0f} cm²",
-    f"  Seitenwand Netzteil   {a_ps/100:7.0f} cm²  (hinter dem Netzteil)",
-    f"  Deckel GPU-Kammer     {a_tg/100:7.0f} cm²",
-    f"  Rückwand GPU-Kammer   {a_rg/100:7.0f} cm²  + Slotblech ~{a_open/100:.0f} cm²",
-    f"  Front GPU-Kammer      {a_fg/100:7.0f} cm²",
-    "Ohne feste Richtung (nicht in den Summen):",
-    f"  Seitenwand Board-Kammer {a_bs/100:5.0f} cm²  (neben Kühler und Board)",
-    f"Summen: Zuluft {(min(a_pl, a_fl) + a_gs + a_fb)/100:.0f} cm², "
-    f"Abluft {(a_rd + a_tb + a_ps + a_tg + a_rg + a_open + a_fg)/100:.0f} cm²",
+    f"  Sockelring            {a_pl/100:7.0f} cm²  (Engstelle der Bodenzuluft)",
+    f"GPU saugt durch: {fan_face}, vor der Karte {a_fan/fan_field*100:.1f} % offen",
     f"Vergleich: 3x 95-mm-GPU-Lüfter ~{3*fan95/100:.0f} cm², 2x 140 mm D15 ~{2*fan140/100:.0f} cm²",
 ]
 for line in lines:
     log("  " + line)
-if a_fan / gs_field < 0.40:
-    warnings.append("GPU-Seitenwand unter 40 % offen")
+if a_fan / fan_field < 0.40:
+    warnings.append(f"GPU-Ansaugfläche ({fan_face}) unter 40 % offen")
+if P.LAYOUT == "B" and a_pl < 3 * fan95:
+    warnings.append(f"Sockelring {a_pl/100:.0f} cm² kleiner als die GPU-Lüfterfläche "
+                    f"{3*fan95/100:.0f} cm²: die Karte holt den Rest über Seitenwände und Front")
 
 # --------------------------------------------------------------------------
 log("\n== Maße ==")
 for k, val in P.summary().items():
     log(f"  {k}: {val}")
-r_sq, r_bend = dummies.riser_length()
-log(f"  Riser-Flachband Stecker -> Sockel: {r_sq:.0f} mm eckig, ~{r_bend:.0f} mm mit Biegeradien")
-if r_bend > 250:
-    warnings.append(f"Riser-Bahn {r_bend:.0f} mm: 250-mm-Riser reicht nicht")
-if P.COOLER_AIR < 3:
-    errors.append(f"Luft über dem Kühler nur {P.COOLER_AIR:.1f} mm")
-if P.GPU_SLOTS == 4 and P.BRACKET_SLOT_Y0 < P.FLAT_Y0:
-    warnings.append("4-Slot-Öffnung reicht in den Eckbogen der Rückwand (siehe README)")
-if P.GPU["T"] > P.GPU_THICK_MAX:
-    errors.append("GPU dicker als die Kammer")
+vol_case = envelope_case().Volume / 1e6
+vol_pl = envelope_plinth().Volume / 1e6
+log(f"  Volumen außen: {vol_case + vol_pl:.1f} l (Gehäuse {vol_case:.1f} l, Sockel {vol_pl:.1f} l)")
+log(f"  Volumen innen: {P.INNER_L * P.INNER_W * P.INNER_H / 1e6:.1f} l (Quader ohne Eckbögen)")
+air = (P.INNER_H - P.COOLER_W1) if P.LAYOUT == "A" else (P.Y_BASE - P.COOLER_W1)
+if air < 3:
+    errors.append(f"Luft am Kühlerende nur {air:.1f} mm")
+iy0, iy1, iz0, iz1 = panels.io_window()
+m = P.IO_KEEPOUT
+if iy0 - m < P.FLAT_Y0 or iy1 + m > P.FLAT_Y1:
+    errors.append("I/O-Fenster reicht in den Eckbogen der Rückwand")
+if P.GPU_OPEN_V[1] + 2 > P.IO_V0:
+    errors.append("Slotblech-Öffnung und I/O-Fenster überschneiden sich")
+if P.rect_vw(*P.GPU_OPEN_V, *P.GPU_OPEN_W)[0] < P.FLAT_Y0 + 1:
+    errors.append("Slotblech-Öffnung reicht in den Eckbogen der Rückwand")
 
 # --------------------------------------------------------------------------
 log("\n== Montage-Dokument ==")

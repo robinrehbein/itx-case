@@ -2,7 +2,8 @@
 
     /Applications/FreeCAD.app/Contents/MacOS/FreeCAD render.py
 
-Öffnet out/assembly.FCStd, speichert out/png/*.png und beendet FreeCAD wieder.
+Öffnet out/<LAYOUT>/assembly.FCStd (LAYOUT=A oder B, Standard A), speichert
+out/<LAYOUT>/png/*.png und beendet FreeCAD wieder.
 Mit RENDER_KEEP_OPEN=1 bleibt FreeCAD offen (Explosionsansicht aktiv).
 """
 import os
@@ -11,7 +12,7 @@ import FreeCAD as App
 import FreeCADGui as Gui
 
 ROOT = os.path.dirname(os.path.abspath(__file__)) if "__file__" in globals() else os.getcwd()
-OUT = os.path.join(ROOT, "out")
+OUT = os.path.join(ROOT, "out", os.environ.get("LAYOUT", "A").upper())
 PNG = os.path.join(OUT, "png")
 os.makedirs(PNG, exist_ok=True)
 
@@ -51,10 +52,10 @@ def explode(scale=1.0):
 # vorn gesehen LINKS; build.py hat die Teile dafür gespiegelt)
 DIRS = {
     "iso": (1, -1, -0.8),        # von vorn links oben
-    "iso_rear": (-1, -1, -0.8),  # von hinten, linke Seite (GPU-Kammer), oben
+    "iso_rear": (-1, -1, -0.8),  # von hinten, linke Seite, oben
     "iso_right": (1, 1, -0.8),   # von vorn rechts oben
-    "left": (0, -1, 0),          # auf die linke Seite (GPU-Kammer)
-    "right": (0, 1, 0),          # auf die rechte Seite (Board-Kammer)
+    "left": (0, -1, 0),          # auf die linke Seite
+    "right": (0, 1, 0),          # auf die rechte Seite
     "top": (0, 0, -1),
     "front": (1, 0, 0),
     "rear": (-1, 0, 0),
@@ -106,9 +107,9 @@ snap("02e_unten", "iso_low")
 # 2 Kammern offen (Deckel und Seitenwände ausgeblendet, Komponenten sichtbar)
 show(lambda o: not is_open_hidden(o))
 snap("03_offen_iso")
-snap("04_offen_gpu_kammer", "left")
-snap("05_offen_board_kammer", "right")
-snap("05b_offen_board_iso", "iso_right")
+snap("04_offen_links", "left")
+snap("05_offen_rechts", "right")
+snap("05b_offen_rechts_iso", "iso_right")
 snap("06_offen_oben", "top")
 
 # 3 Explosionsansicht

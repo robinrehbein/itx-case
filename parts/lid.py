@@ -11,7 +11,8 @@ def dome_positions():
     d = []
     d += [(5.0, y) for y in P.FRONT_TABS_Y]
     d += [(P.INNER_L - 5.0, y) for y in P.REAR_TABS_Y_TOP]
-    d += [(x, P.MID_Y1 + P.TAB_D / 2) for x in P.MID_TABS_X_TOP]
+    if P.TRAY_TABS_X:
+        d += [(x, P.Y_BASE - P.TAB_D / 2) for x in P.TRAY_TABS_X]
     return d
 
 
@@ -21,8 +22,11 @@ def magnet_positions():
     return [(x, yl) for x in P.MAGNET_X] + [(x, yr) for x in P.MAGNET_X]
 
 
-# Fugenflansch nur über der Board-Kammer (y0, y1, z0, z1)
-SEAM_RIB = (P.MID_Y1 + 1.0, P.INNER_W - 11.0, P.INNER_H - P.FLANGE_D, P.INNER_H)
+# Fugenflansch (y0, y1, z0, z1). A: neben dem Kabelbogen der Karte, B: vor dem Träger.
+if P.LAYOUT == "A":
+    SEAM_RIB = (P.GPU_V1 + 6.0, P.INNER_W - 11.0, P.INNER_H - P.FLANGE_D, P.INNER_H)
+else:
+    SEAM_RIB = (11.0, P.Y_BASE - 6.0, P.INNER_H - P.FLANGE_D, P.INNER_H)
 
 
 def vent_sets():
@@ -31,17 +35,15 @@ def vent_sets():
     v = P.TOP_VENT
     pts = hex_grid(v["x0"], v["x1"], v["y0"], v["y1"], corner_r=v["r"], col_at=P.SPLIT_X)
     rects = [(P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, SEAM_RIB[0], SEAM_RIB[1])]
+    if P.LAYOUT == "B":   # Oberkante des Board-Trägers
+        rects.append((-999, 999, P.Y_BASE, P.Y_BASE + P.T_TRAY))
     discs = [(x, y, P.DOME_D / 2) for (x, y) in dome_positions()]
     return split_blind(pts, rects, discs)
 
 
 def vent_points():
-    """Offene Löcher nach Kammer: (Board-Kammer, GPU-Kammer). Löcher über der Mittelwand
-    gehen durch den Deckel, zählen aber nicht zum Querschnitt."""
-    through, _ = vent_sets()
-    r = P.VENT_D / 2
-    return ([q for q in through if q[1] >= P.MID_Y1 + r],
-            [q for q in through if q[1] <= P.MID_Y0 - r])
+    """Offene Löcher des Deckels."""
+    return vent_sets()[0]
 
 
 def build():
@@ -62,10 +64,11 @@ def build():
         cuts.append(cyl_z(x, y, P.INNER_H - 0.01, P.INNER_H + P.MAGNET_H, P.MAGNET_D / 2))
     shape = cut_all(fuse_all([plate] + adds), cuts)
 
-    # Flansch nur über der Board-Kammer: über der GPU bleibt das Lochfeld offen
     ribs = [SEAM_RIB]
     zb = P.INNER_H - 5.0
-    bolts = [(105.0, zb), (150.0, zb), (200.0, zb), (245.0, zb)]
+    y0, y1 = SEAM_RIB[0] + 10.0, SEAM_RIB[1] - 10.0
+    n = max(2, int((y1 - y0) // 50) + 1)
+    bolts = [(y0 + i * (y1 - y0) / (n - 1), zb) for i in range(n)]
     a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_case())
     tools = (holes_z(through, P.INNER_H - 1, TOP + 1)
              + holes_z(blind, P.INNER_H + P.VENT_BLIND_SKIN, TOP + 1))
