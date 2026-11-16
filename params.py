@@ -1,12 +1,14 @@
 """Alle Maße in mm. Einzige Quelle für Maße – Bauteile lesen nur von hier.
 
-Zwei Varianten ohne Riser (LAYOUT=A oder B). Die Karte steckt direkt im Slot, Board,
+Drei Varianten ohne Riser (LAYOUT=A, B oder C). Die Karte steckt direkt im Slot, Board,
 Karte, Kühler und Netzteil bilden einen festen Block. Die Varianten stellen diesen Block
 nur verschieden ins Gehäuse:
   A  liegend: Board flach auf dem Boden, Kühler nach oben, Karte steht senkrecht,
      GPU-Lüfter zur linken Seitenwand.
   B  stehend: Board an einem Träger vor der rechten Seitenwand, Bestückung nach links,
      Karte waagerecht, GPU-Lüfter zum Boden.
+  C  wie B, im Stil des NCase M3 Grater: Front und Deckel als Rahmen mit Einlegern im
+     Reibenmuster (wie Mac Pro 2019) und Staubfilter, vier Füße statt Sockelring.
 
 Gehäusekoordinaten (Innenraum):
   x: vorn -> hinten   (0 = Innenseite Frontwand)
@@ -35,12 +37,15 @@ import os as _os
 # --------------------------------------------------------------------------
 # Auswahl / Optionen
 # --------------------------------------------------------------------------
-LAYOUT = _os.environ.get("LAYOUT", "A").upper()            # "A" liegend | "B" stehend
+LAYOUT = _os.environ.get("LAYOUT", "A").upper()            # "A" liegend | "B" stehend | "C" M3-Stil
 GPU_PROFILE = _os.environ.get("GPU_PROFILE", "reaper")   # "reaper" | "max" (340x140x65)
 PSU_TYPE = _os.environ.get("PSU_TYPE", "SFX")             # "SFX" | "SFX-L"
 USB_C = False            # optionaler USB-C-Ausschnitt in der Front
 COOLER_PROFILE = "NH-D15"  # Noctua NH-D15 (Original, 165 mm)
-assert LAYOUT in ("A", "B"), LAYOUT
+assert LAYOUT in ("A", "B", "C"), LAYOUT
+LYING = LAYOUT == "A"          # A liegt, B und C stehen (gleiche Anordnung innen)
+GRATER = LAYOUT == "C"         # Front und Deckel mit Reiben-Einlegern
+FEET = LAYOUT == "C"           # Füße statt Sockelring
 
 # --------------------------------------------------------------------------
 # Drucker (Voron 2.4 300)
@@ -145,7 +150,7 @@ INNER_L = GPU["L"] + FRONT_GAP
 # --------------------------------------------------------------------------
 # Innenmaße je Variante
 # --------------------------------------------------------------------------
-if LAYOUT == "A":
+if LYING:
     INNER_W = INNER_V
     INNER_H = float(_math.ceil(BLOCK_W + COOLER_TOP_AIR))
     Y_BASE = None
@@ -170,7 +175,9 @@ FLAT_X1 = OUT_X1 - CORNER_R
 
 # Sockel (Mac-Studio-Fuß). Bei B saugt die Karte durch den Boden, der Ring ist höher.
 PLINTH_INSET = 16.0
-PLINTH_H = 12.0 if LAYOUT == "A" else 20.0
+PLINTH_H = 12.0 if LYING else 20.0
+FOOT_H = 12.0          # C: Füße statt Sockelring
+FOOT_D = 24.0
 PLINTH_T = 3.0
 PLINTH_LIP_W = 6.0     # Bodenlippe innen (Gummifüße)
 PLINTH_LIP_T = 2.0
@@ -242,6 +249,7 @@ BUTTON_DEPTH = 28.0    # Körper hinter der Front
 BUTTON_CABLE = 22.0    # dahinter frei für Anschlüsse und Kabelbogen
 BUTTON_V = PSU_V1 - 30.0
 BUTTON_W = PSU_W1 + 20.0
+GRATER_TOP_BAND = 40.0      # C: Rahmen über dem Front-Einleger, darin der Taster
 USBC_W, USBC_H = 9.4, 3.8
 
 # Kaltgeräte-Buchse C14 in der Rückwand über der Karte
@@ -261,18 +269,21 @@ GPU_SUPPORT_ADJ = 15.0
 
 def to_case(u, v, w):
     """Blockpunkt -> Gehäusepunkt."""
-    if LAYOUT == "A":
+    if LYING:
         return u, v, w
     return u, Y_BASE - w, v
 
 
 def rect_vw(v0, v1, w0, w1):
     """Rechteck im Block (v, w) -> Rechteck in der Rückwand/Front (y0, y1, z0, z1)."""
-    if LAYOUT == "A":
+    if LYING:
         return v0, v1, w0, w1
     return Y_BASE - w1, Y_BASE - w0, v0, v1
 
 
+if GRATER:   # Taster links oben im Rahmenband über dem Einleger
+    BUTTON_V = INNER_H - GRATER_TOP_BAND / 2
+    BUTTON_W = Y_BASE - 36.0
 BUTTON_Y, BUTTON_Z = to_case(0, BUTTON_V, BUTTON_W)[1:]
 USBC_Y, USBC_Z = BUTTON_Y, BUTTON_Z + 23.0
 
@@ -293,7 +304,7 @@ TAB_T = 3.0
 TAB_Z_BOT = (DOME_H, DOME_H + TAB_T)
 TAB_Z_TOP = (INNER_H - DOME_H - TAB_T, INNER_H - DOME_H)
 
-if LAYOUT == "A":
+if LYING:
     # Front: eine Lasche zwischen Kabelbogen der Karte und Netzteil-Halter, eine rechts daneben
     _cradle_v0 = PSU_V0 - 0.5 - CRADLE_T
     _cradle_v1 = PSU_V1 + 0.5 + CRADLE_T
@@ -305,7 +316,8 @@ if LAYOUT == "A":
     REAR_LOW_BOSS_Y = [BRACKET_SLOT_V0 - 5.4, IO_V1 + 4.25]
     TRAY_TABS_X = []
 else:
-    FRONT_TABS_Y = [40.0, 140.0]
+    # C: der Taster sitzt links oben im Rahmen, die Laschen weichen ihm aus
+    FRONT_TABS_Y = [40.0, 140.0] if not GRATER else [90.0, 160.0]
     REAR_TABS_Y_TOP = [40.0, 140.0]
     REAR_TABS_Y_BOT = [40.0, 140.0]
     REAR_LOW_BOSS_Y = []
@@ -350,6 +362,22 @@ PLINTH_VENT_D = 3.8
 PLINTH_VENT_PITCH = 5.0
 PLINTH_VENT_EDGE = 0.6
 
+# Reibe (nur C): Einleger von innen gegen eine Lippe im Rahmen, dazwischen Filtergewebe.
+# Außen Kegelmulden (45°) im Wabenraster, die sich an Graten treffen; an jedem Treffpunkt
+# von drei Mulden ein Loch, dazu ein kleines Loch in jeder Muldenspitze. Mit Sacklöchern
+# (GR_HOLE_H < GR_T) entstehen nur Sicheln, dann sind bloß ca. 15 % offen.
+GR_PITCH = 8.0         # Abstand der Mulden
+GR_R = 4.8             # Muldenradius an der Außenfläche = Tiefe (45°)
+GR_T = 4.0             # Dicke des Einlegers
+GR_HOLE_D = 3.6        # Löcher an den Treffpunkten
+GR_HOLE_H = GR_T       # durchgehend
+GR_LIP = 1.5           # Lippe außen im Rahmen
+GR_LAP = 7.0           # Einleger liegt so breit auf der Lippe auf (Magnete 6 x 1)
+GR_CLEAR = 0.3         # Spiel rundum im Rahmen
+GR_FILTER = 0.3        # Filtergewebe zwischen Lippe und Einleger
+GR_MAG = (6.2, 1.1)    # Magnettasche Ø, Tiefe (Magnete 6 x 1 mm)
+GR_EDGE = 4.0          # Rahmen außen neben der Einleger-Tasche (Front)
+
 # --------------------------------------------------------------------------
 # Board-Träger (nur B): Durchbrüche im Block (u0, u1, v0, v1)
 # --------------------------------------------------------------------------
@@ -360,7 +388,7 @@ TRAY_CUTOUTS = [
 ]
 
 # GPU-Stütze: Pfosten vom Boden bis knapp unter die tiefste Kartenfläche
-if LAYOUT == "A":
+if LYING:
     GPU_SUPPORT = dict(x=GPU_X0 + 12.0, y=(GPU_V0 + GPU_V1) / 2, ztop=GPU_W0 - 1.0)
 else:
     GPU_SUPPORT = dict(x=GPU_X0 + 12.0, y=Y_BASE - (GPU_W0 + 30.0), ztop=GPU_V0 - 1.0)
@@ -368,12 +396,12 @@ else:
 
 def summary():
     return {
-        "Variante": {"A": "A liegend", "B": "B stehend"}[LAYOUT],
+        "Variante": {"A": "A liegend", "B": "B stehend", "C": "C stehend, M3-Stil"}[LAYOUT],
         "Außen L x B x H (ohne Sockel)": (OUT_L, OUT_W, OUT_H),
-        "Außen H mit Sockel": OUT_H + PLINTH_H,
+        "Außen H mit Sockel bzw. Füßen": OUT_H + (FOOT_H if FEET else PLINTH_H),
         "Innen L x B x H": (INNER_L, INNER_W, INNER_H),
         "Luft Kühler -> Wand oben/seitlich": round(
-            (INNER_H - COOLER_W1) if LAYOUT == "A" else (Y_BASE - COOLER_W1), 2),
+            (INNER_H - COOLER_W1) if LYING else (Y_BASE - COOLER_W1), 2),
         "Sockel-Mitte (x, v)": (SOCKET_X, SOCKET_V),
         "GPU-Profil": GPU_PROFILE,
         "GPU Luft Lüfter -> Wand": GPU_V0,

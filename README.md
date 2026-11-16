@@ -2,34 +2,39 @@
 
 Ein Gehäuse im Stil des Mac Studio für Mini-ITX-Board, Noctua NH-D15, PowerColor RX 9070 XT
 Reaper und SFX-Netzteil. Die Karte steckt direkt im Slot, es gibt kein Riser-Kabel. Board,
-Karte, Kühler und Netzteil bilden damit einen festen Block. Das Repo baut zwei Varianten, die
+Karte, Kühler und Netzteil bilden damit einen festen Block. Das Repo baut drei Varianten, die
 diesen Block verschieden ins Gehäuse stellen:
 
 - **A liegend:** Das Board liegt flach auf dem Boden, der Kühler steht nach oben, die Karte steht
   senkrecht und saugt durch die linke Seitenwand an. Breit und flach.
 - **B stehend:** Das Board sitzt auf einem Träger vor der rechten Seitenwand, die Karte liegt
   waagerecht und saugt durch Boden und Sockel an. Ein gewöhnlicher Tower, schmal und hoch.
+- **C stehend im Stil des NCase M3 Grater:** innen und in der Größe wie B. Front und Deckel
+  sind Rahmen mit Einlegern im Reibenmuster des Mac Pro 2019, dahinter liegt ein
+  Staubfilter. Statt des Sockelrings trägt C vier Füße, der Boden ist rundum offen. Es ist
+  ein Nachbau nach den öffentlichen Angaben, ohne Logo und ohne die Original-Geometrie.
 
-Die Lüftung läuft in beiden Varianten nur über Felder aus kleinen runden Löchern: Front,
-Rückwand, beide Seitenwände, der ganze Deckel, Boden und der rundum gelochte Sockel.
+Die Lüftung läuft bei A und B nur über Felder aus kleinen runden Löchern: Front, Rückwand,
+beide Seitenwände, der ganze Deckel, Boden und der rundum gelochte Sockel. C hat dieselben
+Felder an Rückwand, Seiten und Boden.
 
-| | A liegend | B stehend |
-|---|---|---|
-| Außen (ohne Sockel) | 322 × 245 × 190 mm | 322 × 211 × 247 mm |
-| Höhe mit Sockel | 202 mm | 267 mm |
-| Volumen außen mit Sockel | 15,7 l | 17,8 l |
-| Innen | 314 × 237 × 180 mm | 314 × 203 × 237 mm |
-| GPU saugt durch | linke Seitenwand, 44,0 % offen | Boden, 41,7 % offen, Sockelring 57 cm² |
-| Luft am Kühlerende | 5,4 mm zum Deckel | 12,4 mm zur linken Seitenwand |
-| Druckteile | 18 | 20 (zusätzlich zwei Träger-Hälften) |
-| Druckzeit / ASA (Gehäuse und Halter) | ca. 48 h / 0,7 kg | ca. 60 h / 0,9 kg |
+| | A liegend | B stehend | C M3-Stil |
+|---|---|---|---|
+| Außen (ohne Sockel/Füße) | 322 × 245 × 190 mm | 322 × 211 × 247 mm | 322 × 211 × 247 mm |
+| Höhe mit Sockel/Füßen | 202 mm | 267 mm | 259 mm |
+| Volumen außen | 15,7 l | 17,8 l | 16,8 l (ohne Füße) |
+| Innen | 314 × 237 × 180 mm | 314 × 203 × 237 mm | wie B |
+| GPU saugt durch | linke Seitenwand, 44,0 % offen | Boden, Engstelle Sockelring 57 cm² | Boden, Spalt unter dem Boden 116 cm² |
+| Front / Deckel offen | 139 / 264 cm² | 160 / 212 cm² | 112 / 150 cm² (Reibe) |
+| Druckteile | 18 | 20 | 25 |
+| Druckzeit / ASA (Gehäuse und Halter) | ca. 48 h / 0,7 kg | ca. 60 h / 0,9 kg | ca. 57 h / 0,9 kg |
 
 Drucker: Voron 2.4 300, alle Teile ≤ 290 × 290 × 270 mm.
 
-| A liegend | B stehend |
-|---|---|
-| ![A](out/A/png/01_gesamt_vorn.png) | ![B](out/B/png/01_gesamt_vorn.png) |
-| ![A offen](out/A/png/05b_offen_rechts_iso.png) | ![B offen](out/B/png/03_offen_iso.png) |
+| A liegend | B stehend | C M3-Stil |
+|---|---|---|
+| ![A](out/A/png/01_gesamt_vorn.png) | ![B](out/B/png/01_gesamt_vorn.png) | ![C](out/C/png/01_gesamt_vorn.png) |
+| ![A offen](out/A/png/05b_offen_rechts_iso.png) | ![B offen](out/B/png/03_offen_iso.png) | ![C Explosion](out/C/png/08_explosion_ohne_komponenten.png) |
 
 ## Der gemeinsame Block
 
@@ -61,6 +66,29 @@ y = `INNER_W` / 2. STEP, STL und `assembly.FCStd` haben die richtige Händigkeit
 
 Das frühere Sandwich-Layout mit Riser liegt im Tag `sandwich-v1`.
 
+## Variante C: Reibe und Füße
+
+Front und Deckel sind Rahmen. Außen bleibt eine 1,5 mm dicke Lippe stehen, das Fenster darin
+ist 7 mm kleiner als der Einleger. Der Einleger sitzt von innen an der Lippe, dazwischen liegt
+das Filtergewebe. Je Seite halten ein bis drei Magnetpaare 6 × 1 mm den Einleger, eines in
+der Lippe und eines im Einleger. Front und Deckel haben je eine Tasche, der Deckel eine pro
+Hälfte, über der Fuge bleibt ein Steg. Der Taster sitzt links im Rahmenband über dem
+Front-Einleger.
+
+Der Einleger ist 4 mm dick. Außen liegen Kegelmulden mit 45° Flanke im 8-mm-Wabenraster, die
+sich an Graten treffen. An jedem Punkt, an dem drei Mulden zusammenstoßen, geht ein
+Ø3,6-Loch durch, und die Spitze jeder Mulde hat ein kleines Loch. Offen sind 40 % der
+Fensterfläche. Mit Sacklöchern statt Durchgangslöchern wären es nur 15 %, dann bekäme der D15
+durch die Front zu wenig Luft. Die Maße stehen in `params.py` unter `GR_*`.
+
+Die Einleger werden mit der Außenseite nach oben gedruckt. Die Mulden sind dann nach oben
+offene 45°-Flächen und brauchen keine Stützen, zeigen aber Schichtstufen. Die Rahmen liegen
+wie bei A und B mit der Sichtseite auf dem Bett.
+
+Zum Reinigen des Filters nimmt man den Deckel ab (Magnete) bzw. schraubt die Front ab und
+zieht den Einleger nach innen heraus. Die vier Füße (Ø24 × 12 mm) sitzen auf den
+Schraubpunkten, an denen bei B der Sockel hängt.
+
 ## Bauen
 
 ```bash
@@ -68,7 +96,8 @@ LAYOUT=A /Applications/FreeCAD.app/Contents/Resources/bin/freecadcmd build.py   
 LAYOUT=A /Applications/FreeCAD.app/Contents/MacOS/FreeCAD render.py             # PNG-Ansichten (GUI)
 ```
 
-`LAYOUT=B` baut die stehende Variante. `build.py` bricht mit Exit-Code 1 ab, wenn eine Prüfung
+`LAYOUT=B` baut die stehende Variante, `LAYOUT=C` die im M3-Stil. Der Vollbau von C dauert
+etwa 15 Minuten, die Einleger haben je über tausend Kegel und Löcher. `build.py` bricht mit Exit-Code 1 ab, wenn eine Prüfung
 fehlschlägt. Das Protokoll steht in `out/<LAYOUT>/report.txt`, die Teiletabelle in
 `out/<LAYOUT>/parts.tsv`. Weitere Optionen per Umgebungsvariable: `GPU_PROFILE=max`,
 `PSU_TYPE=SFX-L`, `QUICK=1` (nur Prüfungen, kein Export). Andere Profile landen in
@@ -81,8 +110,8 @@ das Reaper-Gehäuse passt, sondern baut ein größeres Gehäuse für Karten bis 
 | Pfad | Inhalt |
 |---|---|
 | `params.py` | alle Maße und Optionen |
-| `parts/` | ein Modul pro Bauteilgruppe (`floor`, `lid`, `side_walls`, `panels`, `tray`, `plinth`, `extras`, `dummies`) |
-| `out/A/`, `out/B/` | je Variante: `step/` (Montagelage, `_baugruppe.step` komplett), `stl/` (Druckorientierung), `assembly.FCStd` mit Dummies, `png/` |
+| `parts/` | ein Modul pro Bauteilgruppe (`floor`, `lid`, `side_walls`, `panels`, `tray`, `plinth`, `grater`, `extras`, `dummies`) |
+| `out/A/`, `out/B/`, `out/C/` | je Variante: `step/` (Montagelage, `_baugruppe.step` komplett), `stl/` (Druckorientierung), `assembly.FCStd` mit Dummies, `png/` |
 
 ## Prüfungen (Stand des letzten Builds)
 
@@ -90,9 +119,9 @@ das Reaper-Gehäuse passt, sondern baut ein größeres Gehäuse für Karten bis 
    Kühler-Rückplatte, NH-D15, GPU mit Kontaktfingern, 35-mm-Kabelbogen und Slotblech, Netzteil,
    Taster mit Bauraum für die Leitung, C14): Schnittvolumen 0. Druckteile untereinander: keine
    Überschneidung. Beides gilt für A und B mit `reaper` und SFX, `reaper` und SFX-L sowie `max`
-   und SFX-L.
+   und SFX-L, und für C mit `reaper` und SFX.
 2. **Druckbett:** Alle Teile passen nach dem Drehen in die Druckorientierung auf das Bett.
-3. **Manifold:** Alle STLs sind geschlossene Körper ohne Non-Manifold-Kanten (A 18, B 20).
+3. **Manifold:** Alle STLs sind geschlossene Körper ohne Non-Manifold-Kanten (A 18, B 20, C 25).
 4. **Rückwand:** I/O-Fenster und Slotöffnung liegen in der ebenen Fläche zwischen den Eckbögen
    und überschneiden sich nicht.
 
@@ -117,6 +146,11 @@ Die genauen Werte stehen in `out/<LAYOUT>/parts.tsv`.
 | kabelkamm | 38 × 10 × 8 | gleich | wie eingebaut |
 | passtest_board / _rueckwand | 182 × 182 × 10 / 133 × 211 × 15 | gleich | flach |
 
+C hat dieselben Teile wie B. Statt des Sockels kommen vier Füße (26 × 26 × 12 mm) dazu, außerdem
+drei Einleger mit der Außenseite nach oben: `front_einleger` 182 × 178 × 4 mm,
+`deckel_einleger_vorn` 112 × 162 × 4 mm und `deckel_einleger_hinten` 166 × 162 × 4 mm. Die
+Deckel- und Front-Rahmen sind leichter, weil ihre Lochfelder wegfallen.
+
 **Zuerst die zwei Passtest-Teile drucken.** Sie prüfen die Lage von Lochbild, Slot, Slotblech
 und I/O-Blende zueinander, bevor 50 bis 60 Stunden Druckzeit anfallen. Sie gelten für beide
 Varianten.
@@ -136,6 +170,9 @@ Varianten.
 | Gummifüße selbstklebend, Ø8 × 2–3 mm | 8 | auf die Sockellippe |
 | feines Filtergewebe, 0,2–0,3 mm Maschenweite | nach Bedarf | optional innen hinter die Lochfelder, Halter sind noch nicht modelliert |
 | SFX-Netzteil ≥ 750 W | 1 | PowerColor empfiehlt für die Reaper mindestens 750 W |
+| nur C: Neodym-Scheibenmagnete 6 × 1 mm | 64 | 32 Paare für die drei Einleger, Polung je Paar beachten |
+| nur C: Filtergewebe für die Einleger | 3 Zuschnitte | so groß wie der Einleger, liegt zwischen Lippe und Einleger |
+| nur C: Gummifüße Ø20 | 4 | unter die gedruckten Füße |
 
 ## Slicer-Einstellungen (Voron 2.4, ASA)
 
@@ -245,6 +282,13 @@ hinter den Feldern funktionieren beide Varianten, bei B ist ein Filter am Boden 
   Oberkante.
 - **Rückwand von A unten von unten verschraubt.** I/O-Blende und Slotblech reichen bis 5 mm über
   den Boden. Für Laschen wie an der Front ist dort kein Platz.
+- **C: Größe wie B statt der M3-Außenmaße** (366 × 192 × 270 mm), so wie du entschieden hast.
+  Das M3 hat Platz für Karten bis 359 mm und Kühler bis 168,5 mm, die Reaper und der D15
+  brauchen weniger.
+- **C: Einleger von innen.** Von außen eingelegt bräuchte die Auflage im Rahmen eine 7 mm
+  breite Überhangfläche, von innen liegt die Lippe auf dem Bett.
+- **C: Füße statt Sockelring.** Der Spalt unter dem Boden hat 116 cm², der Sockelring von B nur
+  57 cm².
 - **Lochbild, Sacklöcher, Deckelkante, V-Nut, stützenfreie Flansche** wie im bisherigen Stand.
 
 ## Unsicher – mit dem Passtest prüfen

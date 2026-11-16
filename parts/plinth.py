@@ -58,7 +58,25 @@ def vent_area():
     return n * math.pi * D * D / 4
 
 
+def feet():
+    """C: vier Füße statt Sockelring, von unten in den Boden geschraubt. Der Spalt unter dem
+    Boden ist rundum offen (Zuluft der Karte)."""
+    out = []
+    z0, z1 = Z1 - P.FOOT_H, Z1
+    for i, (x, y) in enumerate(plinth_screw_positions()):
+        body = cyl_z(x, y, z0, z1, P.FOOT_D / 2)
+        body = body.makeFillet(1.5, [e for e in body.Edges if abs(e.BoundBox.ZMin - z0) < 1e-6])
+        hole = cyl_z(x, y, z0 - 1, z1 + 1, P.M3_CLEAR / 2).fuse(
+            cyl_z(x, y, z0 - 1, z1 - 4.0, 3.3))
+        out.append(Spec(f"fuss_{i + 1}", solid(body.cut(hole)), (0.30, 0.30, 0.32),
+                        explode=(0, 0, -100)))
+    gap = 2 * (P.OUT_L + P.OUT_W) * P.FOOT_H - 4 * P.FOOT_D * P.FOOT_H
+    return out, gap
+
+
 def build():
+    if P.FEET:
+        return feet()
     x0, x1, y0, y1, r = outline(0)
     t = P.PLINTH_T
     ring = rrect_prism(x0, x1, y0, y1, r, Z0, Z1).cut(

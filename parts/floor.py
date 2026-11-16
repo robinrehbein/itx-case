@@ -49,14 +49,14 @@ def gpu_support_boss():
 def low_boss_positions():
     """Niedrige Dome mit Einschmelzmutter von oben (Gehäusekoordinaten)."""
     pos = [gpu_support_boss()]
-    if P.LAYOUT == "A":
+    if P.LYING:
         pos += [(u, v) for (u, v, h) in base_mounts() if h == P.LOW_BOSS_H]
     return pos
 
 
 def keep_discs():
     pts = dome_positions() + plinth_screw_positions() + low_boss_positions() + rear_low_positions()
-    if P.LAYOUT == "A":
+    if P.LYING:
         pts += list(standoff_positions().values())
     return pts
 
@@ -66,7 +66,7 @@ def vent_points():
     bei B der Streifen unter dem Board-Träger."""
     i = P.PLINTH_INSET + P.PLINTH_T + 2.0
     keep = [(P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, -999, 999)]
-    if P.LAYOUT == "B":
+    if not P.LYING:
         keep.append((-999, 999, P.Y_BASE - 1.0, P.Y_BASE + P.T_TRAY + 1.0))
     rb = P.DOME_D / 2
     for (x, y) in keep_discs():
@@ -77,7 +77,7 @@ def vent_points():
 
 def rib_y_ranges():
     """Fugenflansch unter dem Boden-Innenraum (y0, y1); bei B endet er vor dem Träger."""
-    if P.LAYOUT == "A":
+    if P.LYING:
         return [(11.0, P.INNER_W - 11.0)]
     return [(11.0, P.Y_BASE - 6.0)]
 
@@ -94,7 +94,7 @@ def build():
         d, h = dome_floor(x, y)
         adds.append(d)
         cuts.append(h)
-    if P.LAYOUT == "A":
+    if P.LYING:
         for (x, y, h) in base_mounts():
             if h != P.LOW_BOSS_H:
                 d, hole = dome_floor(x, y, h)

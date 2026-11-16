@@ -80,6 +80,7 @@ def look(d):
 def snap(name, view="iso", w=1800, h=1200):
     v = Gui.ActiveDocument.ActiveView
     look(DIRS[view])
+    Gui.updateGui()
     v.fitAll()
     Gui.updateGui()
     v.saveImage(os.path.join(PNG, name + ".png"), w, h, "White")
@@ -92,6 +93,10 @@ def is_open_hidden(o):
 
 v = Gui.ActiveDocument.ActiveView
 v.setAxisCross(False)
+try:   # bei großen Modellen läuft die Kamerafahrt sonst noch, während das Bild entsteht
+    v.setAnimationEnabled(False)
+except Exception:
+    pass
 
 # 1 Gesamtansicht
 reset()

@@ -1,15 +1,15 @@
 == Variante B stehend, GPU reaper, SFX ==
 == Bauteile ==
-  Boden                           7.2 s
-  Deckel                          7.5 s
-  Seitenwände                    21.5 s
-  Front                           5.3 s
-  Rückwand                        3.0 s
-  Board-Träger                    0.3 s
-  Sockel                          2.6 s
-  Extras                          0.5 s
+  Boden                           6.6 s
+  Deckel                          6.5 s
+  Seitenwände                    16.7 s
+  Front                           4.7 s
+  Rückwand                        2.7 s
+  Board-Träger                    0.1 s
+  Sockel                          1.8 s
+  Extras                          0.4 s
   Dummies                         0.0 s
-  Spiegeln (Händigkeit)           4.0 s
+  Spiegeln (Händigkeit)           2.7 s
 
 == V-Nut an den Trennstellen ==
   boden_vorn              3 Kanten  V-Fase
@@ -68,7 +68,7 @@
 == Maße ==
   Variante: B stehend
   Außen L x B x H (ohne Sockel): (322.0, 211.0, 247.0)
-  Außen H mit Sockel: 267.0
+  Außen H mit Sockel bzw. Füßen: 267.0
   Innen L x B x H: (314.0, 203.0, 237.0)
   Luft Kühler -> Wand oben/seitlich: 12.4
   Sockel-Mitte (x, v): (220.0, 150.0)
@@ -84,4 +84,4 @@
 
 == Ergebnis ==
   WARNUNG Sockelring 57 cm² kleiner als die GPU-Lüfterfläche 194 cm²: die Karte holt den Rest über Seitenwände und Front
-  OK – 529 s
+  OK – 455 s

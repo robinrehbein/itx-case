@@ -2,6 +2,7 @@
 import params as P
 from parts.common import (Spec, box, cyl_x, cyl_z, rrect_x, hex_grid, holes_x, fuse_all,
                           cut_all, place, insert_up)
+from parts import grater
 
 H = P.INNER_H
 
@@ -11,10 +12,22 @@ def tab(x0, x1, y, z0, z1, hole_x):
     return t, cyl_z(hole_x, y, z0 - 1, z1 + 1, P.M3_CLEAR / 2)
 
 
+def front_recess():
+    """C: Tasche für den Reiben-Einleger (y0, y1, z0, z1); darüber das Rahmenband mit Taster."""
+    return (P.FLAT_Y0 + P.GR_EDGE, P.FLAT_Y1 - P.GR_EDGE,
+            P.VENT_Z0, H - P.GRATER_TOP_BAND)
+
+
+def front_insert():
+    shape = grater.insert("x", P.OUT_X0, -1, front_recess())
+    return Spec("front_einleger", shape, (0.80, 0.80, 0.83), print_rot=[((0, 1, 0), 90)],
+                explode=(-220, 0, 0))
+
+
 def front_vent_points():
     """Lochfeld der Front, gleiches Bild wie die Rückwand; um den Taster bleibt ein Kreis frei."""
     v = P.FRONT_VENT
-    if not v:
+    if not v or P.GRATER:
         return []
     keep = []
     if P.USB_C:
@@ -38,6 +51,8 @@ def front():
         cuts.append(rrect_x(P.OUT_X0 - 1, 1, P.USBC_Y - P.USBC_W / 2, P.USBC_Y + P.USBC_W / 2,
                             P.USBC_Z - P.USBC_H / 2, P.USBC_Z + P.USBC_H / 2, P.USBC_H / 2 - 0.01))
     cuts += holes_x(front_vent_points(), P.OUT_X0 - 1, 1)
+    if P.GRATER:
+        cuts += grater.frame_cuts("x", P.OUT_X0, -1, front_recess(), P.T_WALL)
     shape = cut_all(fuse_all([shape] + adds), cuts)
     return Spec("front", shape, (0.86, 0.86, 0.88), print_rot=[((0, 1, 0), -90)],
                 explode=(-140, 0, 0))

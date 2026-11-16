@@ -1,14 +1,14 @@
 == Variante A liegend, GPU reaper, SFX ==
 == Bauteile ==
-  Boden                           9.7 s
-  Deckel                         10.4 s
-  Seitenwände                    14.7 s
-  Front                           5.3 s
-  Rückwand                        3.4 s
-  Sockel                          1.7 s
+  Boden                           9.3 s
+  Deckel                          9.3 s
+  Seitenwände                    12.3 s
+  Front                           4.3 s
+  Rückwand                        2.7 s
+  Sockel                          1.6 s
   Extras                          0.5 s
   Dummies                         0.0 s
-  Spiegeln (Händigkeit)           4.3 s
+  Spiegeln (Händigkeit)           2.8 s
 
 == V-Nut an den Trennstellen ==
   boden_vorn              3 Kanten  V-Fase
@@ -65,7 +65,7 @@
 == Maße ==
   Variante: A liegend
   Außen L x B x H (ohne Sockel): (322.0, 245.0, 190.0)
-  Außen H mit Sockel: 202.0
+  Außen H mit Sockel bzw. Füßen: 202.0
   Innen L x B x H: (314.0, 237.0, 180.0)
   Luft Kühler -> Wand oben/seitlich: 5.4
   Sockel-Mitte (x, v): (220.0, 150.0)
@@ -80,4 +80,4 @@
   /Users/robinrehbein/Code/itx-case/out/A/assembly.FCStd
 
 == Ergebnis ==
-  OK – 437 s
+  OK – 410 s

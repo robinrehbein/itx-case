@@ -52,7 +52,7 @@ def psu_holder():
     cuts.append(box(x0 + 12, x1 - 12, y0 + 12, y1 - 12, w0 - 1, w1 + 1))
     shape = cut_all(fuse_all(adds), cuts)
     return Spec("netzteil_halter", place(shape), (0.25, 0.25, 0.27), group="extra",
-                print_rot=list(PLACE_UNDO), explode=(0, 0, -30) if P.LAYOUT == "A" else (0, 30, 0))
+                print_rot=list(PLACE_UNDO), explode=(0, 0, -30) if P.LYING else (0, 30, 0))
 
 
 def psu_clamp():
@@ -67,7 +67,7 @@ def psu_clamp():
     shape = cut_all(fuse_all([foot, leg, lip]), [hole])
     return Spec("netzteil_klammer", place(shape), (0.25, 0.25, 0.27), group="extra",
                 print_rot=list(PLACE_UNDO) + [((0, 1, 0), 90)],
-                explode=(0, 0, 60) if P.LAYOUT == "A" else (0, 0, -60))
+                explode=(0, 0, 60) if P.LYING else (0, 0, -60))
 
 
 # --------------------------------------------------------------------------
