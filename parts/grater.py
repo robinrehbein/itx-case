@@ -39,15 +39,16 @@ def slab(axis, w0, w1, u0, u1, v0, v1, r):
     return rrect_prism(u0, u1, v0, v1, r, w0, w1)
 
 
-def lattice(u0, u1, v0, v1):
-    """Muldenmitten (A) und Lochmitten (B, C) im Fenster, zentriert."""
+def lattice(u0, u1, v0, v1, anchor_u=None):
+    """Muldenmitten (A) und Lochmitten (B, C) im Fenster, zentriert. anchor_u: eine Linie
+    u = konst. läuft genau durch Muldenmitten und Löcher (dort liegt die Fuge)."""
     p = P.GR_PITCH
     dv = p * SQ3 / 2
     m_a = 1.0
     m_b = P.GR_HOLE_D / 2 + 0.5
     nu = int((u1 - u0) / p) + 2
     nv = int((v1 - v0) / dv) + 2
-    cu, cv = (u0 + u1) / 2, (v0 + v1) / 2
+    cu, cv = (u0 + u1) / 2 if anchor_u is None else anchor_u, (v0 + v1) / 2
     A, BC = [], []
     for j in range(-nv, nv + 1):
         for i in range(-nu, nu + 1):
@@ -62,9 +63,9 @@ def lattice(u0, u1, v0, v1):
     return A, sorted(set((round(a, 4), round(b, 4)) for (a, b) in BC))
 
 
-def insert_tools(axis, out, sgn, win):
+def insert_tools(axis, out, sgn, win, anchor_u=None):
     """Kegel von außen und Löcher von innen für ein Fenster (u0, u1, v0, v1)."""
-    A, BC = lattice(*win)
+    A, BC = lattice(*win, anchor_u=anchor_u)
     R, e = P.GR_R, 0.3
     inner = out - sgn * P.GR_T
     tools = []
@@ -77,18 +78,21 @@ def insert_tools(axis, out, sgn, win):
     return tools
 
 
-def magnet_spots(rect):
-    """Magnetmitten auf dem Auflagerand: Seitenmitten, lange Seiten zusätzlich bei 1/4 und 3/4."""
+def magnet_spots(rect, seam_u=None):
+    """Magnetmitten auf dem Auflagerand: Seitenmitten, lange Seiten zusätzlich bei 1/4 und 3/4
+    (über 250 mm in Sechsteln). Mit seam_u fallen Magnete nahe der Fuge weg."""
     u0, u1, v0, v1 = rect
     h = P.GR_LAP / 2
     spots = []
     for (a0, a1, fixed, along_u) in ((u0, u1, v0 + h, True), (u0, u1, v1 - h, True),
                                      (v0, v1, u0 + h, False), (v0, v1, u1 - h, False)):
-        n = 3 if (a1 - a0) > 150 else 1
+        n = 5 if (a1 - a0) > 250 else (3 if (a1 - a0) > 150 else 1)
         for k in range(n):
             t = (k + 1) / (n + 1)
             a = a0 + 20 + (a1 - a0 - 40) * t if n > 1 else (a0 + a1) / 2
             spots.append((a, fixed) if along_u else (fixed, a))
+    if seam_u is not None:
+        spots = [q for q in spots if abs(q[0] - seam_u) >= 12.0]
     return spots
 
 
@@ -101,7 +105,7 @@ def rects(recess):
     return recess, ins, win
 
 
-def frame_cuts(axis, outer, sgn, recess, thick, r=6.0):
+def frame_cuts(axis, outer, sgn, recess, thick, r=6.0, seam_u=None):
     """Schnitte im Rahmen: Fenster durch, Tasche von innen bis zur Lippe, Magnettaschen in
     der Lippe. outer = Außenfläche des Rahmens, thick = Rahmendicke."""
     rec, ins, win = rects(recess)
@@ -112,24 +116,44 @@ def frame_cuts(axis, outer, sgn, recess, thick, r=6.0):
     w = sorted((lip_in, far))
     cuts.append(slab(axis, w[0], w[1], *rec, r + P.GR_LAP))
     d, depth = P.GR_MAG
-    for (u, v) in magnet_spots(ins):
+    for (u, v) in magnet_spots(ins, seam_u):
         cuts.append(Part.makeCylinder(d / 2, depth + 0.01,
                                       _pt(axis, lip_in - sgn * 0.01, u, v), _dir(axis, sgn)))
     return cuts
 
 
-def insert(axis, outer, sgn, recess, r=6.0):
+def insert(axis, outer, sgn, recess, r=6.0, seam_u=None):
     """Einleger: Außenseite liegt über dem Filter an der Lippe."""
     rec, ins, win = rects(recess)
     out = outer - sgn * (P.GR_LIP + P.GR_FILTER)
     w = sorted((out, out - sgn * P.GR_T))
     body = slab(axis, w[0], w[1], *ins, r + P.GR_LAP - P.GR_CLEAR)
-    tools = insert_tools(axis, out, sgn, win)
+    tools = insert_tools(axis, out, sgn, win, anchor_u=seam_u)
     d, depth = P.GR_MAG
-    for (u, v) in magnet_spots(ins):
+    for (u, v) in magnet_spots(ins, seam_u):
         tools.append(Part.makeCylinder(d / 2, depth + 0.01,
                                        _pt(axis, out + sgn * 0.01, u, v), _dir(axis, -sgn)))
     return body.cut(tools)
+
+
+def insert_pair(outer, recess, seam_u, r=6.0):
+    """Deckel (axis z): ein durchgehender Einleger, an der Fuge in zwei Teile geteilt. Im
+    Reibenfeld ist die Fuge gerade und liegt genau auf seam_u (Muldenmitten und Löcher). Im
+    glatten Auflagerand greift die untere Hälfte des vorderen Teils GR_SEAM_LAP weit unter das
+    hintere Teil; so tragen sich die Teile an beiden Enden der Fuge gegenseitig."""
+    from parts.common import box, BIG
+    full = insert("z", outer, 1, recess, r, seam_u)
+    wy0, wy1 = rects(recess)[2][2:]
+    out = outer - (P.GR_LIP + P.GR_FILTER)
+    zm = out - P.GR_T / 2
+    g, L, S = P.GR_SEAM_GAP, P.GR_SEAM_LAP, seam_u
+
+    def rims(x1, z1, m):
+        return box(-BIG, x1, -BIG, wy0 - m, -BIG, z1).fuse(box(-BIG, x1, wy1 + m, BIG, -BIG, z1))
+
+    reg_a = box(-BIG, S - g / 2, -BIG, BIG, -BIG, BIG).fuse(rims(S + L - g / 2, zm - g / 2, 0.0))
+    reg_b = box(S + g / 2, BIG, -BIG, BIG, -BIG, BIG).cut(rims(S + L + g / 2, zm + g / 2, -g))
+    return full.common(reg_a), full.common(reg_b)
 
 
 def open_fraction(n=240):

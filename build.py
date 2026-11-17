@@ -190,14 +190,15 @@ a_fl = hole_area(floor.vent_points())
 a_side = hole_area(side_pts)
 a_top = hole_area(lid.vent_points())
 a_front = hole_area(panels.front_vent_points())
-if P.GRATER:
+if P.GRATER or P.GRATER_LID:
     from parts import grater
     f_open = grater.open_fraction()
 
     def win_area(rec):
         u0, u1, v0, v1 = grater.rects(rec)[2]
         return (u1 - u0) * (v1 - v0)
-    a_front = f_open * win_area(panels.front_recess())
+    if P.GRATER:
+        a_front = f_open * win_area(panels.front_recess())
     a_grater_top = f_open * sum(win_area(r) for r in lid.grater_recesses())
     log(f"  Reibe: {f_open*100:.1f} % der Fensterfläche offen (Abtastung)")
 a_rear = hole_area(rear_pts)
@@ -219,7 +220,7 @@ else:
     fan_field = (fx1 - fx0) * (fy1 - fy0)
 a_fan = hole_area(fan_pts)
 gpu_in = (a_side + min(a_pl, a_fl) / 2) if P.LYING else (min(a_pl, a_fl) + a_side / 2)
-if P.GRATER:
+if P.GRATER_LID:
     a_top = a_grater_top
 lines = [
     f"Wabenfeld offen (theoretisch): {hex_ratio*100:.1f} %",

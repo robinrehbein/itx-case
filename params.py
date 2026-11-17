@@ -44,8 +44,14 @@ USB_C = False            # optionaler USB-C-Ausschnitt in der Front
 COOLER_PROFILE = "NH-D15"  # Noctua NH-D15 (Original, 165 mm)
 assert LAYOUT in ("A", "B", "C"), LAYOUT
 LYING = LAYOUT == "A"          # A liegt, B und C stehen (gleiche Anordnung innen)
-GRATER = LAYOUT == "C"         # Front und Deckel mit Reiben-Einlegern
+GRATER = LAYOUT == "C"         # Front mit Reiben-Einleger
+GRATER_LID = LAYOUT in ("B", "C")   # Deckel mit Reiben-Einlegern
 FEET = LAYOUT == "C"           # Füße statt Sockelring
+# Versteckte Fugen: keine V-Nut, Hälften stumpf gestoßen und verklebt, enge Schraubenlöcher
+# in den Flanschen richten sie bündig aus. Die Fugen laufen durch eine Lochspalte bzw. bei der
+# Reibe durch eine Reihe aus Muldenmitten und Löchern.
+HIDDEN_SEAMS = LAYOUT in ("B", "C")
+FLANGE_BOLT_D = 3.15 if HIDDEN_SEAMS else 3.4
 
 # --------------------------------------------------------------------------
 # Drucker (Voron 2.4 300)
@@ -175,7 +181,8 @@ FLAT_X1 = OUT_X1 - CORNER_R
 
 # Sockel (Mac-Studio-Fuß). Bei B saugt die Karte durch den Boden, der Ring ist höher.
 PLINTH_INSET = 16.0
-PLINTH_H = 12.0 if LYING else 20.0
+# B: höher und gröber gelocht, die Karte saugt durch den Boden (Sockelring ist die Engstelle)
+PLINTH_H = {"A": 12.0, "B": 26.0, "C": 20.0}[LAYOUT]
 FOOT_H = 12.0          # C: Füße statt Sockelring
 FOOT_D = 24.0
 PLINTH_T = 3.0
@@ -358,8 +365,8 @@ REAR_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=VENT_Z0, z1=VENT_Z1, r=1
 REAR_RAIL_CLEAR = 6.0  # über der GPU-Leiste frei (Lasche + Schraubenköpfe)
 FRONT_VENT = dict(y0=FLAT_Y0 + 4.0, y1=FLAT_Y1 - 4.0, z0=VENT_Z0, z1=VENT_Z1, r=12.0)
 # Sockelring: etwas größere Löcher (Engstelle der Bodenzuluft), rundum
-PLINTH_VENT_D = 3.8
-PLINTH_VENT_PITCH = 5.0
+PLINTH_VENT_D = 4.4 if LAYOUT == "B" else 3.8
+PLINTH_VENT_PITCH = 5.4 if LAYOUT == "B" else 5.0
 PLINTH_VENT_EDGE = 0.6
 
 # Reibe (nur C): Einleger von innen gegen eine Lippe im Rahmen, dazwischen Filtergewebe.
@@ -377,6 +384,8 @@ GR_CLEAR = 0.3         # Spiel rundum im Rahmen
 GR_FILTER = 0.3        # Filtergewebe zwischen Lippe und Einleger
 GR_MAG = (6.2, 1.1)    # Magnettasche Ø, Tiefe (Magnete 6 x 1 mm)
 GR_EDGE = 4.0          # Rahmen außen neben der Einleger-Tasche (Front)
+GR_SEAM_LAP = 20.0     # Deckel-Einleger überlappen an der Fuge stufenförmig (halbe Dicke)
+GR_SEAM_GAP = 0.2
 
 # --------------------------------------------------------------------------
 # Board-Träger (nur B): Durchbrüche im Block (u0, u1, v0, v1)

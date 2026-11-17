@@ -5,7 +5,7 @@ Bei A sitzt das linke Feld vor den GPU-Lüftern."""
 import params as P
 from parts.common import (Spec, box, rrect_prism, wedge_x, hex_grid, holes_y, split_blind, cyl_z,
                           fuse_all,
-                          cut_all, split_with_flanges, envelope_case, cut_holes_split, BIG)
+                          cut_all, split_with_flanges, envelope_case, seam_envelope, cut_holes_split, BIG)
 
 H = P.INNER_H
 
@@ -108,7 +108,7 @@ def build():
         yb = P.FLANGE_D / 2 if side == "L" else P.INNER_W - P.FLANGE_D / 2
         ribs = side_ribs(side)
         bolts = [(yb, (z0 + z1) / 2) for (z0, z1) in SIDE_RIB_Z]
-        a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_case())
+        a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, seam_envelope(envelope_case()))
         pts, tools = vents[side]
         a, b = cut_holes_split(a, b, P.SPLIT_X, [q[0] for q in pts], tools)
         name = "seite_links" if side == "L" else "seite_rechts"

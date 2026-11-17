@@ -8,7 +8,7 @@ from FreeCAD import Vector as V
 
 import params as P
 from parts.common import (Spec, box, rrect_prism, hex_grid, holes_x, holes_y, cyl_z,
-                          fuse_all, cut_all, split_with_flanges, envelope_plinth,
+                          fuse_all, cut_all, split_with_flanges, envelope_plinth, seam_envelope,
                           cut_holes_split, solid)
 from parts.floor import plinth_screw_positions
 
@@ -114,7 +114,7 @@ def build():
     ribs = [rib(y0 + t, 1), rib(y1 - t, -1)]
     zc = (ZL + Z1) / 2
     bolts = [(y0 + t + g + fd / 2, zc), (y1 - t - g - fd / 2, zc)]
-    a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_plinth())
+    a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, seam_envelope(envelope_plinth()))
 
     sides, ends = vent_sets()
     xs_pts, tools = [], []

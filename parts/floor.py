@@ -4,7 +4,7 @@ Dome für Front, Rückwand und Board-Träger. Bei A trägt der Boden auch das Bo
 import params as P
 from parts.common import (Spec, cyl_z, rrect_prism, hex_grid, holes_z, fuse_all,
                           cut_all, dome_floor, insert_down, insert_up, split_with_flanges,
-                          envelope_case, cut_holes_split)
+                          envelope_case, seam_envelope, cut_holes_split)
 
 
 def standoff_positions():
@@ -117,7 +117,7 @@ def build():
     y0, y1 = rib_y_ranges()[0]
     n = max(2, int((y1 - y0) // 50) + 1)
     bolts = [(y0 + 10 + i * (y1 - y0 - 20) / (n - 1), 5.0) for i in range(n)]
-    a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_case())
+    a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, seam_envelope(envelope_case()))
     a, b = cut_holes_split(a, b, P.SPLIT_X, [q[0] for q in pts],
                            holes_z(pts, -P.T_FLOOR - 1, 0.5))
     col = (0.78, 0.78, 0.80)

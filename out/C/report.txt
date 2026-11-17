@@ -1,26 +1,18 @@
 == Variante C stehend, M3-Stil, GPU reaper, SFX ==
 == Bauteile ==
-  Boden                          13.7 s
-  Deckel                        223.9 s
-  Seitenwände                    20.5 s
+  Boden                           8.2 s
+  Deckel                        130.9 s
+  Seitenwände                    18.2 s
   Front                           0.5 s
-  Front-Einleger                168.0 s
-  Rückwand                        3.1 s
-  Board-Träger                    0.2 s
+  Front-Einleger                219.9 s
+  Rückwand                        3.2 s
+  Board-Träger                    0.3 s
   Sockel                          0.0 s
-  Extras                          0.4 s
+  Extras                          0.6 s
   Dummies                         0.0 s
-  Spiegeln (Händigkeit)           8.3 s
+  Spiegeln (Händigkeit)           9.2 s
 
 == V-Nut an den Trennstellen ==
-  boden_vorn              3 Kanten  V-Fase
-  boden_hinten            3 Kanten  V-Fase
-  deckel_vorn             3 Kanten  V-Fase
-  deckel_hinten           3 Kanten  V-Fase
-  seite_links_vorn        1 Kanten  V-Fase
-  seite_links_hinten      1 Kanten  V-Fase
-  seite_rechts_vorn       1 Kanten  V-Fase
-  seite_rechts_hinten     1 Kanten  V-Fase
 
 == Gültigkeit ==
   ok
@@ -32,12 +24,12 @@
   keine
 
 == Druckbett / Manifold / Export ==
-  boden_vorn              134.0 x  211.0 x   15.0  passt  manifold=ja  ~ 4.2 h  ~  67 g
+  boden_vorn              134.0 x  211.0 x   15.0  passt  manifold=ja  ~ 4.2 h  ~  68 g
   boden_hinten            188.0 x  211.0 x   15.0  passt  manifold=ja  ~ 5.7 h  ~  89 g
-  deckel_vorn             135.0 x  213.0 x   15.0  passt  manifold=ja  ~ 2.0 h  ~  36 g
-  deckel_hinten           189.0 x  213.0 x   15.0  passt  manifold=ja  ~ 2.4 h  ~  44 g
-  deckel_einleger_vorn    112.4 x  162.4 x    4.0  passt  manifold=ja  ~ 1.5 h  ~  17 g
-  deckel_einleger_hinten  166.4 x  162.4 x    4.0  passt  manifold=ja  ~ 2.2 h  ~  24 g
+  deckel_vorn             135.0 x  213.0 x   15.0  passt  manifold=ja  ~ 2.2 h  ~  44 g
+  deckel_hinten           189.0 x  213.0 x   15.0  passt  manifold=ja  ~ 2.8 h  ~  56 g
+  deckel_einleger_vorn    123.6 x  137.4 x    4.0  passt  manifold=ja  ~ 1.2 h  ~  14 g
+  deckel_einleger_hinten  157.7 x  137.4 x    4.0  passt  manifold=ja  ~ 1.7 h  ~  19 g
   seite_links_vorn        134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 3.8 h  ~  54 g
   seite_links_hinten      188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 5.2 h  ~  72 g
   seite_rechts_vorn       134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 3.8 h  ~  54 g
@@ -88,4 +80,4 @@
   /Users/robinrehbein/Code/itx-case/out/C/assembly.FCStd
 
 == Ergebnis ==
-  OK – 842 s
+  OK – 833 s

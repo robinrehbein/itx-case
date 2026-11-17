@@ -270,6 +270,11 @@ def dome_lid(x, y, h=None):
 # --------------------------------------------------------------------------
 # Trennstellen
 # --------------------------------------------------------------------------
+def seam_envelope(env):
+    """Hüllkörper für die V-Nut, oder None bei versteckten Fugen (keine V-Nut)."""
+    return None if P.HIDDEN_SEAMS else env
+
+
 def envelope_case():
     """Außenhülle für die V-Nut-Erkennung (Boden, Wände, Deckel)."""
     return rrect_prism(P.OUT_X0, P.OUT_X1, P.OUT_Y0, P.OUT_Y1, P.CORNER_R,
@@ -341,8 +346,8 @@ def split_with_flanges(shape, xs, ribs, bolts, envelope=None, side_b_nut=True):
     b = solid(fuse_all([b] + rib_b))
     cut_a, cut_b = [], []
     for (y, z) in bolts:
-        cut_a.append(cyl_x(y, z, xs - t - 1, xs + 0.01, P.M3_CLEAR / 2))
-        cut_b.append(cyl_x(y, z, xs - 0.01, xs + t + 1, P.M3_CLEAR / 2))
+        cut_a.append(cyl_x(y, z, xs - t - 1, xs + 0.01, P.FLANGE_BOLT_D / 2))
+        cut_b.append(cyl_x(y, z, xs - 0.01, xs + t + 1, P.FLANGE_BOLT_D / 2))
         if side_b_nut:
             cut_b.append(hex_prism_x(y, z, xs + t - P.M3_NUT_T, xs + t + 0.1, P.M3_NUT_AF))
     a = solid(cut_all(a, cut_a))

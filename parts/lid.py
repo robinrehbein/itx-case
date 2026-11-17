@@ -3,7 +3,7 @@
 import params as P
 from parts import grater
 from parts.common import (Spec, rrect_prism, hex_grid, holes_z, split_blind, cyl_z, fuse_all, cut_all,
-                          dome_lid, split_with_flanges, envelope_case, cut_holes_split)
+                          dome_lid, split_with_flanges, envelope_case, seam_envelope, cut_holes_split)
 
 TOP = P.INNER_H + P.T_LID
 
@@ -23,11 +23,29 @@ def magnet_positions():
     return [(x, yl) for x in P.MAGNET_X] + [(x, yr) for x in P.MAGNET_X]
 
 
+def grater_recess():
+    """Reibe im Deckel: eine Tasche über beide Hälften (x0, x1, y0, y1). Rechts begrenzen
+    die Dome des Board-Trägers, links bleibt derselbe Rand; dort sitzen die Fugenflansche."""
+    y1 = (P.Y_BASE if P.Y_BASE else P.INNER_W) - 16.5
+    border = P.OUT_Y1 - y1
+    return (P.OUT_X0 + 30.0, P.OUT_X1 - 30.0, P.OUT_Y0 + border, y1)
+
+
+def grater_recesses():
+    return [grater_recess()]
+
+
 # Fugenflansch (y0, y1, z0, z1). A: neben dem Kabelbogen der Karte, B: vor dem Träger.
-if P.LYING:
-    SEAM_RIB = (P.GPU_V1 + 6.0, P.INNER_W - 11.0, P.INNER_H - P.FLANGE_D, P.INNER_H)
+# Mit Reibe nur in den Randstreifen neben der Tasche.
+_ZR = (P.INNER_H - P.FLANGE_D, P.INNER_H)
+if P.GRATER_LID:
+    _rec = grater_recess()
+    SEAM_RIBS = [(11.0, _rec[2] - 0.5) + _ZR, (_rec[3] + 0.5, P.Y_BASE - 6.0) + _ZR]
+elif P.LYING:
+    SEAM_RIBS = [(P.GPU_V1 + 6.0, P.INNER_W - 11.0) + _ZR]
 else:
-    SEAM_RIB = (11.0, P.Y_BASE - 6.0, P.INNER_H - P.FLANGE_D, P.INNER_H)
+    SEAM_RIBS = [(11.0, P.Y_BASE - 6.0) + _ZR]
+SEAM_RIB = SEAM_RIBS[0]
 
 
 def vent_sets():
@@ -35,7 +53,7 @@ def vent_sets():
     Rückgabe: (durchgehend, blind). Blind sind die Löcher über Fugenflansch und Domen."""
     v = P.TOP_VENT
     pts = hex_grid(v["x0"], v["x1"], v["y0"], v["y1"], corner_r=v["r"], col_at=P.SPLIT_X)
-    rects = [(P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, SEAM_RIB[0], SEAM_RIB[1])]
+    rects = [(P.SPLIT_X - P.FLANGE_T, P.SPLIT_X + P.FLANGE_T, r[0], r[1]) for r in SEAM_RIBS]
     if not P.LYING:   # Oberkante des Board-Trägers
         rects.append((-999, 999, P.Y_BASE, P.Y_BASE + P.T_TRAY))
     discs = [(x, y, P.DOME_D / 2) for (x, y) in dome_positions()]
@@ -44,7 +62,7 @@ def vent_sets():
 
 def vent_points():
     """Offene Löcher des Deckels (bei C keine, dort sitzt die Reibe)."""
-    return [] if P.GRATER else vent_sets()[0]
+    return [] if P.GRATER_LID else vent_sets()[0]
 
 
 def grater_recesses():
@@ -72,22 +90,24 @@ def build():
         cuts.append(cyl_z(x, y, P.INNER_H - 0.01, P.INNER_H + P.MAGNET_H, P.MAGNET_D / 2))
     shape = cut_all(fuse_all([plate] + adds), cuts)
 
-    ribs = [SEAM_RIB]
+    ribs = list(SEAM_RIBS)
     zb = P.INNER_H - 5.0
-    y0, y1 = SEAM_RIB[0] + 10.0, SEAM_RIB[1] - 10.0
-    n = max(2, int((y1 - y0) // 50) + 1)
-    bolts = [(y0 + i * (y1 - y0) / (n - 1), zb) for i in range(n)]
-    a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, envelope_case())
+    if P.GRATER_LID:
+        bolts = [((r[0] + r[1]) / 2, zb) for r in SEAM_RIBS]
+    else:
+        y0, y1 = SEAM_RIB[0] + 10.0, SEAM_RIB[1] - 10.0
+        n = max(2, int((y1 - y0) // 50) + 1)
+        bolts = [(y0 + i * (y1 - y0) / (n - 1), zb) for i in range(n)]
+    a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, seam_envelope(envelope_case()))
     col = (0.80, 0.80, 0.82)
     rot = [((1, 0, 0), 180)]   # Sichtfläche aufs Bett
-    if P.GRATER:
-        ra, rb = grater_recesses()
-        a = a.cut(grater.frame_cuts("z", TOP, 1, ra, P.T_LID))
-        b = b.cut(grater.frame_cuts("z", TOP, 1, rb, P.T_LID))
-        ins = [Spec("deckel_einleger_vorn", grater.insert("z", TOP, 1, ra), (0.80, 0.80, 0.83),
-                    explode=(-25, 0, 200)),
-               Spec("deckel_einleger_hinten", grater.insert("z", TOP, 1, rb), (0.80, 0.80, 0.83),
-                    explode=(25, 0, 200))]
+    if P.GRATER_LID:
+        rec = grater_recess()
+        cuts = grater.frame_cuts("z", TOP, 1, rec, P.T_LID, seam_u=P.SPLIT_X)
+        a, b = a.cut(cuts), b.cut(cuts)
+        ia, ib = grater.insert_pair(TOP, rec, P.SPLIT_X)
+        ins = [Spec("deckel_einleger_vorn", ia, (0.80, 0.80, 0.83), explode=(-25, 0, 200)),
+               Spec("deckel_einleger_hinten", ib, (0.80, 0.80, 0.83), explode=(25, 0, 200))]
         return [Spec("deckel_vorn", a, col, print_rot=rot, explode=(-25, 0, 120)),
                 Spec("deckel_hinten", b, col, print_rot=rot, explode=(25, 0, 120))] + ins, 0
     tools = (holes_z(through, P.INNER_H - 1, TOP + 1)
