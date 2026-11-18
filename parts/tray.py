@@ -12,13 +12,19 @@ T = P.T_TRAY
 
 def build():
     V = P.INNER_V
-    shape = box(X0, X1, 0, V, -T, 0)
+    # oben 1 mm Luft: dort ragen die Reiben-Einleger des Deckels 0,8 mm nach innen
+    shape = box(X0, X1, 0, V - 1.0, -T, 0)
     adds, cuts = [], []
-    # Laschen zu den Domen in Boden (v klein) und Deckel (v groß)
+    # Laschen unten zu den Bodendomen (Board-Seite), oben zu den Deckeldomen (Kabelseite)
+    v0, v1 = P.TAB_Z_BOT
     for x in P.TRAY_TABS_X:
-        for (v0, v1) in (P.TAB_Z_BOT, P.TAB_Z_TOP):
-            adds.append(box(x - P.TAB_W / 2, x + P.TAB_W / 2, v0, v1, -1.0, P.TAB_D))
-            cuts.append(cyl_y(x, P.TAB_D / 2, v0 - 1, v1 + 1, P.M3_CLEAR / 2))
+        adds.append(box(x - P.TAB_W / 2, x + P.TAB_W / 2, v0, v1, -1.0, P.TAB_D))
+        cuts.append(cyl_y(x, P.TAB_D / 2, v0 - 1, v1 + 1, P.M3_CLEAR / 2))
+    v0, v1 = P.TAB_Z_TOP
+    wc = -T - P.TAB_D / 2
+    for x in P.TRAY_TOP_TABS_X:
+        adds.append(box(x - P.TAB_W / 2, x + P.TAB_W / 2, v0, v1, -T - P.TAB_D, -T + 1.0))
+        cuts.append(cyl_y(x, wc, v0 - 1, v1 + 1, P.M3_CLEAR / 2))
     for (u, v, h) in base_mounts():
         r = 5.0 if h > P.LOW_BOSS_H else P.DOME_D / 2
         adds.append(cyl_z(u, v, -1.0, h, r))

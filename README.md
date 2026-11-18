@@ -27,10 +27,10 @@ sichtbaren Felder Reibe, nur Boden und Sockelring behalten Rundlöcher.
 | Volumen außen | 15,7 l | 18,1 l | 16,8 l (ohne Füße) |
 | Innen | 314 × 237 × 180 mm | 314 × 203 × 237 mm | wie B |
 | GPU saugt durch | linke Seitenwand, 44,0 % offen | Boden, Engstelle Sockelring 98 cm² | Boden, Spalt unter dem Boden 116 cm² |
-| Offen: Front / Deckel / Seite / Rückwand | 139 / 264 / 190 / 84 cm² | 112 / 150 / 196 / 60 cm² (Reibe) | wie B |
+| Offen: Front / Deckel / Seite / Rückwand | 139 / 264 / 190 / 84 cm² | 112 / 183 / 196 / 60 cm² (Reibe) | wie B |
 | Fugen | V-Nut | versteckt, verklebt | versteckt, verklebt |
 | Druckteile | 18 | 28 | 30 |
-| Druckzeit / ASA (Gehäuse und Halter) | ca. 48 h / 0,7 kg | ca. 57 h / 0,9 kg | ca. 55 h / 0,9 kg |
+| Druckzeit / ASA (Gehäuse und Halter) | ca. 48 h / 0,7 kg | ca. 56 h / 0,9 kg | ca. 54 h / 0,9 kg |
 
 Drucker: Voron 2.4 300, alle Teile ≤ 290 × 290 × 270 mm.
 
@@ -82,7 +82,13 @@ Sockel sind deshalb bei x = 130 mm geteilt. Bei B und C ist diese Fuge versteckt
 - Deckel und Seitenwände haben je ein durchgehendes Reibenfeld ohne Steg. Die zwei Einleger
   stoßen in einer Reihe aus Muldenmitten und Löchern aneinander. Im glatten Auflagerand greift
   das vordere Teil 20 mm unter das hintere, so tragen sich beide an den Enden der Fuge. Die
-  Rahmen sind nur in den Randstreifen neben dem Feld verbunden, dort sitzen die Flansche.
+  Seitenwand-Rahmen sind nur in den Randstreifen über und unter dem Feld verbunden, dort sitzen
+  die Flansche.
+- Das Deckelfeld hat rundum denselben Abstand zum Rand wie Front und Seiten (16 mm bis zur
+  Tasche). Für Flansche bleibt im Deckelrand kein Platz. Jede Deckelhälfte ist mit Front bzw.
+  Rückwand verschraubt, die Fuge wird nur verklebt. Die oberen Laschen des Board-Trägers sitzen
+  deshalb auf seiner Rückseite im Kabelraum und werden bei abgenommener rechter Seitenwand
+  verschraubt.
 - Sichtbar bleibt eine Haarfuge in den glatten Randstreifen.
 
 `HIDDEN_SEAMS = False` in `params.py` bringt die V-Nut zurück. Wenn die Haarfugen stören, wäre
@@ -135,7 +141,8 @@ das Reaper-Gehäuse passt, sondern baut ein größeres Gehäuse für Karten bis 
 | `out/A/`, `out/B/`, `out/C/` | je Variante: `step/` (je Teil in Montagelage), `stl/` (Druckorientierung), `assembly.FCStd` mit Dummies, `png/` |
 
 `build.py` schreibt zusätzlich `step/_baugruppe.step` mit allen Teilen. Die Datei ist bei B und C
-über 180 MB groß und liegt deshalb nicht im Repo (GitHub erlaubt höchstens 100 MB pro Datei).
+über 200 MB groß und liegt deshalb nicht im Repo, ebenso `assembly.FCStd` von B und C (je
+111 MB). GitHub erlaubt höchstens 100 MB pro Datei. Beide entstehen beim Bauen lokal neu.
 
 ## Prüfungen (Stand des letzten Builds)
 
@@ -176,7 +183,7 @@ B und C haben acht Einleger, alle 4 mm dick und mit der Außenseite nach oben ge
 | Einleger | Druckmaß (mm) |
 |---|---|
 | front_einleger | 182 × 178 |
-| deckel_einleger_vorn / _hinten | 124 / 158 × 137 |
+| deckel_einleger_vorn / _hinten | 138 / 173 × 178 |
 | seite_links_einleger_vorn / _hinten | 138 / 172 × 190 |
 | seite_rechts_einleger_vorn / _hinten | 138 / 172 × 190 |
 | rueckwand_einleger | 158 × 117 |
@@ -279,7 +286,7 @@ Löcher Sacklöcher mit 0,6 mm Haut (`VENT_BLIND_SKIN`) und zählen nicht zum Qu
 | Front | 139 cm² | 112 cm² (Reibe) |
 | Rückwand | 84 cm² + Slotblech ca. 19 cm² | 60 cm² (Reibe) + Slotblech ca. 19 cm² |
 | Seitenwand, je Seite | 190 cm² | 196 cm² (Reibe) |
-| Deckel | 264 cm² | 150 cm² (Reibe) |
+| Deckel | 264 cm² | 183 cm² (Reibe) |
 | Boden über dem Sockel | 228 cm² | 193 cm² |
 | Sockelring | 37 cm² | 98 cm² (Ring 26 mm hoch), bei C 116 cm² Spalt unter dem Boden |
 
@@ -316,7 +323,7 @@ hinter den Feldern funktionieren beide Varianten, bei B ist ein Filter am Boden 
   oder Füße wie bei C (116 cm², offener Spalt rundum).
 - **B und C mit Reibe auf allen sichtbaren Feldern**, so dass jede Fläche gleich aussieht. Der
   Preis gegenüber dem Rundlochfeld: Front 112 statt 160 cm², Rückwand 60 statt 94 cm²,
-  Seitenwände 196 statt 266 cm², Deckel 150 statt 212 cm². Boden und Sockelring bleiben
+  Seitenwände 196 statt 266 cm², Deckel 183 statt 212 cm². Boden und Sockelring bleiben
   gelocht, der Ring ist mit 3 mm zu dünn für 4 mm tiefe Mulden.
 - **Netzteil-Halter mit Klammer:** Wanne mit vollen Wänden an der blanken Seite und zum Kühler,
   an Lüfter und Anschlüssen nur Ecken. Eine Klammer an der blanken Seite greift über die

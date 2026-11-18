@@ -5,3 +5,5 @@ __pycache__/
 out/*-*/
 out/*/*.FCBak
 out/*/step/_baugruppe.step
+out/B/assembly.FCStd
+out/C/assembly.FCStd

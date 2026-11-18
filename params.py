@@ -326,13 +326,17 @@ if LYING:
     # neben den Ausschnitten, von unten durch den Boden verschraubt.
     REAR_LOW_BOSS_Y = [BRACKET_SLOT_V0 - 5.4, IO_V1 + 4.25]
     TRAY_TABS_X = []
+    TRAY_TOP_TABS_X = []
 else:
     # C: der Taster sitzt links oben im Rahmen, die Laschen weichen ihm aus
     FRONT_TABS_Y = [40.0, 140.0] if not GRATER else [90.0, 160.0]
     REAR_TABS_Y_TOP = [40.0, 140.0]
     REAR_TABS_Y_BOT = [40.0, 140.0]
     REAR_LOW_BOSS_Y = []
-    TRAY_TABS_X = [35.0, 110.0, 200.0, 285.0]
+    TRAY_TABS_X = [35.0, 110.0, 200.0, 285.0]          # unten, zum Boden
+    # oben, zum Deckel: auf der Rückseite des Trägers im Kabelraum, damit der Deckelrand so
+    # schmal bleiben kann wie an Front und Seiten; zwischen den Magnetnasen der Seitenwand
+    TRAY_TOP_TABS_X = [60.0, 150.0, 235.0]
 
 # Seitenwände: unten Randfalz im Boden, oben Magnete 10x3
 RIM_H = 3.0

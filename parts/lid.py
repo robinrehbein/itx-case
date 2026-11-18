@@ -12,8 +12,8 @@ def dome_positions():
     d = []
     d += [(5.0, y) for y in P.FRONT_TABS_Y]
     d += [(P.INNER_L - 5.0, y) for y in P.REAR_TABS_Y_TOP]
-    if P.TRAY_TABS_X:
-        d += [(x, P.Y_BASE - P.TAB_D / 2) for x in P.TRAY_TABS_X]
+    if P.TRAY_TOP_TABS_X:
+        d += [(x, P.Y_BASE + P.T_TRAY + P.TAB_D / 2) for x in P.TRAY_TOP_TABS_X]
     return d
 
 
@@ -24,11 +24,10 @@ def magnet_positions():
 
 
 def grater_recess():
-    """Reibe im Deckel: eine Tasche über beide Hälften (x0, x1, y0, y1). Rechts begrenzen
-    die Dome des Board-Trägers, links bleibt derselbe Rand; dort sitzen die Fugenflansche."""
-    y1 = (P.Y_BASE if P.Y_BASE else P.INNER_W) - 16.5
-    border = P.OUT_Y1 - y1
-    return (P.OUT_X0 + 30.0, P.OUT_X1 - 30.0, P.OUT_Y0 + border, y1)
+    """Reibe im Deckel: eine Tasche über beide Hälften (x0, x1, y0, y1), rundum mit demselben
+    Abstand zum Außenrand wie Front und Seitenwände (Eckbogen + GR_EDGE)."""
+    m = P.CORNER_R + P.GR_EDGE
+    return (P.OUT_X0 + m, P.OUT_X1 - m, P.OUT_Y0 + m, P.OUT_Y1 - m)
 
 
 def grater_recesses():
@@ -36,16 +35,17 @@ def grater_recesses():
 
 
 # Fugenflansch (y0, y1, z0, z1). A: neben dem Kabelbogen der Karte, B: vor dem Träger.
-# Mit Reibe nur in den Randstreifen neben der Tasche.
+# Mit Reibe kein Flansch: der Rand ist zu schmal, darunter sitzen die Flansche der
+# Seitenwände. Jede Deckelhälfte ist mit Front bzw. Rückwand verschraubt, die Fuge wird
+# verklebt und über die überlappenden Einleger ausgerichtet.
 _ZR = (P.INNER_H - P.FLANGE_D, P.INNER_H)
 if P.GRATER_LID:
-    _rec = grater_recess()
-    SEAM_RIBS = [(11.0, _rec[2] - 0.5) + _ZR, (_rec[3] + 0.5, P.Y_BASE - 6.0) + _ZR]
+    SEAM_RIBS = []
 elif P.LYING:
     SEAM_RIBS = [(P.GPU_V1 + 6.0, P.INNER_W - 11.0) + _ZR]
 else:
     SEAM_RIBS = [(11.0, P.Y_BASE - 6.0) + _ZR]
-SEAM_RIB = SEAM_RIBS[0]
+SEAM_RIB = SEAM_RIBS[0] if SEAM_RIBS else None
 
 
 def vent_sets():
@@ -63,13 +63,6 @@ def vent_sets():
 def vent_points():
     """Offene Löcher des Deckels (bei C keine, dort sitzt die Reibe)."""
     return [] if P.GRATER_LID else vent_sets()[0]
-
-
-def grater_recesses():
-    """C: je Deckelhälfte eine Tasche (x0, x1, y0, y1); über der Fuge bleibt ein Steg."""
-    v = P.TOP_VENT
-    y1 = min(v["y1"], P.Y_BASE - 12.0) if P.Y_BASE else v["y1"]
-    return [(v["x0"], P.SPLIT_X - 5.0, v["y0"], y1), (P.SPLIT_X + 5.0, v["x1"], v["y0"], y1)]
 
 
 def build():
