@@ -16,6 +16,8 @@ def base_mounts():
     """Dome auf der Board-Ebene (Block): (u, v, Höhe). A: Boden, B: Träger."""
     m = [(u, v, P.STANDOFF) for (u, v) in standoff_positions().values()]
     m += [(u, v, P.LOW_BOSS_H) for (u, v) in P.PSU_BOSS]
+    if not P.LYING:   # Stützen des Leitblechs
+        m += [(u, P.BAFFLE_POST_V, P.LOW_BOSS_H) for u in P.BAFFLE_POSTS_U]
     return m
 
 

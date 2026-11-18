@@ -24,7 +24,7 @@ import Part  # noqa: E402
 import MeshPart  # noqa: E402
 
 import params as P  # noqa: E402
-from parts import floor, lid, side_walls, panels, tray, plinth, extras, dummies  # noqa: E402
+from parts import floor, lid, side_walls, panels, tray, plinth, extras, dummies, cables  # noqa: E402
 from parts.common import hole_area, VGROOVE_LOG, envelope_case, envelope_plinth  # noqa: E402
 
 VARIANT = P.LAYOUT if (P.GPU_PROFILE, P.PSU_TYPE) == ("reaper", "SFX") else \
@@ -61,6 +61,8 @@ mid_parts = timed("Board-Träger", tray.build) if not P.LYING else []
 plinth_parts, a_pl = timed("Sockel", plinth.build)
 extra_parts, fit_parts = timed("Extras", extras.build)
 dummy_parts = timed("Dummies", dummies.build)
+cable_parts, cable_info = timed("Kabelwege", cables.build)
+dummy_parts += cable_parts
 
 case_parts = (floor_parts + lid_parts + side_parts + [front] + front_ins + [rear] + rear_ins
               + mid_parts + plinth_parts)
@@ -122,6 +124,22 @@ for d in dummy_parts:
             errors.append(f"Kollision {p.name} <-> {d.name}: {v:.3f} mm³")
             log(f"  FEHLER {p.name} <-> {d.name}: {v:.3f} mm³")
 log(f"  {'keine Kollision' if coll == 0 else f'{coll} Kollisionen'}")
+
+if cable_parts:
+    log("\n== Kabelwege gegen Komponenten ==")
+    comp = {d.name.replace("dummy_", ""): d for d in dummy_parts if d.name.startswith("dummy_")}
+    cc = 0
+    for c in cable_parts:
+        ends = cable_info[c.name][1]
+        for key, d in comp.items():
+            if key in ends or (key == "board" and "board" in ends):
+                continue
+            v = overlap(c.shape, d.shape)
+            if not (v < 1e-3):
+                cc += 1
+                errors.append(f"Kabelweg {c.name} läuft durch {d.name}: {v:.1f} mm³")
+                log(f"  FEHLER {c.name} <-> {d.name}: {v:.1f} mm³")
+    log(f"  {'frei' if cc == 0 else f'{cc} Konflikte'}")
 
 log("\n== Überschneidung Druckteile untereinander ==")
 ov = 0
@@ -247,6 +265,11 @@ if a_fan / fan_field < 0.40:
 if not P.LYING and not P.FEET and a_pl < 3 * fan95:
     warnings.append(f"Sockelring {a_pl/100:.0f} cm² kleiner als die GPU-Lüfterfläche "
                     f"{3*fan95/100:.0f} cm²: die Karte holt den Rest über Seitenwände und Front")
+
+if cable_info:
+    log("\n== Kabellängen (Weg im Modell, + 30 mm je Stecker) ==")
+    for name, (ln, ends) in cable_info.items():
+        log(f"  {name:<14} {ln:5.0f} mm Weg, Kabel ca. {ln + 60:4.0f} mm")
 
 # --------------------------------------------------------------------------
 log("\n== Maße ==")

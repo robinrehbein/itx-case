@@ -336,7 +336,7 @@ else:
     TRAY_TABS_X = [35.0, 110.0, 200.0, 285.0]          # unten, zum Boden
     # oben, zum Deckel: auf der Rückseite des Trägers im Kabelraum, damit der Deckelrand so
     # schmal bleiben kann wie an Front und Seiten; zwischen den Magnetnasen der Seitenwand
-    TRAY_TOP_TABS_X = [60.0, 150.0, 235.0]
+    TRAY_TOP_TABS_X = [75.0, 150.0, 235.0]
 
 # Seitenwände: unten Randfalz im Boden, oben Magnete 10x3
 RIM_H = 3.0
@@ -403,6 +403,26 @@ TRAY_CUTOUTS = [
     (PSU_X1 + 8.0, PSU_X1 + 48.0, PSU_V0, PSU_V1),                          # Netzteilkabel
     (PSU_X0 + 18.0, PSU_X1 - 18.0, PSU_V1 + 2.0, INNER_V - 6.0),            # hinter dem Netzteil
 ]
+
+# Leitblech (nur stehend): Platte zwischen Backplate der Karte und Unterseite des D15. Die
+# warme Luft der Karte steigt sonst direkt in die Lamellen des Kühlers; so zieht sie zur
+# linken Seitenwand ab. Über dem Board erst ab w = BAFFLE_W0 (Bauteile auf der Platine).
+BAFFLE_V0 = GPU_V1 + 5.0
+BAFFLE_T = 2.5
+BAFFLE_W0 = 30.0
+BAFFLE_W1 = GPU_W1 - 5.0
+BAFFLE_U = (GPU_X0, min(SOCKET_X + COOLER_KEEP_X, BOARD_X1 - 26.0))   # endet vor dem I/O-Block
+BAFFLE_RIBS_U = [40.0, 135.0, 210.0, 280.0]     # Rippen quer, auf der Oberseite
+BAFFLE_RIB_H = 5.0
+BAFFLE_POSTS_U = [30.0, 110.0]                  # Stützen zum Träger, vor dem Board, neben dem Fugenflansch
+BAFFLE_POST_V = BAFFLE_V0 + BAFFLE_T + 3.5     # Schraubachse über der Platte (Zugang von links)
+
+# Kabelwege (nur stehend), Annahmen fürs aktuelle Board, mit dem neuen Board prüfen:
+# 24-Pin an der Vorderkante, EPS an der Oberkante nahe der I/O-Seite, Strom der Karte an
+# ihrer Oberkante (Reaper: 2 x 8-Pin).
+ATX24_V = BOARD_V0 + 140.0
+EPS_U = BOARD_X1 - 30.0
+GPU_POWER_U = GPU_X0 + 200.0
 
 # GPU-Stütze: Pfosten vom Boden bis knapp unter die tiefste Kartenfläche
 if LYING:

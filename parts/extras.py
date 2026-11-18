@@ -71,6 +71,28 @@ def psu_clamp():
 
 
 # --------------------------------------------------------------------------
+def baffle():
+    """Leitblech über der Karte (nur stehend), im Block. Platte mit Querrippen oben und
+    Randrippe zur linken Seitenwand hin, zwei Stützen zum Träger, dort verschraubt."""
+    u0, u1 = P.BAFFLE_U
+    v0, t = P.BAFFLE_V0, P.BAFFLE_T
+    w0, w1 = P.BAFFLE_W0, P.BAFFLE_W1
+    adds = [box(u0, u1, v0, v0 + t, w0, w1),
+            box(u0, u1, v0, v0 + t + P.BAFFLE_RIB_H, w1 - 2.0, w1)]
+    for u in P.BAFFLE_RIBS_U:
+        adds.append(box(u - 1.0, u + 1.0, v0, v0 + t + P.BAFFLE_RIB_H, w0, w1))
+    cuts = []
+    vc = P.BAFFLE_POST_V
+    for u in P.BAFFLE_POSTS_U:
+        adds.append(box(u - 6.0, u + 6.0, v0, vc + 4.0, B + 0.2, w0 + 1.0))
+        cuts.append(cyl_z(u, vc, B - 1.0, w0 + 2.0, P.M3_CLEAR / 2))
+        cuts.append(cyl_z(u, vc, B + 8.0, w0 + 2.0, P.M3_HEAD_D / 2))   # Kopf versenkt
+    shape = cut_all(fuse_all(adds), cuts)
+    # Druck: Platte flach aufs Bett, Rippen und Stützen nach oben
+    return Spec("leitblech", place(shape), (0.20, 0.45, 0.80), group="extra",
+                print_rot=list(PLACE_UNDO) + [((1, 0, 0), 90)], explode=(0, 0, 40))
+
+
 def gpu_support():
     """Pfosten unter der Kartenvorderkante, Fuß mit Langloch zum Einstellen."""
     bx, by = gpu_support_boss()
@@ -136,5 +158,41 @@ def fit_test():
             Spec("passtest_rueckwand", plate_r, col, group="fit", print_rot=[((0, 1, 0), 90)])]
 
 
+def grater_test():
+    """Probestück Reibe: Rahmen 90 x 90 mm in Deckeldicke mit Lippe und Magnettaschen, zwei
+    Einleger mit der Fuge in der Mitte (wie im Deckel). Prüft Stege, Mulden, Magnete, Fuge."""
+    from parts import grater
+    t = P.T_LID
+    rec = (10.0, 80.0, 10.0, 80.0)
+    frame = box(0, 90, 0, 90, 0, t).cut(grater.frame_cuts("z", t, 1, rec, t, seam_u=45.0))
+    ia, ib = grater.insert_pair("z", t, 1, rec, 45.0)
+    col = (0.95, 0.55, 0.10)
+    return [Spec("passtest_reibe_rahmen", frame, col, group="fit", print_rot=[((1, 0, 0), 180)]),
+            Spec("passtest_reibe_einleger_a", ia, col, group="fit"),
+            Spec("passtest_reibe_einleger_b", ib, col, group="fit")]
+
+
+def seam_test():
+    """Probestück versteckte Fuge: Platte 80 x 50 mm, Wandstärke, Lochspalte auf der Fuge,
+    Flansch mit engem Schraubenloch. Die Sichtseite (z = 0) liegt beim Druck auf dem Bett."""
+    from parts.common import hex_grid, holes_z, split_with_flanges
+    t = P.T_WALL
+    plate = box(-40, 40, 0, 50, 0, t)
+    pts = hex_grid(-36, 36, 22, 46, col_at=0.0)
+    ribs = [(5.0, 18.0, t, t + P.FLANGE_D)]
+    a, b = split_with_flanges(plate, 0.0, ribs, [(11.5, t + P.FLANGE_D / 2)])
+    a = a.cut([c for (x, c) in zip([q[0] for q in pts], holes_z(pts, -1, t + 1)) if x < 1.7])
+    b = b.cut([c for (x, c) in zip([q[0] for q in pts], holes_z(pts, -1, t + 1)) if x > -1.7])
+    col = (0.95, 0.55, 0.10)
+    return [Spec("passtest_fuge_a", a, col, group="fit"),
+            Spec("passtest_fuge_b", b, col, group="fit")]
+
+
 def build():
-    return [psu_holder(), psu_clamp(), gpu_support(), cable_comb()], fit_test()
+    extra = [psu_holder(), psu_clamp(), gpu_support(), cable_comb()]
+    fit = fit_test()
+    if not P.LYING:
+        extra.append(baffle())
+    if P.GRATER:
+        fit += grater_test() + seam_test()
+    return extra, fit

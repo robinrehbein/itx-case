@@ -17,7 +17,7 @@ front	237.0	187.0	15.0	True	ja	114.7	32.0
 front_einleger	182.4	178.4	4.0	True	ja	229.5	76.2
 rueckwand	237.0	187.0	17.0	True	ja	132.3	36.7
 rueckwand_einleger	158.4	117.2	4.0	True	ja	133.9	43.4
-traeger_vorn	127.8	236.0	25.0	True	ja	233.7	81.5
+traeger_vorn	127.8	236.0	25.0	True	ja	234.3	81.7
 traeger_hinten	181.8	236.0	25.0	True	ja	294.7	103.8
 sockel_vorn	118.0	179.0	26.0	True	ja	81.5	17.1
 sockel_hinten	172.0	179.0	26.0	True	ja	98.1	20.5
@@ -25,5 +25,11 @@ netzteil_halter	70.5	128.0	28.0	True	ja	72.8	20.3
 netzteil_klammer	103.5	30.5	14.0	True	ja	19.4	4.1
 gpu_stuetze	47.0	16.0	13.0	True	ja	13.8	2.5
 kabelkamm	37.6	10.0	8.0	True	ja	10.5	1.1
+leitblech	274.0	131.4	10.0	True	ja	181.7	49.2
 passtest_board	182.0	182.0	10.0	True	ja	96.5	22.4
 passtest_rueckwand	132.6	211.4	15.0	True	ja	93.1	21.6
+passtest_reibe_rahmen	90.0	90.0	5.0	True	ja	43.0	11.3
+passtest_reibe_einleger_a	54.6	69.4	4.0	True	ja	20.6	3.5
+passtest_reibe_einleger_b	35.5	69.4	4.0	True	ja	18.5	2.8
+passtest_fuge_a	40.0	50.0	14.0	True	ja	21.1	4.3
+passtest_fuge_b	40.0	50.0	14.0	True	ja	21.1	4.2

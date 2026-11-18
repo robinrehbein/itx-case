@@ -191,9 +191,15 @@ B und C haben acht Einleger, alle 4 mm dick und mit der Außenseite nach oben ge
 Der Sockel von B ist 26 mm hoch (Druckmaß je Hälfte ca. 118 / 172 × 179 × 26 mm). C hat statt
 des Sockels vier Füße (26 × 26 × 12 mm).
 
-**Zuerst die zwei Passtest-Teile drucken.** Sie prüfen die Lage von Lochbild, Slot, Slotblech
-und I/O-Blende zueinander, bevor 50 bis 60 Stunden Druckzeit anfallen. Sie gelten für beide
-Varianten.
+Dazu kommt bei B und C das `leitblech` (274 × 131 × 10 mm, Platte aufs Bett).
+
+**Zuerst die Probestücke drucken**, bevor 50 bis 60 Stunden Druckzeit anfallen:
+
+| Teil | prüft |
+|---|---|
+| `passtest_board`, `passtest_rueckwand` | Lage von Lochbild, Slot, Slotblech und I/O-Blende zueinander |
+| `passtest_reibe_rahmen`, `passtest_reibe_einleger_a` / `_b` (B, C) | Stege und Mulden der Reibe, Haltekraft der Magnete, Fuge zwischen zwei Einlegern, Sitz des Filters |
+| `passtest_fuge_a` / `_b` (B, C) | verklebte Fuge durch eine Lochspalte: wie sichtbar sie nach Kleben und Schleifen bleibt |
 
 ## Einkaufsliste
 
@@ -205,7 +211,7 @@ Varianten.
 | Zylinderkopfschrauben M3 × 6 | 10 | Board auf Einschmelzmuttern, GPU-Slotblech |
 | M3-Muttern (DIN 934) | 25 | Flansche, Mutternkanal der GPU-Leiste |
 | Neodym-Scheibenmagnete 10 × 3 mm | 16 | 8 im Deckel, 8 in den Seitenwänden, **Polung beachten** |
-| C14-Einbaubuchse, Schnappbefestigung, Ausschnitt 27,5 × 19,8 mm, Wandstärke 1–2 mm | 1 | mit internem Kabel C14 auf C13 gewinkelt, ca. 50 cm |
+| C14-Einbaubuchse, Schnappbefestigung, Ausschnitt 27,5 × 19,8 mm, Wandstärke 1–2 mm | 1 | mit internem Kabel C14 auf C13 gewinkelt, A ca. 50 cm, B und C 60–70 cm |
 | Vandalismus-Taster 16 mm, Taster (nicht rastend), max. 28 mm Einbautiefe | 1 | mit zweipoliger Leitung und Dupont-Buchse 2,54 mm für PWR_SW, 30–40 cm |
 | Gummifüße selbstklebend, Ø8 × 2–3 mm | 8 | auf die Sockellippe |
 | A: feines Filtergewebe, 0,2–0,3 mm Maschenweite | nach Bedarf | optional innen hinter die Lochfelder, Halter sind bei A nicht modelliert |
@@ -213,6 +219,7 @@ Varianten.
 | B und C: Neodym-Scheibenmagnete 6 × 1 mm | 124 | 62 Paare: Front 12, Deckel 10, Seiten je 16, Rückwand 8; Polung je Paar beachten |
 | B und C: Filtergewebe für die Einleger | 5 Zuschnitte | Front, Deckel, zwei Seiten, Rückwand, je so groß wie der Einleger, liegt zwischen Lippe und Einleger |
 | nur C: Gummifüße Ø20 | 4 | unter die gedruckten Füße |
+| B und C: kurze Custom-Kabel für das Netzteil | je 1 | Längen siehe Abschnitt Kabelwege |
 
 ## Slicer-Einstellungen (Voron 2.4, ASA)
 
@@ -268,11 +275,38 @@ Variante B:
    Durchbrüche nach hinten führen. Der D15 kann später montiert werden, der Träger hat hinter
    dem Sockel einen Ausschnitt.
 7. Träger in den Boden stellen und unten über die Laschen verschrauben.
-8. Netzteil einsetzen (Lüfter zur Front, Anschlüsse nach oben), Klammer verschrauben, D15
-   montieren.
+8. Netzteil einsetzen (Lüfter zur Front, Anschlüsse nach oben), Klammer verschrauben. Kabel
+   nach dem Abschnitt Kabelwege verlegen, D15 montieren.
 9. Karte einstecken, Lasche verschrauben, GPU-Stütze unter die Vorderkante schieben.
+   Leitblech über die Karte setzen und von links durch die zwei Stützen in den Träger
+   schrauben.
 10. Deckel aufsetzen und über die Laschen von Front, Rückwand und Träger verschrauben,
     Seitenwände einhängen.
+
+## Leitblech und Kabelwege (B und C)
+
+**Leitblech:** Eine 2,5 mm dicke Platte mit Rippen liegt zwischen der Backplate der Karte und
+der Unterseite des D15, 5 mm über der Karte und 9 mm unter dem Kühler. Ohne Blech steigt die
+warme Luft der Karte direkt in die Lamellen des Kühlers. Mit Blech zieht sie zur linken
+Seitenwand ab, deren Reibenfeld dort beginnt. Über dem Board beginnt das Blech erst 30 mm über
+der Platine, damit es nicht an Bauteilen anstößt. Es wird mit zwei Stützen vor dem Board am
+Träger verschraubt.
+
+**Kabelwege:** Die vier Hauptkabel sind im Modell als Züge eingetragen und werden mit allen
+Teilen auf Kollision geprüft. Die Anschlusslagen am Board sind Annahmen fürs aktuelle Board
+(`ATX24_V`, `EPS_U`, `GPU_POWER_U` in `params.py`) und müssen mit dem neuen Board geprüft werden.
+
+| Kabel | Weg | Länge im Modell | Kabel ab Netzteil ca. |
+|---|---|---|---|
+| 24-Pin | vom Netzteil nach oben, durch den Träger in den Kabelraum, unten durch den Durchbruch vor dem Board zur Buchse an der Vorderkante | 245 mm | 300 mm |
+| EPS 8-Pin | vom Netzteil nach oben, im 12-mm-Spalt über den Kühler zur Oberkante des Boards | 354 mm | 410 mm |
+| 2 × 8-Pin Karte | vom Netzteil nach links, vor dem Kühler nach unten, im Kabelbogen zur Buchse an der Oberkante der Karte | 400 mm | 460 mm |
+| C14 auf C13 | von der Buchse hinten unten an der linken Wand nach vorn, unter dem Kühler, vorn hoch zum Netzteil | 572 mm | 630 mm |
+
+Die Längen rechnen 30 mm je Stecker dazu. Für ein SFX-Netzteil mit Custom-Kabeln würde ich je
+2 bis 3 cm Reserve einplanen. Das C14-Kabel ist länger als die 50 cm aus der Einkaufsliste,
+60 bis 70 cm passen. Der Kabelraum hinter dem Träger ist 11 mm tief: Für das 24-Pin passt ein
+flaches oder einzeln gesleevtes Kabel, ein runder Standardstrang nicht.
 
 ## Luftstrom und freie Querschnitte
 

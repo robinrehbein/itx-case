@@ -1,17 +1,18 @@
 == Variante C stehend, M3-Stil, GPU reaper, SFX ==
 == Bauteile ==
-  Boden                          11.1 s
-  Deckel                        205.0 s
-  Seitenwände                   468.9 s
-  Front                           0.4 s
-  Front-Einleger                174.7 s
-  Rückwand-Einleger              84.3 s
+  Boden                          21.9 s
+  Deckel                        260.0 s
+  Seitenwände                   454.9 s
+  Front                           0.5 s
+  Front-Einleger                185.2 s
+  Rückwand-Einleger              82.7 s
   Rückwand                        0.6 s
   Board-Träger                    0.2 s
   Sockel                          0.0 s
-  Extras                          0.5 s
-  Dummies                         0.1 s
-  Spiegeln (Händigkeit)          17.4 s
+  Extras                          9.4 s
+  Dummies                         0.0 s
+  Kabelwege                       0.1 s
+  Spiegeln (Händigkeit)          18.0 s
 
 == V-Nut an den Trennstellen ==
 
@@ -20,6 +21,9 @@
 
 == Kollision Gehäuse/Halter <-> Komponenten ==
   keine Kollision
+
+== Kabelwege gegen Komponenten ==
+  frei
 
 == Überschneidung Druckteile untereinander ==
   keine
@@ -53,8 +57,14 @@
   netzteil_klammer        103.5 x   30.5 x   14.0  passt  manifold=ja  ~ 0.3 h  ~   4 g
   gpu_stuetze              47.0 x   16.0 x   13.0  passt  manifold=ja  ~ 0.2 h  ~   3 g
   kabelkamm                37.6 x   10.0 x    8.0  passt  manifold=ja  ~ 0.2 h  ~   1 g
+  leitblech               274.0 x  131.4 x   10.0  passt  manifold=ja  ~ 3.0 h  ~  49 g
   passtest_board          182.0 x  182.0 x   10.0  passt  manifold=ja  ~ 1.6 h  ~  22 g
   passtest_rueckwand      132.6 x  211.4 x   15.0  passt  manifold=ja  ~ 1.6 h  ~  22 g
+  passtest_reibe_rahmen    90.0 x   90.0 x    5.0  passt  manifold=ja  ~ 0.7 h  ~  11 g
+  passtest_reibe_einleger_a   54.6 x   69.4 x    4.0  passt  manifold=ja  ~ 0.3 h  ~   3 g
+  passtest_reibe_einleger_b   35.5 x   69.4 x    4.0  passt  manifold=ja  ~ 0.3 h  ~   3 g
+  passtest_fuge_a          40.0 x   50.0 x   14.0  passt  manifold=ja  ~ 0.4 h  ~   4 g
+  passtest_fuge_b          40.0 x   50.0 x   14.0  passt  manifold=ja  ~ 0.4 h  ~   4 g
 
 == Freie Querschnitte (Ø3.2, Raster 4.5; Sockel Ø3.8) ==
   Reibe: 40.4 % der Fensterfläche offen (Abtastung)
@@ -67,6 +77,12 @@
     Spalt unter dem Boden     116 cm²  (Füße 12 mm, rundum offen)
   GPU saugt durch: Boden, vor der Karte 41.7 % offen
   Vergleich: 3x 95-mm-GPU-Lüfter ~194 cm², 2x 140 mm D15 ~277 cm²
+
+== Kabellängen (Weg im Modell, + 30 mm je Stecker) ==
+  kabel_24pin      245 mm Weg, Kabel ca.  305 mm
+  kabel_eps        354 mm Weg, Kabel ca.  414 mm
+  kabel_gpu        400 mm Weg, Kabel ca.  460 mm
+  kabel_c14        572 mm Weg, Kabel ca.  632 mm
 
 == Maße ==
   Variante: C stehend, M3-Stil
@@ -86,4 +102,4 @@
   /Users/robinrehbein/Code/itx-case/out/C/assembly.FCStd
 
 == Ergebnis ==
-  OK – 1378 s
+  OK – 1421 s
