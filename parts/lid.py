@@ -105,7 +105,7 @@ def build():
         rec = grater_recess()
         cuts = grater.frame_cuts("z", TOP, 1, rec, P.T_LID, seam_u=P.SPLIT_X)
         a, b = a.cut(cuts), b.cut(cuts)
-        ia, ib = grater.insert_pair(TOP, rec, P.SPLIT_X)
+        ia, ib = grater.insert_pair("z", TOP, 1, rec, P.SPLIT_X)
         ins = [Spec("deckel_einleger_vorn", ia, (0.80, 0.80, 0.83), explode=(-25, 0, 200)),
                Spec("deckel_einleger_hinten", ib, (0.80, 0.80, 0.83), explode=(25, 0, 200))]
         return [Spec("deckel_vorn", a, col, print_rot=rot, explode=(-25, 0, 120)),

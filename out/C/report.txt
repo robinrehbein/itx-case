@@ -1,16 +1,17 @@
 == Variante C stehend, M3-Stil, GPU reaper, SFX ==
 == Bauteile ==
-  Boden                           8.2 s
-  Deckel                        130.9 s
-  Seitenwände                    18.2 s
-  Front                           0.5 s
-  Front-Einleger                219.9 s
-  Rückwand                        3.2 s
-  Board-Träger                    0.3 s
+  Boden                           7.0 s
+  Deckel                        125.7 s
+  Seitenwände                   429.7 s
+  Front                           0.4 s
+  Front-Einleger                174.7 s
+  Rückwand-Einleger              80.1 s
+  Rückwand                        0.6 s
+  Board-Träger                    0.2 s
   Sockel                          0.0 s
-  Extras                          0.6 s
+  Extras                          0.4 s
   Dummies                         0.0 s
-  Spiegeln (Händigkeit)           9.2 s
+  Spiegeln (Händigkeit)          16.2 s
 
 == V-Nut an den Trennstellen ==
 
@@ -30,13 +31,18 @@
   deckel_hinten           189.0 x  213.0 x   15.0  passt  manifold=ja  ~ 2.8 h  ~  56 g
   deckel_einleger_vorn    123.6 x  137.4 x    4.0  passt  manifold=ja  ~ 1.2 h  ~  14 g
   deckel_einleger_hinten  157.7 x  137.4 x    4.0  passt  manifold=ja  ~ 1.7 h  ~  19 g
-  seite_links_vorn        134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 3.8 h  ~  54 g
-  seite_links_hinten      188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 5.2 h  ~  72 g
-  seite_rechts_vorn       134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 3.8 h  ~  54 g
-  seite_rechts_hinten     188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 5.2 h  ~  72 g
+  seite_links_vorn        134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 1.6 h  ~  29 g
+  seite_links_hinten      188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 2.0 h  ~  35 g
+  seite_links_einleger_vorn  137.6 x  190.4 x    4.0  passt  manifold=ja  ~ 1.8 h  ~  18 g
+  seite_links_einleger_hinten  171.7 x  190.4 x    4.0  passt  manifold=ja  ~ 2.5 h  ~  26 g
+  seite_rechts_vorn       134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 1.6 h  ~  29 g
+  seite_rechts_hinten     188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 2.0 h  ~  35 g
+  seite_rechts_einleger_vorn  137.6 x  190.4 x    4.0  passt  manifold=ja  ~ 1.8 h  ~  18 g
+  seite_rechts_einleger_hinten  171.7 x  190.4 x    4.0  passt  manifold=ja  ~ 2.5 h  ~  26 g
   front                   237.0 x  187.0 x   15.0  passt  manifold=ja  ~ 1.9 h  ~  32 g
   front_einleger          182.4 x  178.4 x    4.0  passt  manifold=ja  ~ 3.8 h  ~  76 g
-  rueckwand               237.0 x  187.0 x   17.0  passt  manifold=ja  ~ 3.9 h  ~  55 g
+  rueckwand               237.0 x  187.0 x   17.0  passt  manifold=ja  ~ 2.2 h  ~  37 g
+  rueckwand_einleger      158.4 x  117.2 x    4.0  passt  manifold=ja  ~ 2.2 h  ~  43 g
   traeger_vorn            127.8 x  237.0 x   15.0  passt  manifold=ja  ~ 3.9 h  ~  82 g
   traeger_hinten          181.8 x  237.0 x   15.0  passt  manifold=ja  ~ 4.9 h  ~ 104 g
   fuss_1                   26.0 x   26.0 x   12.0  passt  manifold=ja  ~ 0.2 h  ~   3 g
@@ -54,8 +60,8 @@
   Reibe: 40.4 % der Fensterfläche offen (Abtastung)
   Wabenfeld offen (theoretisch): 45.9 %
     Front                     112 cm²  (vor Netzteil und CPU-Kühler)
-    Rückwand                   94 cm²  + Slotblech ~19 cm²
-    Seitenwand je Seite       266 cm²
+    Rückwand                   60 cm²  + Slotblech ~19 cm²
+    Seitenwand je Seite       196 cm²
     Deckel                    150 cm²
     Boden (über Sockel)       193 cm²
     Spalt unter dem Boden     116 cm²  (Füße 12 mm, rundum offen)
@@ -80,4 +86,4 @@
   /Users/robinrehbein/Code/itx-case/out/C/assembly.FCStd
 
 == Ergebnis ==
-  OK – 833 s
+  OK – 1173 s

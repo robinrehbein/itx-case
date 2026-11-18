@@ -7,8 +7,8 @@ nur verschieden ins Gehäuse:
      GPU-Lüfter zur linken Seitenwand.
   B  stehend: Board an einem Träger vor der rechten Seitenwand, Bestückung nach links,
      Karte waagerecht, GPU-Lüfter zum Boden.
-  C  wie B, im Stil des NCase M3 Grater: Front und Deckel als Rahmen mit Einlegern im
-     Reibenmuster (wie Mac Pro 2019) und Staubfilter, vier Füße statt Sockelring.
+     B hat Lüftungsfelder als Reibe (wie Mac Pro 2019) in Rahmen mit Einlegern und Filter.
+  C  wie B im Stil des NCase M3 Grater, mit vier Füßen statt Sockelring.
 
 Gehäusekoordinaten (Innenraum):
   x: vorn -> hinten   (0 = Innenseite Frontwand)
@@ -44,8 +44,12 @@ USB_C = False            # optionaler USB-C-Ausschnitt in der Front
 COOLER_PROFILE = "NH-D15"  # Noctua NH-D15 (Original, 165 mm)
 assert LAYOUT in ("A", "B", "C"), LAYOUT
 LYING = LAYOUT == "A"          # A liegt, B und C stehen (gleiche Anordnung innen)
-GRATER = LAYOUT == "C"         # Front mit Reiben-Einleger
-GRATER_LID = LAYOUT in ("B", "C")   # Deckel mit Reiben-Einlegern
+# B und C: alle sichtbaren Lüftungsfelder (Front, Deckel, Seiten, Rückwand) als Reibe in
+# Rahmen mit Einlegern. Boden und Sockelring behalten Rundlöcher.
+GRATER = LAYOUT in ("B", "C")  # Front mit Reiben-Einleger
+GRATER_LID = GRATER            # Deckel
+GRATER_SIDES = GRATER          # Seitenwände
+GRATER_REAR = GRATER           # Rückwand
 FEET = LAYOUT == "C"           # Füße statt Sockelring
 # Versteckte Fugen: keine V-Nut, Hälften stumpf gestoßen und verklebt, enge Schraubenlöcher
 # in den Flanschen richten sie bündig aus. Die Fugen laufen durch eine Lochspalte bzw. bei der

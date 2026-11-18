@@ -8,17 +8,17 @@ diesen Block verschieden ins Gehäuse stellen:
 - **A liegend:** Das Board liegt flach auf dem Boden, der Kühler steht nach oben, die Karte steht
   senkrecht und saugt durch die linke Seitenwand an. Breit und flach.
 - **B stehend:** Das Board sitzt auf einem Träger vor der rechten Seitenwand, die Karte liegt
-  waagerecht und saugt durch Boden und Sockel an. Ein gewöhnlicher Tower, schmal und hoch. Der
-  Deckel trägt ein durchgehendes Reibenfeld wie beim Mac Pro 2019, der Sockel ist 26 mm hoch und
-  grob gelocht. Das ist die Variante, die fertig ausgearbeitet wird.
-- **C stehend im Stil des NCase M3 Grater:** innen und in der Größe wie B. Front und Deckel
-  sind Rahmen mit Einlegern im Reibenmuster des Mac Pro 2019, dahinter liegt ein
-  Staubfilter. Statt des Sockelrings trägt C vier Füße, der Boden ist rundum offen. Es ist
-  ein Nachbau nach den öffentlichen Angaben, ohne Logo und ohne die Original-Geometrie.
+  waagerecht und saugt durch Boden und Sockel an. Ein gewöhnlicher Tower, schmal und hoch. Alle
+  sichtbaren Lüftungsfelder (Front, Deckel, Seitenwände, Rückwand) sind Einleger im
+  Reibenmuster des Mac Pro 2019 mit Filter dahinter. Der Sockel ist 26 mm hoch und grob gelocht.
+  Das ist die Variante, die fertig ausgearbeitet wird.
+- **C stehend im Stil des NCase M3 Grater:** wie B, aber mit vier Füßen statt Sockelring, der
+  Boden ist rundum offen. Es ist ein Nachbau nach den öffentlichen Angaben, ohne Logo und ohne
+  die Original-Geometrie.
 
-Die Lüftung läuft bei A nur über Felder aus kleinen runden Löchern: Front, Rückwand, beide
-Seitenwände, der ganze Deckel, Boden und der rundum gelochte Sockel. B hat dieselben Felder,
-nur der Deckel trägt die Reibe. C hat Rundlochfelder an Rückwand, Seiten und Boden.
+Bei A läuft die Lüftung über Felder aus kleinen runden Löchern: Front, Rückwand, beide
+Seitenwände, der ganze Deckel, Boden und der rundum gelochte Sockel. Bei B und C sind alle
+sichtbaren Felder Reibe, nur Boden und Sockelring behalten Rundlöcher.
 
 | | A liegend | B stehend | C M3-Stil |
 |---|---|---|---|
@@ -27,10 +27,10 @@ nur der Deckel trägt die Reibe. C hat Rundlochfelder an Rückwand, Seiten und B
 | Volumen außen | 15,7 l | 18,1 l | 16,8 l (ohne Füße) |
 | Innen | 314 × 237 × 180 mm | 314 × 203 × 237 mm | wie B |
 | GPU saugt durch | linke Seitenwand, 44,0 % offen | Boden, Engstelle Sockelring 98 cm² | Boden, Spalt unter dem Boden 116 cm² |
-| Front / Deckel offen | 139 / 264 cm² | 160 / 150 cm² (Deckel Reibe) | 112 / 150 cm² (Reibe) |
+| Offen: Front / Deckel / Seite / Rückwand | 139 / 264 / 190 / 84 cm² | 112 / 150 / 196 / 60 cm² (Reibe) | wie B |
 | Fugen | V-Nut | versteckt, verklebt | versteckt, verklebt |
-| Druckteile | 18 | 22 | 25 |
-| Druckzeit / ASA (Gehäuse und Halter) | ca. 48 h / 0,7 kg | ca. 58 h / 0,9 kg | ca. 57 h / 0,9 kg |
+| Druckteile | 18 | 28 | 30 |
+| Druckzeit / ASA (Gehäuse und Halter) | ca. 48 h / 0,7 kg | ca. 57 h / 0,9 kg | ca. 55 h / 0,9 kg |
 
 Drucker: Voron 2.4 300, alle Teile ≤ 290 × 290 × 270 mm.
 
@@ -78,24 +78,23 @@ Sockel sind deshalb bei x = 130 mm geteilt. Bei B und C ist diese Fuge versteckt
   Aceton-Lösung, PETG: Sekundenkleber). Danach die Fuge leicht überschleifen.
 - Die Schraubenlöcher in den Flanschen sind eng (Ø3,15). Die M3-Schrauben richten die Hälften
   damit bündig aus, bevor der Kleber anzieht.
-- In Seitenwänden, Boden und Sockel läuft die Fuge genau durch eine Lochspalte. Sichtbar bleibt
-  eine Haarfuge nur in den glatten Randstreifen.
-- Im Deckel gibt es ein durchgehendes Reibenfeld ohne Steg. Die zwei Einleger stoßen in einer
-  Reihe aus Muldenmitten und Löchern aneinander. Im glatten Auflagerand greift das vordere Teil
-  20 mm unter das hintere, so tragen sich beide an den Enden der Fuge. Der Deckelrahmen ist nur
-  in den Randstreifen neben dem Feld verbunden, dort sitzen die Flansche.
+- In Boden und Sockel läuft die Fuge genau durch eine Lochspalte.
+- Deckel und Seitenwände haben je ein durchgehendes Reibenfeld ohne Steg. Die zwei Einleger
+  stoßen in einer Reihe aus Muldenmitten und Löchern aneinander. Im glatten Auflagerand greift
+  das vordere Teil 20 mm unter das hintere, so tragen sich beide an den Enden der Fuge. Die
+  Rahmen sind nur in den Randstreifen neben dem Feld verbunden, dort sitzen die Flansche.
+- Sichtbar bleibt eine Haarfuge in den glatten Randstreifen.
 
 `HIDDEN_SEAMS = False` in `params.py` bringt die V-Nut zurück. Wenn die Haarfugen stören, wäre
 der nächste Schritt eine Teilung an den Kanten: Front- und Rückkappen, die um die Ecken greifen.
 
-## Variante C: Reibe und Füße
+## Reibe (B und C)
 
-Front und Deckel sind Rahmen. Außen bleibt eine 1,5 mm dicke Lippe stehen, das Fenster darin
-ist 7 mm kleiner als der Einleger. Der Einleger sitzt von innen an der Lippe, dazwischen liegt
-das Filtergewebe. Je Seite halten ein bis drei Magnetpaare 6 × 1 mm den Einleger, eines in
-der Lippe und eines im Einleger. Front und Deckel haben je eine Tasche, der Deckel eine pro
-Hälfte, über der Fuge bleibt ein Steg. Der Taster sitzt links im Rahmenband über dem
-Front-Einleger.
+Front, Deckel, Seitenwände und Rückwand sind Rahmen. Außen bleibt eine 1,5 mm dicke Lippe
+stehen, das Fenster darin ist 7 mm kleiner als der Einleger. Der Einleger sitzt von innen an
+der Lippe, dazwischen liegt das Filtergewebe. Magnetpaare 6 × 1 mm halten ihn, eines in der
+Lippe und eines im Einleger. Die Rückwand hat ihr Feld im freien Rechteck neben I/O-Blende,
+Slotblech und C14. Der Taster sitzt links im Rahmenband über dem Front-Einleger.
 
 Der Einleger ist 4 mm dick. Außen liegen Kegelmulden mit 45° Flanke im 8-mm-Wabenraster, die
 sich an Graten treffen. An jedem Punkt, an dem drei Mulden zusammenstoßen, geht ein
@@ -107,9 +106,9 @@ Die Einleger werden mit der Außenseite nach oben gedruckt. Die Mulden sind dann
 offene 45°-Flächen und brauchen keine Stützen, zeigen aber Schichtstufen. Die Rahmen liegen
 wie bei A und B mit der Sichtseite auf dem Bett.
 
-Zum Reinigen des Filters nimmt man den Deckel ab (Magnete) bzw. schraubt die Front ab und
-zieht den Einleger nach innen heraus. Die vier Füße (Ø24 × 12 mm) sitzen auf den
-Schraubpunkten, an denen bei B der Sockel hängt.
+Zum Reinigen der Filter nimmt man Deckel und Seitenwände ab (Magnete) bzw. schraubt Front oder
+Rückwand ab und zieht den Einleger nach innen heraus. Bei C sitzen die vier Füße (Ø24 × 12 mm)
+auf den Schraubpunkten, an denen bei B der Sockel hängt.
 
 ## Bauen
 
@@ -133,7 +132,10 @@ das Reaper-Gehäuse passt, sondern baut ein größeres Gehäuse für Karten bis 
 |---|---|
 | `params.py` | alle Maße und Optionen |
 | `parts/` | ein Modul pro Bauteilgruppe (`floor`, `lid`, `side_walls`, `panels`, `tray`, `plinth`, `grater`, `extras`, `dummies`) |
-| `out/A/`, `out/B/`, `out/C/` | je Variante: `step/` (Montagelage, `_baugruppe.step` komplett), `stl/` (Druckorientierung), `assembly.FCStd` mit Dummies, `png/` |
+| `out/A/`, `out/B/`, `out/C/` | je Variante: `step/` (je Teil in Montagelage), `stl/` (Druckorientierung), `assembly.FCStd` mit Dummies, `png/` |
+
+`build.py` schreibt zusätzlich `step/_baugruppe.step` mit allen Teilen. Die Datei ist bei B und C
+über 180 MB groß und liegt deshalb nicht im Repo (GitHub erlaubt höchstens 100 MB pro Datei).
 
 ## Prüfungen (Stand des letzten Builds)
 
@@ -141,10 +143,10 @@ das Reaper-Gehäuse passt, sondern baut ein größeres Gehäuse für Karten bis 
    Kühler-Rückplatte, NH-D15, GPU mit Kontaktfingern, 35-mm-Kabelbogen und Slotblech, Netzteil,
    Taster mit Bauraum für die Leitung, C14): Schnittvolumen 0. Druckteile untereinander: keine
    Überschneidung. Beides gilt für A mit `reaper` und SFX, `reaper` und SFX-L sowie `max` und
-   SFX-L, für B und C mit `reaper` und SFX. B wurde vor dem Reibe-Deckel auch mit SFX-L und
-   `max` geprüft.
+   SFX-L, für B und C mit `reaper` und SFX. B wurde vor der Reibe auch mit SFX-L und `max`
+   geprüft.
 2. **Druckbett:** Alle Teile passen nach dem Drehen in die Druckorientierung auf das Bett.
-3. **Manifold:** Alle STLs sind geschlossene Körper ohne Non-Manifold-Kanten (A 18, B 22, C 25).
+3. **Manifold:** Alle STLs sind geschlossene Körper ohne Non-Manifold-Kanten (A 18, B 28, C 30).
 4. **Rückwand:** I/O-Fenster und Slotöffnung liegen in der ebenen Fläche zwischen den Eckbögen
    und überschneiden sich nicht.
 
@@ -169,10 +171,18 @@ Die genauen Werte stehen in `out/<LAYOUT>/parts.tsv`.
 | kabelkamm | 38 × 10 × 8 | gleich | wie eingebaut |
 | passtest_board / _rueckwand | 182 × 182 × 10 / 133 × 211 × 15 | gleich | flach |
 
-B und C haben zwei Deckel-Einleger, gedruckt mit der Außenseite nach oben:
-`deckel_einleger_vorn` 124 × 137 × 4 mm und `deckel_einleger_hinten` 158 × 137 × 4 mm. Der
-Sockel von B ist 26 mm hoch (Druckmaß je Hälfte ca. 118 / 172 × 179 × 26 mm). C hat statt des
-Sockels vier Füße (26 × 26 × 12 mm) und zusätzlich `front_einleger` (182 × 178 × 4 mm).
+B und C haben acht Einleger, alle 4 mm dick und mit der Außenseite nach oben gedruckt:
+
+| Einleger | Druckmaß (mm) |
+|---|---|
+| front_einleger | 182 × 178 |
+| deckel_einleger_vorn / _hinten | 124 / 158 × 137 |
+| seite_links_einleger_vorn / _hinten | 138 / 172 × 190 |
+| seite_rechts_einleger_vorn / _hinten | 138 / 172 × 190 |
+| rueckwand_einleger | 158 × 117 |
+
+Der Sockel von B ist 26 mm hoch (Druckmaß je Hälfte ca. 118 / 172 × 179 × 26 mm). C hat statt
+des Sockels vier Füße (26 × 26 × 12 mm).
 
 **Zuerst die zwei Passtest-Teile drucken.** Sie prüfen die Lage von Lochbild, Slot, Slotblech
 und I/O-Blende zueinander, bevor 50 bis 60 Stunden Druckzeit anfallen. Sie gelten für beide
@@ -191,10 +201,10 @@ Varianten.
 | C14-Einbaubuchse, Schnappbefestigung, Ausschnitt 27,5 × 19,8 mm, Wandstärke 1–2 mm | 1 | mit internem Kabel C14 auf C13 gewinkelt, ca. 50 cm |
 | Vandalismus-Taster 16 mm, Taster (nicht rastend), max. 28 mm Einbautiefe | 1 | mit zweipoliger Leitung und Dupont-Buchse 2,54 mm für PWR_SW, 30–40 cm |
 | Gummifüße selbstklebend, Ø8 × 2–3 mm | 8 | auf die Sockellippe |
-| feines Filtergewebe, 0,2–0,3 mm Maschenweite | nach Bedarf | optional innen hinter die Lochfelder, Halter sind noch nicht modelliert |
+| A: feines Filtergewebe, 0,2–0,3 mm Maschenweite | nach Bedarf | optional innen hinter die Lochfelder, Halter sind bei A nicht modelliert |
 | SFX-Netzteil ≥ 750 W | 1 | PowerColor empfiehlt für die Reaper mindestens 750 W |
-| B und C: Neodym-Scheibenmagnete 6 × 1 mm | B 20, C 44 | 10 Paare im Deckel, bei C 12 weitere in der Front; Polung je Paar beachten |
-| B und C: Filtergewebe für die Einleger | B 1, C 2 Zuschnitte | so groß wie das Reibenfeld plus Rand, liegt zwischen Lippe und Einleger |
+| B und C: Neodym-Scheibenmagnete 6 × 1 mm | 124 | 62 Paare: Front 12, Deckel 10, Seiten je 16, Rückwand 8; Polung je Paar beachten |
+| B und C: Filtergewebe für die Einleger | 5 Zuschnitte | Front, Deckel, zwei Seiten, Rückwand, je so groß wie der Einleger, liegt zwischen Lippe und Einleger |
 | nur C: Gummifüße Ø20 | 4 | unter die gedruckten Füße |
 
 ## Slicer-Einstellungen (Voron 2.4, ASA)
@@ -264,24 +274,25 @@ Die Löcher haben Ø3,2 im Wabenraster mit 4,5 mm Abstand (theoretisch 45,9 % of
 Trennfuge. Wo innen ein Flansch, ein Dom oder eine Magnetnase hinter dem Feld sitzt, sind die
 Löcher Sacklöcher mit 0,6 mm Haut (`VENT_BLIND_SKIN`) und zählen nicht zum Querschnitt.
 
-| | A liegend | B stehend |
+| | A liegend | B und C stehend |
 |---|---|---|
-| Front | 139 cm² | 160 cm² |
-| Rückwand | 84 cm² + Slotblech ca. 19 cm² | 94 cm² + Slotblech ca. 19 cm² |
-| Seitenwand, je Seite | 190 cm² | 266 cm² |
-| Deckel | 264 cm² | 212 cm² |
+| Front | 139 cm² | 112 cm² (Reibe) |
+| Rückwand | 84 cm² + Slotblech ca. 19 cm² | 60 cm² (Reibe) + Slotblech ca. 19 cm² |
+| Seitenwand, je Seite | 190 cm² | 196 cm² (Reibe) |
+| Deckel | 264 cm² | 150 cm² (Reibe) |
 | Boden über dem Sockel | 228 cm² | 193 cm² |
-| Sockelring | 37 cm² | 57 cm² (Ring 20 mm hoch) |
+| Sockelring | 37 cm² | 98 cm² (Ring 26 mm hoch), bei C 116 cm² Spalt unter dem Boden |
 
 Zum Vergleich: drei 95-mm-Lüfter der Karte haben ca. 194 cm² freie Fläche, die zwei
 140-mm-Lüfter des D15 ca. 277 cm².
 
 - **A:** Die Karte saugt geradeaus durch die linke Seitenwand an, 17 mm vor den Lüftern. Der D15
   saugt durch die Front an (über und neben dem Netzteil) und bläst durch Rückwand und Deckel aus.
-- **B:** Die Karte saugt durch den Boden an. Der Sockelring ist die Engstelle: Mit 57 cm²
-  liefert er weniger als ein Drittel der Lüfterfläche, den Rest holt die Karte über die
-  Seitenwände und die Front. `build.py` warnt deshalb. Die warme Luft steigt zum Deckel, der D15
-  bläst von vorn nach hinten.
+- **B und C:** Die Karte saugt durch den Boden an. Der Sockelring von B ist die Engstelle: Mit
+  98 cm² liefert er etwa die Hälfte der Lüfterfläche, den Rest holt die Karte über die
+  Seitenwände und die Front. `build.py` warnt deshalb. Bei C ist der Boden rundum offen. Die
+  warme Luft steigt zum Deckel, der D15 bläst von vorn nach hinten und hat hinten nur 60 cm²
+  Reibe, der Rest geht durch den Deckel.
 
 Der offene Deckel hat einen Preis: Staub und verschüttete Flüssigkeit fallen direkt auf Board
 und Karte. Bei B zieht der Boden zusätzlich Staub vom Tisch an. Mit feinem Filtergewebe innen
@@ -303,8 +314,10 @@ hinter den Feldern funktionieren beide Varianten, bei B ist ein Filter am Boden 
   Boden an, der Sockelring war mit 20 mm Höhe und Ø3,8 die Engstelle (57 cm²). Jetzt sind es
   98 cm² bei 6 mm mehr Höhe. Weitere Stellschrauben: noch höher (30 mm ergäben etwa 115 cm²)
   oder Füße wie bei C (116 cm², offener Spalt rundum).
-- **B mit Reibe nur im Deckel**, Front weiter mit Rundlochfeld (160 cm² statt 112 cm² mit
-  Reibe), damit der D15 genug Luft bekommt.
+- **B und C mit Reibe auf allen sichtbaren Feldern**, so dass jede Fläche gleich aussieht. Der
+  Preis gegenüber dem Rundlochfeld: Front 112 statt 160 cm², Rückwand 60 statt 94 cm²,
+  Seitenwände 196 statt 266 cm², Deckel 150 statt 212 cm². Boden und Sockelring bleiben
+  gelocht, der Ring ist mit 3 mm zu dünn für 4 mm tiefe Mulden.
 - **Netzteil-Halter mit Klammer:** Wanne mit vollen Wänden an der blanken Seite und zum Kühler,
   an Lüfter und Anschlüssen nur Ecken. Eine Klammer an der blanken Seite greift über die
   Oberkante.

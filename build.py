@@ -55,14 +55,15 @@ lid_parts, n_lid = timed("Deckel", lid.build)
 side_parts, n_side = timed("Seitenwände", side_walls.build)
 front = timed("Front", panels.front)
 front_ins = [timed("Front-Einleger", panels.front_insert)] if P.GRATER else []
+rear_ins = [timed("Rückwand-Einleger", panels.rear_insert)] if P.GRATER_REAR else []
 rear, rear_pts = timed("Rückwand", panels.rear)
 mid_parts = timed("Board-Träger", tray.build) if not P.LYING else []
 plinth_parts, a_pl = timed("Sockel", plinth.build)
 extra_parts, fit_parts = timed("Extras", extras.build)
 dummy_parts = timed("Dummies", dummies.build)
 
-case_parts = (floor_parts + lid_parts + side_parts + [front] + front_ins + [rear] + mid_parts
-              + plinth_parts)
+case_parts = (floor_parts + lid_parts + side_parts + [front] + front_ins + [rear] + rear_ins
+              + mid_parts + plinth_parts)
 assembly_printed = case_parts + [p for p in extra_parts if p.group == "extra"]
 all_printed = case_parts + extra_parts + fit_parts
 
@@ -83,7 +84,8 @@ timed("Spiegeln (Händigkeit)", lambda: [to_freecad(p) for p in all_printed + du
 errors, warnings = [], []
 
 log("\n== V-Nut an den Trennstellen ==")
-split_names = [p.name for p in floor_parts + lid_parts[:2] + side_parts
+split_names = [p.name for p in floor_parts + lid_parts[:2]
+               + [p for p in side_parts if "einleger" not in p.name]
                + ([] if P.FEET else plinth_parts)]
 for name, (side, n, how) in zip(split_names, VGROOVE_LOG):
     log(f"  {name:<22} {n:2d} Kanten  {how}")
@@ -190,6 +192,7 @@ a_fl = hole_area(floor.vent_points())
 a_side = hole_area(side_pts)
 a_top = hole_area(lid.vent_points())
 a_front = hole_area(panels.front_vent_points())
+a_rear = hole_area(rear_pts)
 if P.GRATER or P.GRATER_LID:
     from parts import grater
     f_open = grater.open_fraction()
@@ -199,9 +202,12 @@ if P.GRATER or P.GRATER_LID:
         return (u1 - u0) * (v1 - v0)
     if P.GRATER:
         a_front = f_open * win_area(panels.front_recess())
+    if P.GRATER_SIDES:
+        a_side = f_open * win_area(side_walls.grater_recess())
+    if P.GRATER_REAR:
+        a_rear = f_open * win_area(panels.rear_recess())
     a_grater_top = f_open * sum(win_area(r) for r in lid.grater_recesses())
     log(f"  Reibe: {f_open*100:.1f} % der Fensterfläche offen (Abtastung)")
-a_rear = hole_area(rear_pts)
 y0, y1, z0, z1 = panels.gpu_open()
 a_open = (y1 - y0) * (z1 - z0) * 0.5   # Slotblech ~50 % offen
 fan95 = math.pi * (47.5 ** 2 - 14 ** 2)

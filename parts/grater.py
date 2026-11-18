@@ -8,10 +8,10 @@ Außenseite nach oben: die Mulden sind dann nach oben offene 45°-Flächen, die 
 liegt flach auf dem Bett.
 
 Eine Fläche wird beschrieben durch:
-  axis   "x" (Front) oder "z" (Deckel): Richtung der Flächennormale
+  axis   "x" (Front, Rückwand), "y" (Seitenwände) oder "z" (Deckel): Flächennormale
   out    Koordinate der Außenseite des Einlegers
-  sgn    +1, wenn die Außenseite in +axis liegt (Deckel), -1 für die Front
-  (u, v) Koordinaten in der Fläche: Front (y, z), Deckel (x, y)
+  sgn    +1, wenn die Außenseite in +axis liegt (Deckel, Rückwand, rechts), sonst -1
+  (u, v) Koordinaten in der Fläche: x-Flächen (y, z), y-Flächen (x, z), Deckel (x, y)
 """
 import math
 
@@ -19,23 +19,34 @@ import Part
 from FreeCAD import Vector as V
 
 import params as P
-from parts.common import rrect_prism, rrect_x
+from parts.common import rrect_prism, rrect_x, rrect_y
 
 SQ3 = math.sqrt(3.0)
 
 
 def _pt(axis, w, u, v):
-    return V(w, u, v) if axis == "x" else V(u, v, w)
+    return {"x": V(w, u, v), "y": V(u, w, v), "z": V(u, v, w)}[axis]
 
 
 def _dir(axis, s):
-    return V(s, 0, 0) if axis == "x" else V(0, 0, s)
+    return {"x": V(s, 0, 0), "y": V(0, s, 0), "z": V(0, 0, s)}[axis]
+
+
+def _box(axis, u0, u1, v0, v1, w0, w1):
+    from parts.common import box
+    if axis == "x":
+        return box(w0, w1, u0, u1, v0, v1)
+    if axis == "y":
+        return box(u0, u1, w0, w1, v0, v1)
+    return box(u0, u1, v0, v1, w0, w1)
 
 
 def slab(axis, w0, w1, u0, u1, v0, v1, r):
     """Abgerundetes Rechteck in (u, v), Dicke w0..w1 entlang axis."""
     if axis == "x":
         return rrect_x(w0, w1, u0, u1, v0, v1, r)
+    if axis == "y":
+        return rrect_y(u0, u1, v0, v1, w0, w1, r)
     return rrect_prism(u0, u1, v0, v1, r, w0, w1)
 
 
@@ -136,23 +147,30 @@ def insert(axis, outer, sgn, recess, r=6.0, seam_u=None):
     return body.cut(tools)
 
 
-def insert_pair(outer, recess, seam_u, r=6.0):
-    """Deckel (axis z): ein durchgehender Einleger, an der Fuge in zwei Teile geteilt. Im
-    Reibenfeld ist die Fuge gerade und liegt genau auf seam_u (Muldenmitten und Löcher). Im
-    glatten Auflagerand greift die untere Hälfte des vorderen Teils GR_SEAM_LAP weit unter das
-    hintere Teil; so tragen sich die Teile an beiden Enden der Fuge gegenseitig."""
-    from parts.common import box, BIG
-    full = insert("z", outer, 1, recess, r, seam_u)
-    wy0, wy1 = rects(recess)[2][2:]
-    out = outer - (P.GR_LIP + P.GR_FILTER)
-    zm = out - P.GR_T / 2
+def insert_pair(axis, outer, sgn, recess, seam_u, r=6.0):
+    """Ein durchgehender Einleger, an der Fuge u = seam_u in zwei Teile geteilt. Im
+    Reibenfeld ist die Fuge gerade und liegt genau auf einer Reihe aus Muldenmitten und
+    Löchern. Im glatten Auflagerand greift die innere Hälfte des vorderen Teils GR_SEAM_LAP
+    weit unter das hintere Teil; so tragen sich die Teile an beiden Enden der Fuge."""
+    from parts.common import BIG
+    full = insert(axis, outer, sgn, recess, r, seam_u)
+    wv0, wv1 = rects(recess)[2][2:]
+    out = outer - sgn * (P.GR_LIP + P.GR_FILTER)
+    wm = out - sgn * P.GR_T / 2
     g, L, S = P.GR_SEAM_GAP, P.GR_SEAM_LAP, seam_u
 
-    def rims(x1, z1, m):
-        return box(-BIG, x1, -BIG, wy0 - m, -BIG, z1).fuse(box(-BIG, x1, wy1 + m, BIG, -BIG, z1))
+    def inner_half(c):
+        return (-BIG, c) if sgn > 0 else (c, BIG)
 
-    reg_a = box(-BIG, S - g / 2, -BIG, BIG, -BIG, BIG).fuse(rims(S + L - g / 2, zm - g / 2, 0.0))
-    reg_b = box(S + g / 2, BIG, -BIG, BIG, -BIG, BIG).cut(rims(S + L + g / 2, zm + g / 2, -g))
+    def rims(u1, c, m):
+        w0, w1 = inner_half(c)
+        return _box(axis, -BIG, u1, -BIG, wv0 - m, w0, w1).fuse(
+            _box(axis, -BIG, u1, wv1 + m, BIG, w0, w1))
+
+    reg_a = _box(axis, -BIG, S - g / 2, -BIG, BIG, -BIG, BIG).fuse(
+        rims(S + L - g / 2, wm - sgn * g / 2, 0.0))
+    reg_b = _box(axis, S + g / 2, BIG, -BIG, BIG, -BIG, BIG).cut(
+        rims(S + L + g / 2, wm + sgn * g / 2, -g))
     return full.common(reg_a), full.common(reg_b)
 
 

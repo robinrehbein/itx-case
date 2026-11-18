@@ -92,6 +92,23 @@ def rear_vent_points():
     return hex_grid(v["y0"], v["y1"], v["z0"], v["z1"], keep, corner_r=v["r"])
 
 
+def rear_recess():
+    """Reibe in der Rückwand: das größte freie Rechteck neben I/O-Fenster, Slotöffnung,
+    GPU-Leiste und C14 (nur stehende Varianten)."""
+    iy0 = io_window()[0]
+    m = P.IO_KEEPOUT + 0.5
+    (rv0, rv1), (rw0, rw1) = rail_rect()
+    rail = P.rect_vw(rv0, rv1, rw0, rw1 + P.REAR_RAIL_CLEAR)
+    z0 = max(gpu_open()[3], rail[3], c14_rect(4.0)[3]) + 4.0
+    return (P.FLAT_Y0 + P.GR_EDGE, iy0 - m - 4.0, z0, P.VENT_Z1)
+
+
+def rear_insert():
+    shape = grater.insert("x", P.OUT_X1, 1, rear_recess())
+    return Spec("rueckwand_einleger", shape, (0.80, 0.80, 0.83), print_rot=[((0, 1, 0), -90)],
+                explode=(220, 0, 0))
+
+
 def rear():
     X1 = P.INNER_L
     shape = box(X1, P.OUT_X1, P.FLAT_Y0, P.FLAT_Y1, 0, H)
@@ -137,8 +154,10 @@ def rear():
     ty0, ty1, tz0, tz1 = c14_rect(4.0)
     cuts.append(box(X1 - 1, P.OUT_X1 - P.C14_PANEL_T, ty0, ty1, tz0, tz1))
 
-    pts = rear_vent_points()
+    pts = [] if P.GRATER_REAR else rear_vent_points()
     cuts += holes_x(pts, X1 - 1, P.OUT_X1 + 1)
+    if P.GRATER_REAR:
+        cuts += grater.frame_cuts("x", P.OUT_X1, 1, rear_recess(), P.T_WALL)
     shape = cut_all(fuse_all([shape] + adds), cuts)
     return Spec("rueckwand", shape, (0.86, 0.86, 0.88), print_rot=[((0, 1, 0), 90)],
                 explode=(140, 0, 0)), pts

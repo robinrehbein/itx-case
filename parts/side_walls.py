@@ -3,6 +3,7 @@ Unten im Randfalz des Bodens, oben mit Magneten 10x3 im Deckel gehalten.
 Beide Wände tragen das gleiche Lochfeld, auf gleicher Höhe wie Front und Rückwand.
 Bei A sitzt das linke Feld vor den GPU-Lüftern."""
 import params as P
+from parts import grater
 from parts.common import (Spec, box, rrect_prism, wedge_x, hex_grid, holes_y, split_blind, cyl_z,
                           fuse_all,
                           cut_all, split_with_flanges, envelope_case, seam_envelope, cut_holes_split, BIG)
@@ -65,7 +66,14 @@ def vent_sets():
 
 
 def vent_points():
-    return vent_sets()[0]
+    """Offene Rundlöcher (bei Reibe keine)."""
+    return [] if P.GRATER_SIDES else vent_sets()[0]
+
+
+def grater_recess():
+    """Reibe: Tasche (x0, x1, z0, z1) zwischen den Fugenflanschen unten und oben."""
+    (_, lz1), (uz0, _) = SIDE_RIB_Z
+    return (P.FLAT_X0 + 4.0, P.FLAT_X1 - 4.0, lz1 + 1.0, uz0 - P.FLANGE_D - 2.0)
 
 
 def magnet_boss(x, side):
@@ -109,10 +117,24 @@ def build():
         ribs = side_ribs(side)
         bolts = [(yb, (z0 + z1) / 2) for (z0, z1) in SIDE_RIB_Z]
         a, b = split_with_flanges(shape, P.SPLIT_X, ribs, bolts, seam_envelope(envelope_case()))
-        pts, tools = vents[side]
-        a, b = cut_holes_split(a, b, P.SPLIT_X, [q[0] for q in pts], tools)
         name = "seite_links" if side == "L" else "seite_rechts"
         ey = -130 if side == "L" else 130
+        ins = []
+        if P.GRATER_SIDES:
+            outer, sgn = (P.OUT_Y0, -1) if side == "L" else (P.OUT_Y1, 1)
+            rec = grater_recess()
+            cuts = grater.frame_cuts("y", outer, sgn, rec, P.T_WALL, seam_u=P.SPLIT_X)
+            a, b = a.cut(cuts), b.cut(cuts)
+            ia, ib = grater.insert_pair("y", outer, sgn, rec, P.SPLIT_X)
+            rot = [((1, 0, 0), 90 * sgn)]      # Außenseite nach oben
+            ins = [Spec(name + "_einleger_vorn", ia, (0.80, 0.80, 0.83), print_rot=rot,
+                        explode=(-25, ey * 1.6, 0)),
+                   Spec(name + "_einleger_hinten", ib, (0.80, 0.80, 0.83), print_rot=rot,
+                        explode=(25, ey * 1.6, 0))]
+        else:
+            pts, tools = vents[side]
+            a, b = cut_holes_split(a, b, P.SPLIT_X, [q[0] for q in pts], tools)
         out.append(Spec(name + "_vorn", a, col, explode=(-25, ey, 0)))
         out.append(Spec(name + "_hinten", b, col, explode=(25, ey, 0)))
+        out += ins
     return out, len(t)
