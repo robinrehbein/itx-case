@@ -50,6 +50,16 @@ def slab(axis, w0, w1, u0, u1, v0, v1, r):
     return rrect_prism(u0, u1, v0, v1, r, w0, w1)
 
 
+def _grow(rect, m):
+    u0, u1, v0, v1 = rect
+    return (u0 - m, u1 + m, v0 - m, v1 + m)
+
+
+def _inside(u, v, rect, m=0.0):
+    u0, u1, v0, v1 = rect
+    return u0 - m < u < u1 + m and v0 - m < v < v1 + m
+
+
 def lattice(u0, u1, v0, v1, anchor_u=None):
     """Muldenmitten (A) und Lochmitten (B, C) im Fenster, zentriert. anchor_u: eine Linie
     u = konst. läuft genau durch Muldenmitten und Löcher (dort liegt die Fuge)."""
@@ -74,9 +84,14 @@ def lattice(u0, u1, v0, v1, anchor_u=None):
     return A, sorted(set((round(a, 4), round(b, 4)) for (a, b) in BC))
 
 
-def insert_tools(axis, out, sgn, win, anchor_u=None):
-    """Kegel von außen und Löcher von innen für ein Fenster (u0, u1, v0, v1)."""
+def insert_tools(axis, out, sgn, win, anchor_u=None, notch=None):
+    """Kegel von außen und Löcher von innen für ein Fenster (u0, u1, v0, v1). notch: glatte
+    Insel im Fenster (u0, u1, v0, v1), dort bleibt der Einleger ausgespart."""
     A, BC = lattice(*win, anchor_u=anchor_u)
+    if notch:
+        keep = _grow(notch, P.GR_CLEAR + P.GR_LAP)
+        A = [q for q in A if not _inside(*q, keep, 1.0)]
+        BC = [q for q in BC if not _inside(*q, keep, P.GR_HOLE_D / 2 + 0.5)]
     R, e = P.GR_R, 0.3
     inner = out - sgn * P.GR_T
     tools = []
@@ -89,7 +104,7 @@ def insert_tools(axis, out, sgn, win, anchor_u=None):
     return tools
 
 
-def magnet_spots(rect, seam_u=None):
+def magnet_spots(rect, seam_u=None, notch=None):
     """Magnetmitten auf dem Auflagerand: Seitenmitten, lange Seiten zusätzlich bei 1/4 und 3/4
     (über 250 mm in Sechsteln). Mit seam_u fallen Magnete nahe der Fuge weg."""
     u0, u1, v0, v1 = rect
@@ -104,6 +119,15 @@ def magnet_spots(rect, seam_u=None):
             spots.append((a, fixed) if along_u else (fixed, a))
     if seam_u is not None:
         spots = [q for q in spots if abs(q[0] - seam_u) >= 12.0]
+    if notch:   # Magnete auf dem Rand um die Insel statt in ihr
+        spots = [q for q in spots if not _inside(*q, notch, 6.0)]
+        n0, n1, m0, m1 = notch
+        c, h = P.GR_CLEAR, P.GR_LAP / 2
+        u0_, u1_, v0_, v1_ = rect
+        if n1 < u1_ - 1:
+            spots.append((n1 + c + h, (max(m0, v0_) + min(m1, v1_)) / 2))
+        if m0 > v0_ + 1:
+            spots.append(((max(n0, u0_) + min(n1, u1_)) / 2, m0 - c - h))
     return spots
 
 
@@ -116,35 +140,45 @@ def rects(recess):
     return recess, ins, win
 
 
-def frame_cuts(axis, outer, sgn, recess, thick, r=6.0, seam_u=None):
+def frame_cuts(axis, outer, sgn, recess, thick, r=6.0, seam_u=None, notch=None):
     """Schnitte im Rahmen: Fenster durch, Tasche von innen bis zur Lippe, Magnettaschen in
     der Lippe. outer = Außenfläche des Rahmens, thick = Rahmendicke."""
     rec, ins, win = rects(recess)
     lip_in = outer - sgn * P.GR_LIP              # Innenseite der Lippe
     far = outer - sgn * (thick + 1.0)
     w = sorted((outer + sgn * 1.0, far))
-    cuts = [slab(axis, w[0], w[1], *win, r)]
+    cw = slab(axis, w[0], w[1], *win, r)
+    if notch:
+        cw = cw.cut(slab(axis, w[0] - 1, w[1] + 1, *_grow(notch, P.GR_CLEAR + P.GR_LAP), r))
+    cuts = [cw]
     w = sorted((lip_in, far))
-    cuts.append(slab(axis, w[0], w[1], *rec, r + P.GR_LAP))
+    cr = slab(axis, w[0], w[1], *rec, r + P.GR_LAP)
+    if notch:
+        cr = cr.cut(slab(axis, w[0] - 1, w[1] + 1, *_grow(notch, 0.0), 2.0))
+    cuts.append(cr)
     d, depth = P.GR_MAG
-    for (u, v) in magnet_spots(ins, seam_u):
+    for (u, v) in magnet_spots(ins, seam_u, notch):
         cuts.append(Part.makeCylinder(d / 2, depth + 0.01,
                                       _pt(axis, lip_in - sgn * 0.01, u, v), _dir(axis, sgn)))
     return cuts
 
 
-def insert(axis, outer, sgn, recess, r=6.0, seam_u=None):
+def insert(axis, outer, sgn, recess, r=6.0, seam_u=None, notch=None):
     """Einleger: Außenseite liegt über dem Filter an der Lippe."""
     rec, ins, win = rects(recess)
     out = outer - sgn * (P.GR_LIP + P.GR_FILTER)
     w = sorted((out, out - sgn * P.GR_T))
     body = slab(axis, w[0], w[1], *ins, r + P.GR_LAP - P.GR_CLEAR)
-    tools = insert_tools(axis, out, sgn, win, anchor_u=seam_u)
+    tools = insert_tools(axis, out, sgn, win, anchor_u=seam_u, notch=notch)
     d, depth = P.GR_MAG
-    for (u, v) in magnet_spots(ins, seam_u):
+    for (u, v) in magnet_spots(ins, seam_u, notch):
         tools.append(Part.makeCylinder(d / 2, depth + 0.01,
                                        _pt(axis, out + sgn * 0.01, u, v), _dir(axis, -sgn)))
-    return body.cut(tools)
+    shape = body.cut(tools)
+    if notch:   # Insel erst zum Schluss ausschneiden (der Boolesche Schnitt mit vielen
+        # Werkzeugen an einem L-förmigen Körper ist in OCC langsam und unzuverlässig)
+        shape = shape.cut(slab(axis, w[0] - 1, w[1] + 1, *_grow(notch, P.GR_CLEAR), 2.0))
+    return shape
 
 
 def insert_pair(axis, outer, sgn, recess, seam_u, r=6.0):
@@ -172,6 +206,32 @@ def insert_pair(axis, outer, sgn, recess, seam_u, r=6.0):
     reg_b = _box(axis, S + g / 2, BIG, -BIG, BIG, -BIG, BIG).cut(
         rims(S + L + g / 2, wm + sgn * g / 2, -g))
     return full.common(reg_a), full.common(reg_b)
+
+
+def blind_tools(axis, outer, sgn, region, keeps, anchor):
+    """Blinde Mulden (ohne Loch) auf glatten Flächen, gleiches Raster wie ein Reibenfeld:
+    Kegelstumpf mit flachem Grund, Restwand GR_BLIND_SKIN. region/keeps: (u0, u1, v0, v1),
+    anchor: Mitte des Reibenfensters, an das das Raster anschließt."""
+    p = P.GR_PITCH
+    dv = p * SQ3 / 2
+    R, e = P.GR_R, 0.3
+    depth = P.T_WALL - P.GR_BLIND_SKIN
+    au, av = anchor
+    u0, u1, v0, v1 = region
+    tools = []
+    j0, j1 = int((v0 - av) / dv) - 1, int((v1 - av) / dv) + 1
+    for j in range(j0, j1 + 1):
+        v = av + j * dv
+        i0, i1 = int((u0 - au) / p) - 2, int((u1 - au) / p) + 2
+        for i in range(i0, i1 + 1):
+            u = au + i * p + (j % 2) * p / 2
+            if not (u0 + R + 1 <= u <= u1 - R - 1 and v0 + R + 1 <= v <= v1 - R - 1):
+                continue
+            if any(_inside(u, v, k, R + 1.0) for k in keeps):
+                continue
+            base = _pt(axis, outer + sgn * e, u, v)
+            tools.append(Part.makeCone(R + e, R - depth, depth + e, base, _dir(axis, -sgn)))
+    return tools
 
 
 def open_fraction(n=240):

@@ -27,7 +27,7 @@ sichtbaren Felder Reibe, nur Boden und Sockelring behalten Rundlöcher.
 | Volumen außen | 15,7 l | 18,1 l | 16,8 l (ohne Füße) |
 | Innen | 314 × 237 × 180 mm | 314 × 203 × 237 mm | wie B |
 | GPU saugt durch | linke Seitenwand, 44,0 % offen | Boden, Engstelle Sockelring 98 cm² | Boden, Spalt unter dem Boden 116 cm² |
-| Offen: Front / Deckel / Seite / Rückwand | 139 / 264 / 190 / 84 cm² | 112 / 183 / 196 / 60 cm² (Reibe) | wie B |
+| Offen: Front / Deckel / Seite / Rückwand | 139 / 264 / 190 / 84 cm² | 122 / 183 / 222 / 61 cm² (Reibe) | wie B |
 | Fugen | V-Nut | versteckt, verklebt | versteckt, verklebt |
 | Druckteile | 18 | 28 | 30 |
 | Druckzeit / ASA (Gehäuse und Halter) | ca. 48 h / 0,7 kg | ca. 56 h / 0,9 kg | ca. 54 h / 0,9 kg |
@@ -56,8 +56,9 @@ die Board-Ebene der Boden, bei B die Vorderseite des Trägers.
   C13-Stecker. Vor dem D15 bleiben 64 mm Luft. Flach liegend wären es nur etwa 5 mm, dann würde
   das Netzteil die untere Hälfte des vorderen D15-Lüfters zudecken.
 - **Kaltgerätebuchse** in der Rückwand über der Karte (A oben links, B unten links).
-- **Taster** in der Front über dem Netzteil (A oben rechts, B oben links), mit eigener Leitung
-  zum F_PANEL-Anschluss des Boards.
+- **Einschalter** vorn mit eigener Leitung zum F_PANEL-Anschluss des Boards: bei A ein
+  16-mm-Taster oben rechts, bei B und C eine mechanische Taste in der Front-I/O-Insel oben
+  links (siehe unten).
 - **Abstandshalter 8 mm** statt 6,35 mm, damit die Rückplatte des Kühlers (6 mm angenommen)
   unter das Board passt.
 - **Trennstelle bei x = 130 mm**, vor dem Kühler. So stößt kein Flansch an Kühler, Board oder
@@ -100,7 +101,30 @@ Front, Deckel, Seitenwände und Rückwand sind Rahmen. Außen bleibt eine 1,5 mm
 stehen, das Fenster darin ist 7 mm kleiner als der Einleger. Der Einleger sitzt von innen an
 der Lippe, dazwischen liegt das Filtergewebe. Magnetpaare 6 × 1 mm halten ihn, eines in der
 Lippe und eines im Einleger. Die Rückwand hat ihr Feld im freien Rechteck neben I/O-Blende,
-Slotblech und C14. Der Taster sitzt links im Rahmenband über dem Front-Einleger.
+Slotblech und C14. Ihre übrigen glatten Flächen tragen blinde Mulden im selben Raster (ohne
+Loch, 0,8 mm Restwand), damit auch die Rückseite einheitlich aussieht.
+
+Alle Reibenfelder haben rundum denselben Abstand zum Außenrand: 16 mm bis zur Tasche, 23 mm bis
+zum sichtbaren Feld. Dafür halten die Seitenwände mit je zwei Magneten in den Eckbögen statt
+vier in der Mitte, und eine 2 mm breite Leiste unter dem Deckel führt ihre Oberkante. Unter
+dem Deckel und über dem Boden läuft eine Schattenfuge von 1 × 1 mm rundum, die Unterkante des
+Bodens ist wie die Deckelkante mit 2,5 mm gerundet.
+
+## Front-I/O (B und C)
+
+Oben links in der Front bleibt eine glatte Insel von 44 × 62 mm stehen, die Reibe läuft
+L-förmig darum herum. Auf der Insel sitzen von oben nach unten:
+
+- **Einschalter:** eine mechanische Tastaturtaste, Kailh Choc v1 (Low Profile) mit Kappe. Sie
+  klemmt in einer 1,2 mm dünnen Platte am Grund einer Tastenmulde, die Kappe steht etwa 3 mm
+  vor. Zwei Drähte gehen an PWR_SW. Mit `SWITCH = "mx"` wird es ein normaler MX-Schalter
+  (Platte 1,5 mm), dessen Kappe aber gut 10 mm vorsteht.
+- **USB-A** als Einbaubuchse mit Kabel auf den USB-3.0-Header (19-Pin) des Boards.
+- **USB-C** als Einbaubuchse mit Kabel auf den Typ-E-Header des Boards.
+
+Hinter der Insel sind bis 35 mm Tiefe frei, das Netzteil beginnt rechts daneben. Die
+Ausschnitte für die USB-Buchsen (`USBA_CUT`, `USBC_CUT`) sind Annahmen. Die Befestigung hängt
+vom gekauften Bauteil ab: kleben oder einen Halter nach Maß ergänzen, wenn die Buchsen da sind.
 
 Der Einleger ist 4 mm dick. Außen liegen Kegelmulden mit 45° Flanke im 8-mm-Wabenraster, die
 sich an Graten treffen. An jedem Punkt, an dem drei Mulden zusammenstoßen, geht ein
@@ -210,9 +234,12 @@ Dazu kommt bei B und C das `leitblech` (274 × 131 × 10 mm, Platte aufs Bett).
 | Zylinderkopfschrauben M3 × 12 | 25 | Trennflansche (2 × 4 mm) |
 | Zylinderkopfschrauben M3 × 6 | 10 | Board auf Einschmelzmuttern, GPU-Slotblech |
 | M3-Muttern (DIN 934) | 25 | Flansche, Mutternkanal der GPU-Leiste |
-| Neodym-Scheibenmagnete 10 × 3 mm | 16 | 8 im Deckel, 8 in den Seitenwänden, **Polung beachten** |
+| Neodym-Scheibenmagnete 10 × 3 mm | A 16, B und C 8 | je zur Hälfte in Deckel und Seitenwänden (B, C in den Ecken), **Polung beachten** |
 | C14-Einbaubuchse, Schnappbefestigung, Ausschnitt 27,5 × 19,8 mm, Wandstärke 1–2 mm | 1 | mit internem Kabel C14 auf C13 gewinkelt, A ca. 50 cm, B und C 60–70 cm |
-| Vandalismus-Taster 16 mm, Taster (nicht rastend), max. 28 mm Einbautiefe | 1 | mit zweipoliger Leitung und Dupont-Buchse 2,54 mm für PWR_SW, 30–40 cm |
+| A: Vandalismus-Taster 16 mm, Taster (nicht rastend), max. 28 mm Einbautiefe | 1 | mit zweipoliger Leitung und Dupont-Buchse 2,54 mm für PWR_SW, 30–40 cm |
+| B und C: Kailh Choc v1 (Low Profile) mit Kappe | 1 | Einschalter; zwei Drähte mit Dupont-Buchse 2,54 mm an PWR_SW, 40 cm |
+| B und C: USB-A-Einbaubuchse mit Kabel auf USB-3.0-Header (19-Pin) | 1 | Ausschnitt 13,6 × 6 mm angenommen, vor dem Druck mit dem Bauteil abgleichen |
+| B und C: USB-C-Einbaubuchse mit Kabel auf Typ-E-Header | 1 | Ausschnitt 9,4 × 3,6 mm angenommen; das Board braucht einen Typ-E-Header |
 | Gummifüße selbstklebend, Ø8 × 2–3 mm | 8 | auf die Sockellippe |
 | A: feines Filtergewebe, 0,2–0,3 mm Maschenweite | nach Bedarf | optional innen hinter die Lochfelder, Halter sind bei A nicht modelliert |
 | SFX-Netzteil ≥ 750 W | 1 | PowerColor empfiehlt für die Reaper mindestens 750 W |
@@ -254,7 +281,8 @@ Gemeinsam für beide Varianten:
 3. **Hälften verschrauben:** Boden, Deckel, Sockel, Seitenwände und bei B der Träger, jeweils an
    den Flanschen mit M3 × 12 und Mutter. Die V-Nut außen ausrichten, erst dann anziehen.
 4. **Sockel unter den Boden** schrauben, Gummifüße auf die Lippe kleben.
-5. **Front** mit Taster und **Rückwand** mit C14-Buchse auf den Boden stellen und verschrauben.
+5. **Front** mit Einschalter (bei B und C Taste und USB-Buchsen in der Insel) und
+   **Rückwand** mit C14-Buchse auf den Boden stellen und verschrauben.
 
 Variante A:
 
@@ -317,9 +345,9 @@ Löcher Sacklöcher mit 0,6 mm Haut (`VENT_BLIND_SKIN`) und zählen nicht zum Qu
 
 | | A liegend | B und C stehend |
 |---|---|---|
-| Front | 139 cm² | 112 cm² (Reibe) |
-| Rückwand | 84 cm² + Slotblech ca. 19 cm² | 60 cm² (Reibe) + Slotblech ca. 19 cm² |
-| Seitenwand, je Seite | 190 cm² | 196 cm² (Reibe) |
+| Front | 139 cm² | 122 cm² (Reibe) |
+| Rückwand | 84 cm² + Slotblech ca. 19 cm² | 61 cm² (Reibe) + Slotblech ca. 19 cm² |
+| Seitenwand, je Seite | 190 cm² | 222 cm² (Reibe) |
 | Deckel | 264 cm² | 183 cm² (Reibe) |
 | Boden über dem Sockel | 228 cm² | 193 cm² |
 | Sockelring | 37 cm² | 98 cm² (Ring 26 mm hoch), bei C 116 cm² Spalt unter dem Boden |
@@ -332,7 +360,7 @@ Zum Vergleich: drei 95-mm-Lüfter der Karte haben ca. 194 cm² freie Fläche, di
 - **B und C:** Die Karte saugt durch den Boden an. Der Sockelring von B ist die Engstelle: Mit
   98 cm² liefert er etwa die Hälfte der Lüfterfläche, den Rest holt die Karte über die
   Seitenwände und die Front. `build.py` warnt deshalb. Bei C ist der Boden rundum offen. Die
-  warme Luft steigt zum Deckel, der D15 bläst von vorn nach hinten und hat hinten nur 60 cm²
+  warme Luft steigt zum Deckel, der D15 bläst von vorn nach hinten und hat hinten nur 61 cm²
   Reibe, der Rest geht durch den Deckel.
 
 Der offene Deckel hat einen Preis: Staub und verschüttete Flüssigkeit fallen direkt auf Board
@@ -356,8 +384,8 @@ hinter den Feldern funktionieren beide Varianten, bei B ist ein Filter am Boden 
   98 cm² bei 6 mm mehr Höhe. Weitere Stellschrauben: noch höher (30 mm ergäben etwa 115 cm²)
   oder Füße wie bei C (116 cm², offener Spalt rundum).
 - **B und C mit Reibe auf allen sichtbaren Feldern**, so dass jede Fläche gleich aussieht. Der
-  Preis gegenüber dem Rundlochfeld: Front 112 statt 160 cm², Rückwand 60 statt 94 cm²,
-  Seitenwände 196 statt 266 cm², Deckel 183 statt 212 cm². Boden und Sockelring bleiben
+  Preis gegenüber dem Rundlochfeld: Front 122 statt 160 cm², Rückwand 61 statt 94 cm²,
+  Seitenwände 222 statt 266 cm², Deckel 183 statt 212 cm². Boden und Sockelring bleiben
   gelocht, der Ring ist mit 3 mm zu dünn für 4 mm tiefe Mulden.
 - **Netzteil-Halter mit Klammer:** Wanne mit vollen Wänden an der blanken Seite und zum Kühler,
   an Lüfter und Anschlüssen nur Ecken. Eine Klammer an der blanken Seite greift über die

@@ -49,14 +49,33 @@ def psu():
     return _spec("dummy_netzteil", s, (0.15, 0.15, 0.15))
 
 
+def front_io():
+    """Front-I/O (Gehäusekoordinaten): Schalter unter der Platte mit Anschlussdrähten,
+    Einbaubuchsen USB-A und USB-C mit Kabelbogen."""
+    xp = P.OUT_X0 + P.T_WALL - P.SW["plate"]
+    ky, kz = P.IO_KEY
+    key = box(0.0, xp + P.SW["below"], ky - 8, ky + 8, kz - 8, kz + 8)   # hinter der Platte
+    parts = [key]
+    for (yc, zc), (hw, hh) in ((P.IO_USBA, (10, 6)), (P.IO_USBC, (8, 5))):
+        parts.append(box(0, P.IO_MODULE_DEPTH, yc - hw, yc + hw, zc - hh, zc + hh))
+        parts.append(box(P.IO_MODULE_DEPTH, P.IO_MODULE_DEPTH + P.IO_CABLE, yc - 4, yc + 4,
+                         zc - 3, zc + 3))
+    return Spec("dummy_front_io", fuse_all(parts), (0.6, 0.6, 0.6), group="dummy",
+                printable=False)
+
+
 def keepouts():
-    # Taster: Körper + Mutter, dahinter Raum für Anschlüsse und Leitung zum F_PANEL
-    btn = cyl_x(P.BUTTON_V, P.BUTTON_W, 0, P.BUTTON_DEPTH, 11.0).fuse(
-        cyl_x(P.BUTTON_V, P.BUTTON_W, P.BUTTON_DEPTH, P.BUTTON_DEPTH + P.BUTTON_CABLE, 7.0))
     c14 = box(P.INNER_L - P.C14_DEPTH, P.INNER_L, P.C14_V - 15, P.C14_V + 15,
               P.C14_W_POS - 12, P.C14_W_POS + 12)
-    return [_spec("dummy_taster", btn, (0.6, 0.6, 0.6)),
-            _spec("dummy_c14", c14, (0.6, 0.6, 0.6))]
+    out = [_spec("dummy_c14", c14, (0.6, 0.6, 0.6))]
+    if P.GRATER:
+        out.append(front_io())
+    else:
+        # Taster: Körper + Mutter, dahinter Raum für Anschlüsse und Leitung zum F_PANEL
+        btn = cyl_x(P.BUTTON_V, P.BUTTON_W, 0, P.BUTTON_DEPTH, 11.0).fuse(
+            cyl_x(P.BUTTON_V, P.BUTTON_W, P.BUTTON_DEPTH, P.BUTTON_DEPTH + P.BUTTON_CABLE, 7.0))
+        out.append(_spec("dummy_taster", btn, (0.6, 0.6, 0.6)))
+    return out
 
 
 def build():

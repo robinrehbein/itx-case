@@ -2,7 +2,7 @@
 (TOP_VENT), Magnettaschen über den Seitenwänden, Dome für die Wandlaschen."""
 import params as P
 from parts import grater
-from parts.common import (Spec, rrect_prism, hex_grid, holes_z, split_blind, cyl_z, fuse_all, cut_all,
+from parts.common import (Spec, box, rrect_prism, hex_grid, holes_z, split_blind, cyl_z, fuse_all, cut_all,
                           dome_lid, split_with_flanges, envelope_case, seam_envelope, cut_holes_split)
 
 TOP = P.INNER_H + P.T_LID
@@ -18,6 +18,10 @@ def dome_positions():
 
 
 def magnet_positions():
+    if P.CORNER_MAGNETS:
+        m, s = P.CORNER_MAG_IN, P.CORNER_MAG_SIDE
+        xs, ys = (m, P.INNER_L - m), (s, P.INNER_W - s)
+        return [(x, y) for x in xs for y in ys]
     yl = P.OUT_Y0 + P.MAGNET_FROM_OUTER
     yr = P.OUT_Y1 - P.MAGNET_FROM_OUTER
     return [(x, yl) for x in P.MAGNET_X] + [(x, yr) for x in P.MAGNET_X]
@@ -81,6 +85,17 @@ def build():
         cuts.append(h)
     for (x, y) in magnet_positions():
         cuts.append(cyl_z(x, y, P.INNER_H - 0.01, P.INNER_H + P.MAGNET_H, P.MAGNET_D / 2))
+    if P.CORNER_MAGNETS:   # Leiste innen an der Oberkante beider Seitenwände
+        g0, g1, lh = P.LID_LIP
+        x0, x1 = P.FLAT_X0 + 4.0, P.FLAT_X1 - 4.0
+        adds.append(box(x0, x1, g0, g1, P.INNER_H - lh, P.INNER_H))
+        adds.append(box(x0, x1, P.INNER_W - g1, P.INNER_W - g0, P.INNER_H - lh, P.INNER_H))
+    if P.GRATER:           # Schattenfuge an der Unterkante des Deckels
+        r = P.REVEAL
+        cuts.append(rrect_prism(P.OUT_X0 - 1, P.OUT_X1 + 1, P.OUT_Y0 - 1, P.OUT_Y1 + 1,
+                                P.CORNER_R + 1, P.INNER_H - 1, P.INNER_H + r).cut(
+            rrect_prism(P.OUT_X0 + r, P.OUT_X1 - r, P.OUT_Y0 + r, P.OUT_Y1 - r,
+                        P.CORNER_R - r, P.INNER_H - 2, P.INNER_H + r + 1)))
     shape = cut_all(fuse_all([plate] + adds), cuts)
 
     ribs = list(SEAM_RIBS)

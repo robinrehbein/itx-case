@@ -1,18 +1,18 @@
 == Variante B stehend, GPU reaper, SFX ==
 == Bauteile ==
-  Boden                          22.2 s
-  Deckel                        259.4 s
-  Seitenwände                   455.0 s
-  Front                           0.5 s
-  Front-Einleger                184.9 s
-  Rückwand-Einleger              82.0 s
-  Rückwand                        0.7 s
+  Boden                           8.3 s
+  Deckel                        186.4 s
+  Seitenwände                   488.0 s
+  Front                           1.5 s
+  Front-Einleger                261.2 s
+  Rückwand-Einleger              82.4 s
+  Rückwand                        0.8 s
   Board-Träger                    0.2 s
-  Sockel                          2.8 s
-  Extras                          9.5 s
+  Sockel                          2.4 s
+  Extras                         10.2 s
   Dummies                         0.0 s
   Kabelwege                       0.1 s
-  Spiegeln (Händigkeit)          17.8 s
+  Spiegeln (Händigkeit)          18.1 s
 
 == V-Nut an den Trennstellen ==
 
@@ -29,24 +29,24 @@
   keine
 
 == Druckbett / Manifold / Export ==
-  boden_vorn              134.0 x  211.0 x   15.0  passt  manifold=ja  ~ 4.2 h  ~  68 g
-  boden_hinten            188.0 x  211.0 x   15.0  passt  manifold=ja  ~ 5.7 h  ~  89 g
-  deckel_vorn             135.0 x  213.0 x   13.0  passt  manifold=ja  ~ 1.3 h  ~  23 g
-  deckel_hinten           189.0 x  213.0 x   13.0  passt  manifold=ja  ~ 1.6 h  ~  29 g
+  boden_vorn              135.0 x  213.0 x   15.0  passt  manifold=ja  ~ 4.2 h  ~  67 g
+  boden_hinten            189.0 x  213.0 x   15.0  passt  manifold=ja  ~ 5.7 h  ~  88 g
+  deckel_vorn             135.0 x  213.0 x   13.0  passt  manifold=ja  ~ 1.4 h  ~  24 g
+  deckel_hinten           189.0 x  213.0 x   13.0  passt  manifold=ja  ~ 1.7 h  ~  31 g
   deckel_einleger_vorn    137.6 x  178.4 x    4.0  passt  manifold=ja  ~ 1.7 h  ~  18 g
   deckel_einleger_hinten  172.5 x  178.4 x    4.0  passt  manifold=ja  ~ 2.4 h  ~  25 g
-  seite_links_vorn        134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 1.6 h  ~  29 g
-  seite_links_hinten      188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 2.0 h  ~  35 g
-  seite_links_einleger_vorn  137.6 x  190.4 x    4.0  passt  manifold=ja  ~ 1.8 h  ~  18 g
-  seite_links_einleger_hinten  171.7 x  190.4 x    4.0  passt  manifold=ja  ~ 2.5 h  ~  26 g
-  seite_rechts_vorn       134.0 x   14.0 x  237.0  passt  manifold=ja  ~ 1.6 h  ~  29 g
-  seite_rechts_hinten     188.0 x   14.0 x  237.0  passt  manifold=ja  ~ 2.0 h  ~  35 g
-  seite_rechts_einleger_vorn  137.6 x  190.4 x    4.0  passt  manifold=ja  ~ 1.8 h  ~  18 g
-  seite_rechts_einleger_hinten  171.7 x  190.4 x    4.0  passt  manifold=ja  ~ 2.5 h  ~  26 g
-  front                   237.0 x  187.0 x   15.0  passt  manifold=ja  ~ 1.9 h  ~  32 g
-  front_einleger          182.4 x  178.4 x    4.0  passt  manifold=ja  ~ 3.8 h  ~  76 g
-  rueckwand               237.0 x  187.0 x   17.0  passt  manifold=ja  ~ 2.2 h  ~  37 g
-  rueckwand_einleger      158.4 x  117.2 x    4.0  passt  manifold=ja  ~ 2.2 h  ~  43 g
+  seite_links_vorn        134.0 x   16.0 x  237.0  passt  manifold=ja  ~ 1.3 h  ~  21 g
+  seite_links_hinten      188.0 x   16.0 x  237.0  passt  manifold=ja  ~ 1.5 h  ~  25 g
+  seite_links_einleger_vorn  137.6 x  213.9 x    4.0  passt  manifold=ja  ~ 2.0 h  ~  20 g
+  seite_links_einleger_hinten  171.7 x  213.9 x    4.0  passt  manifold=ja  ~ 2.8 h  ~  28 g
+  seite_rechts_vorn       134.0 x   14.5 x  237.0  passt  manifold=ja  ~ 1.3 h  ~  21 g
+  seite_rechts_hinten     188.0 x   14.5 x  237.0  passt  manifold=ja  ~ 1.5 h  ~  24 g
+  seite_rechts_einleger_vorn  137.6 x  213.9 x    4.0  passt  manifold=ja  ~ 2.0 h  ~  20 g
+  seite_rechts_einleger_hinten  171.7 x  213.9 x    4.0  passt  manifold=ja  ~ 2.8 h  ~  28 g
+  front                   237.0 x  187.0 x   16.0  passt  manifold=ja  ~ 1.6 h  ~  25 g
+  front_einleger          215.0 x  179.0 x    6.0  passt  manifold=ja  ~ 4.2 h  ~  83 g
+  rueckwand               237.0 x  187.0 x   17.0  passt  manifold=ja  ~ 2.1 h  ~  35 g
+  rueckwand_einleger      161.4 x  117.2 x    4.0  passt  manifold=ja  ~ 2.3 h  ~  44 g
   traeger_vorn            127.8 x  236.0 x   25.0  passt  manifold=ja  ~ 3.9 h  ~  82 g
   traeger_hinten          181.8 x  236.0 x   25.0  passt  manifold=ja  ~ 4.9 h  ~ 104 g
   sockel_vorn             118.0 x  179.0 x   26.0  passt  manifold=ja  ~ 1.4 h  ~  17 g
@@ -67,9 +67,9 @@
 == Freie Querschnitte (Ø3.2, Raster 4.5; Sockel Ø4.4) ==
   Reibe: 40.4 % der Fensterfläche offen (Abtastung)
   Wabenfeld offen (theoretisch): 45.9 %
-    Front                     112 cm²  (vor Netzteil und CPU-Kühler)
-    Rückwand                   60 cm²  + Slotblech ~19 cm²
-    Seitenwand je Seite       196 cm²
+    Front                     122 cm²  (vor Netzteil und CPU-Kühler)
+    Rückwand                   61 cm²  + Slotblech ~19 cm²
+    Seitenwand je Seite       222 cm²
     Deckel                    183 cm²
     Boden (über Sockel)       193 cm²
     Sockelring                 98 cm²  (Engstelle der Bodenzuluft)
@@ -101,4 +101,4 @@
 
 == Ergebnis ==
   WARNUNG Sockelring 98 cm² kleiner als die GPU-Lüfterfläche 194 cm²: die Karte holt den Rest über Seitenwände und Front
-  OK – 1422 s
+  OK – 1913 s

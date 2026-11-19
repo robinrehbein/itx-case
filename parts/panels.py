@@ -13,13 +13,30 @@ def tab(x0, x1, y, z0, z1, hole_x):
 
 
 def front_recess():
-    """C: Tasche für den Reiben-Einleger (y0, y1, z0, z1); darüber das Rahmenband mit Taster."""
-    return (P.FLAT_Y0 + P.GR_EDGE, P.FLAT_Y1 - P.GR_EDGE,
-            P.VENT_Z0, H - P.GRATER_TOP_BAND)
+    """Reibe: Tasche für den Front-Einleger (y0, y1, z0, z1), rundum 16 mm vom Außenrand wie
+    Deckel und Seiten. Oben links bleibt die I/O-Insel (P.FRONT_IO) stehen."""
+    return (P.FLAT_Y0 + P.GR_EDGE, P.FLAT_Y1 - P.GR_EDGE, P.TAB_Z_BOT[1], P.TAB_Z_TOP[0])
+
+
+def io_cuts():
+    """Front-I/O auf der Insel: Tastenmulde mit Schalterausschnitt (Platte P.SW['plate']),
+    USB-A und USB-C."""
+    x0 = P.OUT_X0
+    plate = P.SW["plate"]
+    ky, kz = P.IO_KEY
+    cw, ch = P.SW["cap"]
+    c = P.SW["cut"]
+    cuts = [rrect_x(x0 - 1, x0 + P.T_WALL - plate, ky - cw / 2 - 0.75, ky + cw / 2 + 0.75,
+                    kz - ch / 2 - 0.75, kz + ch / 2 + 0.75, 2.0),
+            rrect_x(x0 - 1, 1, ky - c / 2, ky + c / 2, kz - c / 2, kz + c / 2, 0.3)]
+    for (yc, zc), (w, h) in ((P.IO_USBA, P.USBA_CUT), (P.IO_USBC, P.USBC_CUT)):
+        cuts.append(rrect_x(x0 - 1, 1, yc - w / 2, yc + w / 2, zc - h / 2, zc + h / 2,
+                            min(h / 2 - 0.01, 1.7)))
+    return cuts
 
 
 def front_insert():
-    shape = grater.insert("x", P.OUT_X0, -1, front_recess())
+    shape = grater.insert("x", P.OUT_X0, -1, front_recess(), notch=P.FRONT_IO)
     return Spec("front_einleger", shape, (0.80, 0.80, 0.83), print_rot=[((0, 1, 0), 90)],
                 explode=(-220, 0, 0))
 
@@ -46,13 +63,16 @@ def front():
             t, h = tab(-1.0, P.TAB_D, y, z0, z1, 5.0)
             adds.append(t)
             cuts.append(h)
-    cuts.append(cyl_x(P.BUTTON_Y, P.BUTTON_Z, P.OUT_X0 - 1, 1, P.BUTTON_D / 2))
-    if P.USB_C:
+    if P.GRATER:
+        cuts += io_cuts()
+    else:
+        cuts.append(cyl_x(P.BUTTON_Y, P.BUTTON_Z, P.OUT_X0 - 1, 1, P.BUTTON_D / 2))
+    if P.USB_C and not P.GRATER:
         cuts.append(rrect_x(P.OUT_X0 - 1, 1, P.USBC_Y - P.USBC_W / 2, P.USBC_Y + P.USBC_W / 2,
                             P.USBC_Z - P.USBC_H / 2, P.USBC_Z + P.USBC_H / 2, P.USBC_H / 2 - 0.01))
     cuts += holes_x(front_vent_points(), P.OUT_X0 - 1, 1)
     if P.GRATER:
-        cuts += grater.frame_cuts("x", P.OUT_X0, -1, front_recess(), P.T_WALL)
+        cuts += grater.frame_cuts("x", P.OUT_X0, -1, front_recess(), P.T_WALL, notch=P.FRONT_IO)
     shape = cut_all(fuse_all([shape] + adds), cuts)
     return Spec("front", shape, (0.86, 0.86, 0.88), print_rot=[((0, 1, 0), -90)],
                 explode=(-140, 0, 0))
@@ -100,7 +120,18 @@ def rear_recess():
     (rv0, rv1), (rw0, rw1) = rail_rect()
     rail = P.rect_vw(rv0, rv1, rw0, rw1 + P.REAR_RAIL_CLEAR)
     z0 = max(gpu_open()[3], rail[3], c14_rect(4.0)[3]) + 4.0
-    return (P.FLAT_Y0 + P.GR_EDGE, iy0 - m - 4.0, z0, P.VENT_Z1)
+    return (P.FLAT_Y0 + P.GR_EDGE, iy0 - m - 4.0, z0, P.TAB_Z_TOP[0])
+
+
+def rear_blind_tools():
+    """Blinde Mulden auf den glatten Flächen der Rückwand, im Raster des Reibenfelds."""
+    rec, ins, win = grater.rects(rear_recess())
+    anchor = ((win[0] + win[1]) / 2, (win[2] + win[3]) / 2)
+    m = P.IO_KEEPOUT + 0.5
+    iy0, iy1, iz0, iz1 = io_window()
+    keeps = [rec, (iy0 - m, iy1 + m, iz0 - m, iz1 + m), gpu_open(), c14_rect(4.0)]
+    region = (P.FLAT_Y0 + P.GR_EDGE, P.FLAT_Y1 - P.GR_EDGE, P.TAB_Z_BOT[1], P.TAB_Z_TOP[0])
+    return grater.blind_tools("x", P.OUT_X1, 1, region, keeps, anchor)
 
 
 def rear_insert():
@@ -158,6 +189,7 @@ def rear():
     cuts += holes_x(pts, X1 - 1, P.OUT_X1 + 1)
     if P.GRATER_REAR:
         cuts += grater.frame_cuts("x", P.OUT_X1, 1, rear_recess(), P.T_WALL)
+        cuts += rear_blind_tools()
     shape = cut_all(fuse_all([shape] + adds), cuts)
     return Spec("rueckwand", shape, (0.86, 0.86, 0.88), print_rot=[((0, 1, 0), 90)],
                 explode=(140, 0, 0)), pts

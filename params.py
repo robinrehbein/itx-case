@@ -74,6 +74,8 @@ T_TRAY = 5.0        # Board-Träger (nur B)
 CORNER_R = 12.0
 LID_EDGE_R = 2.5    # Rundung Deckel-Oberkante
 LID_EDGE_BED_CHAMFER = 1.0  # davon die äußersten 1 mm als 45°-Fase (liegt auf dem Druckbett)
+FLOOR_EDGE_R = 2.5  # B, C: Unterkante des Bodens gerundet wie die Deckelkante
+REVEAL = 1.0        # B, C: Schattenfuge 1 x 1 mm unter dem Deckel und über dem Boden
 
 # --------------------------------------------------------------------------
 # Komponenten
@@ -260,7 +262,20 @@ BUTTON_DEPTH = 28.0    # Körper hinter der Front
 BUTTON_CABLE = 22.0    # dahinter frei für Anschlüsse und Kabelbogen
 BUTTON_V = PSU_V1 - 30.0
 BUTTON_W = PSU_W1 + 20.0
-GRATER_TOP_BAND = 40.0      # C: Rahmen über dem Front-Einleger, darin der Taster
+# Front-I/O (B, C): glatte Insel oben links im Frontrahmen, die Reibe läuft L-förmig darum.
+# Von oben: mechanische Taste (Kailh Choc, Low Profile), USB-A, USB-C. Dahinter sind bis
+# 35 mm frei, das Netzteil beginnt rechts daneben.
+SWITCH = "choc"             # "choc" (Kailh Choc v1, Platte 1,2 mm) | "mx" (Platte 1,5 mm)
+SWITCHES = {
+    "choc": dict(cut=13.8, plate=1.2, cap=(17.5, 16.5), below=8.0),
+    "mx":   dict(cut=14.0, plate=1.5, cap=(18.0, 18.0), below=15.0),
+}
+SW = SWITCHES[SWITCH]
+FRONT_IO_W, FRONT_IO_H = 44.0, 62.0
+USBA_CUT = (13.6, 6.0)      # Ausschnitt Einbaubuchse USB-A (Annahme, mit Bauteil prüfen)
+USBC_CUT = (9.4, 3.6)       # Ausschnitt Einbaubuchse USB-C (Annahme)
+IO_MODULE_DEPTH = 30.0      # Bautiefe der Einbaubuchsen hinter der Front
+IO_CABLE = 20.0             # dahinter frei für den Kabelbogen
 USBC_W, USBC_H = 9.4, 3.8
 
 # Kaltgeräte-Buchse C14 in der Rückwand über der Karte
@@ -292,9 +307,6 @@ def rect_vw(v0, v1, w0, w1):
     return Y_BASE - w1, Y_BASE - w0, v0, v1
 
 
-if GRATER:   # Taster links oben im Rahmenband über dem Einleger
-    BUTTON_V = INNER_H - GRATER_TOP_BAND / 2
-    BUTTON_W = Y_BASE - 36.0
 BUTTON_Y, BUTTON_Z = to_case(0, BUTTON_V, BUTTON_W)[1:]
 USBC_Y, USBC_Z = BUTTON_Y, BUTTON_Z + 23.0
 
@@ -314,6 +326,13 @@ TAB_D = 10.0
 TAB_T = 3.0
 TAB_Z_BOT = (DOME_H, DOME_H + TAB_T)
 TAB_Z_TOP = (INNER_H - DOME_H - TAB_T, INNER_H - DOME_H)
+# Front-I/O-Insel (y0, y1, z0, z1) in der Ecke oben links der Front-Tasche, Mitten der Elemente
+_io_y0 = FLAT_Y0 + 4.0          # linker Rand der Front-Tasche (FLAT_Y0 + GR_EDGE)
+FRONT_IO = (_io_y0, _io_y0 + FRONT_IO_W, TAB_Z_TOP[0] - FRONT_IO_H, TAB_Z_TOP[0])
+_io_yc = (FRONT_IO[0] + FRONT_IO[1]) / 2
+IO_KEY = (_io_yc, FRONT_IO[3] - 16.0)
+IO_USBA = (_io_yc, FRONT_IO[3] - 37.0)
+IO_USBC = (_io_yc, FRONT_IO[3] - 51.0)
 
 if LYING:
     # Front: eine Lasche zwischen Kabelbogen der Karte und Netzteil-Halter, eine rechts daneben
@@ -354,6 +373,13 @@ FLANGE_T = 4.0
 FLANGE_D = 10.0
 VGROOVE = 0.8         # Fase je Seite -> V-Nut 1.6 breit, 0.8 tief
 MAGNET_X = [FLAT_X0 + 20.0, SPLIT_X - 25.0, SPLIT_X + 40.0, FLAT_X1 - 20.0]
+# Mit Reibe in den Seitenwänden: je zwei Magnete in den Eckbögen, damit das Feld oben denselben
+# Rand hat wie Deckel und Front. Eine Leiste unter dem Deckel führt die Oberkante der Wand.
+CORNER_MAGNETS = LAYOUT in ("B", "C")
+CORNER_MAG_IN = 6.0       # Magnetmitte ab Innenseite Front/Rückwand (x)
+CORNER_MAG_SIDE = 4.0     # Magnetmitte ab Innenseite Seitenwand (y)
+CORNER_BOSS = 12.0        # Nase im Eckbogen, Kantenlänge innen
+LID_LIP = (0.3, 2.3, 4.0) # Leiste unter dem Deckel: Abstand zur Wand, Ende, Höhe
 
 # --------------------------------------------------------------------------
 # Lüftung: runde Löcher im Wabenraster
@@ -394,6 +420,7 @@ GR_MAG = (6.2, 1.1)    # Magnettasche Ø, Tiefe (Magnete 6 x 1 mm)
 GR_EDGE = 4.0          # Rahmen außen neben der Einleger-Tasche (Front)
 GR_SEAM_LAP = 20.0     # Deckel-Einleger überlappen an der Fuge stufenförmig (halbe Dicke)
 GR_SEAM_GAP = 0.2
+GR_BLIND_SKIN = 0.8    # blinde Mulden auf glatten Flächen (Rückwand): Restwand innen
 
 # --------------------------------------------------------------------------
 # Board-Träger (nur B): Durchbrüche im Block (u0, u1, v0, v1)

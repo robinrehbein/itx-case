@@ -219,7 +219,7 @@ if P.GRATER or P.GRATER_LID:
         u0, u1, v0, v1 = grater.rects(rec)[2]
         return (u1 - u0) * (v1 - v0)
     if P.GRATER:
-        a_front = f_open * win_area(panels.front_recess())
+        a_front = f_open * (win_area(panels.front_recess()) - P.FRONT_IO_W * P.FRONT_IO_H)
     if P.GRATER_SIDES:
         a_side = f_open * win_area(side_walls.grater_recess())
     if P.GRATER_REAR:

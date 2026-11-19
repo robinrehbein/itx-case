@@ -86,6 +86,19 @@ def rib_y_ranges():
 
 def build():
     plate = rrect_prism(P.OUT_X0, P.OUT_X1, P.OUT_Y0, P.OUT_Y1, P.CORNER_R, -P.T_FLOOR, 0)
+    if P.GRATER:
+        # Unterkante gerundet wie die Deckelkante, die äußersten 1 mm als Fase (Druckbett);
+        # oben eine Schattenfuge, auf der die Wände stehen
+        z0 = -P.T_FLOOR
+        edges = [e for e in plate.Edges
+                 if abs(e.BoundBox.ZMin - z0) < 1e-6 and abs(e.BoundBox.ZMax - z0) < 1e-6]
+        plate = plate.makeFillet(P.FLOOR_EDGE_R, edges).common(
+            plate.makeChamfer(P.LID_EDGE_BED_CHAMFER, edges))
+        r = P.REVEAL
+        plate = plate.cut(rrect_prism(P.OUT_X0 - 1, P.OUT_X1 + 1, P.OUT_Y0 - 1, P.OUT_Y1 + 1,
+                                      P.CORNER_R + 1, -r, 1).cut(
+            rrect_prism(P.OUT_X0 + r, P.OUT_X1 - r, P.OUT_Y0 + r, P.OUT_Y1 - r,
+                        P.CORNER_R - r, -r - 1, 2)))
     pts = vent_points()
 
     rim = rrect_prism(0, P.INNER_L, 0, P.INNER_W, P.CORNER_RI, 0, P.RIM_H).cut(
