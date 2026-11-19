@@ -57,7 +57,7 @@ die Board-Ebene der Boden, bei B die Vorderseite des Trägers.
   das Netzteil die untere Hälfte des vorderen D15-Lüfters zudecken.
 - **Kaltgerätebuchse** in der Rückwand über der Karte (A oben links, B unten links).
 - **Einschalter** vorn mit eigener Leitung zum F_PANEL-Anschluss des Boards: bei A ein
-  16-mm-Taster oben rechts, bei B und C eine mechanische Taste in der Front-I/O-Insel oben
+  16-mm-Taster oben rechts, bei B und C eine mechanische Taste in der Front-I/O-Insel unten
   links (siehe unten).
 - **Abstandshalter 8 mm** statt 6,35 mm, damit die Rückplatte des Kühlers (6 mm angenommen)
   unter das Board passt.
@@ -112,7 +112,7 @@ Bodens ist wie die Deckelkante mit 2,5 mm gerundet.
 
 ## Front-I/O (B und C)
 
-Oben links in der Front bleibt eine glatte Insel von 44 × 62 mm stehen, die Reibe läuft
+Unten links in der Front bleibt eine glatte Insel von 44 × 62 mm stehen, die Reibe läuft
 L-förmig darum herum. Auf der Insel sitzen von oben nach unten:
 
 - **Einschalter:** eine mechanische Tastaturtaste, Kailh Choc v1 (Low Profile) mit Kappe. Sie
@@ -122,7 +122,8 @@ L-förmig darum herum. Auf der Insel sitzen von oben nach unten:
 - **USB-A** als Einbaubuchse mit Kabel auf den USB-3.0-Header (19-Pin) des Boards.
 - **USB-C** als Einbaubuchse mit Kabel auf den Typ-E-Header des Boards.
 
-Hinter der Insel sind bis 35 mm Tiefe frei, das Netzteil beginnt rechts daneben. Die
+Hinter der Insel sind bis 35 mm Tiefe frei, rechts daneben beginnt die Karte (3 mm Abstand
+zu den USB-Buchsen). Die
 Ausschnitte für die USB-Buchsen (`USBA_CUT`, `USBC_CUT`) sind Annahmen. Die Befestigung hängt
 vom gekauften Bauteil ab: kleben oder einen Halter nach Maß ergänzen, wenn die Buchsen da sind.
 

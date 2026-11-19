@@ -1,18 +1,18 @@
 == Variante C stehend, M3-Stil, GPU reaper, SFX ==
 == Bauteile ==
-  Boden                           8.2 s
-  Deckel                        185.9 s
-  Seitenwände                   488.5 s
+  Boden                           8.4 s
+  Deckel                        187.5 s
+  Seitenwände                   481.6 s
   Front                           1.5 s
-  Front-Einleger                260.7 s
-  Rückwand-Einleger              82.6 s
+  Front-Einleger                240.9 s
+  Rückwand-Einleger              78.2 s
   Rückwand                        0.8 s
   Board-Träger                    0.2 s
   Sockel                          0.0 s
-  Extras                         10.1 s
+  Extras                          9.2 s
   Dummies                         0.0 s
   Kabelwege                       0.1 s
-  Spiegeln (Händigkeit)          18.7 s
+  Spiegeln (Händigkeit)          18.5 s
 
 == V-Nut an den Trennstellen ==
 
@@ -102,4 +102,4 @@
   /Users/robinrehbein/Code/itx-case/out/C/assembly.FCStd
 
 == Ergebnis ==
-  OK – 1903 s
+  OK – 1849 s

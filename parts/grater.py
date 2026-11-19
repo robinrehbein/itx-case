@@ -124,10 +124,16 @@ def magnet_spots(rect, seam_u=None, notch=None):
         n0, n1, m0, m1 = notch
         c, h = P.GR_CLEAR, P.GR_LAP / 2
         u0_, u1_, v0_, v1_ = rect
+        vm = (max(m0, v0_) + min(m1, v1_)) / 2
+        um = (max(n0, u0_) + min(n1, u1_)) / 2
+        if n0 > u0_ + 1:
+            spots.append((n0 - c - h, vm))
         if n1 < u1_ - 1:
-            spots.append((n1 + c + h, (max(m0, v0_) + min(m1, v1_)) / 2))
+            spots.append((n1 + c + h, vm))
         if m0 > v0_ + 1:
-            spots.append(((max(n0, u0_) + min(n1, u1_)) / 2, m0 - c - h))
+            spots.append((um, m0 - c - h))
+        if m1 < v1_ - 1:
+            spots.append((um, m1 + c + h))
     return spots
 
 

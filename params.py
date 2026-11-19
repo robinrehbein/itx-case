@@ -262,9 +262,9 @@ BUTTON_DEPTH = 28.0    # Körper hinter der Front
 BUTTON_CABLE = 22.0    # dahinter frei für Anschlüsse und Kabelbogen
 BUTTON_V = PSU_V1 - 30.0
 BUTTON_W = PSU_W1 + 20.0
-# Front-I/O (B, C): glatte Insel oben links im Frontrahmen, die Reibe läuft L-förmig darum.
+# Front-I/O (B, C): glatte Insel unten links im Frontrahmen, die Reibe läuft L-förmig darum.
 # Von oben: mechanische Taste (Kailh Choc, Low Profile), USB-A, USB-C. Dahinter sind bis
-# 35 mm frei, das Netzteil beginnt rechts daneben.
+# 35 mm frei; rechts daneben beginnt die Karte.
 SWITCH = "choc"             # "choc" (Kailh Choc v1, Platte 1,2 mm) | "mx" (Platte 1,5 mm)
 SWITCHES = {
     "choc": dict(cut=13.8, plate=1.2, cap=(17.5, 16.5), below=8.0),
@@ -326,9 +326,9 @@ TAB_D = 10.0
 TAB_T = 3.0
 TAB_Z_BOT = (DOME_H, DOME_H + TAB_T)
 TAB_Z_TOP = (INNER_H - DOME_H - TAB_T, INNER_H - DOME_H)
-# Front-I/O-Insel (y0, y1, z0, z1) in der Ecke oben links der Front-Tasche, Mitten der Elemente
+# Front-I/O-Insel (y0, y1, z0, z1) in der Ecke unten links der Front-Tasche, Mitten der Elemente
 _io_y0 = FLAT_Y0 + 4.0          # linker Rand der Front-Tasche (FLAT_Y0 + GR_EDGE)
-FRONT_IO = (_io_y0, _io_y0 + FRONT_IO_W, TAB_Z_TOP[0] - FRONT_IO_H, TAB_Z_TOP[0])
+FRONT_IO = (_io_y0, _io_y0 + FRONT_IO_W, TAB_Z_BOT[1], TAB_Z_BOT[1] + FRONT_IO_H)
 _io_yc = (FRONT_IO[0] + FRONT_IO[1]) / 2
 IO_KEY = (_io_yc, FRONT_IO[3] - 16.0)
 IO_USBA = (_io_yc, FRONT_IO[3] - 37.0)

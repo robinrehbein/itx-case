@@ -36,7 +36,10 @@ def gpu():
     bw0 = P.GPU_TAB_W - P.BRACKET_LEN
     bracket = box(P.GPU_BRACKET_X0, P.INNER_L, P.GPU_V1 - g["slots"] * P.SLOT_PITCH, P.GPU_V1,
                   bw0, P.GPU_RAIL_W0)
-    cables = box(P.GPU_X0, P.INNER_L - P.GPU_CABLE_REAR_FREE, P.GPU_V0, P.GPU_V1,
+    # Raum für den Kabelbogen an den Strombuchsen; liegend über die ganze Länge (Annahme),
+    # stehend nur um die Buchse, der Weg zum Netzteil ist dort als Kabelzug modelliert
+    cx0 = P.GPU_X0 if P.LYING else P.GPU_POWER_U - 50.0
+    cables = box(cx0, P.INNER_L - P.GPU_CABLE_REAR_FREE, P.GPU_V0, P.GPU_V1,
                  P.GPU_W1, P.GPU_W1 + P.GPU_CABLE_BEND)
     # Kontaktfinger im Slot
     fingers = box(P.GPU_FINGER_X0, P.GPU_FINGER_X1, P.GPU_PCB_V - 0.8, P.GPU_PCB_V + 0.8,
